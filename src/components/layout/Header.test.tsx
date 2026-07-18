@@ -1,17 +1,11 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { usePathname } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 
 vi.mock("next/navigation", () => ({
-  usePathname: vi.fn(() => "/"),
+  usePathname: () => "/",
 }));
-
-beforeEach(() => {
-  vi.mocked(usePathname).mockReturnValue("/");
-  Object.defineProperty(window, "scrollY", { value: 0, configurable: true });
-});
 
 describe("Header", () => {
   it("opens the mobile menu when the hamburger button is clicked", async () => {
@@ -37,25 +31,11 @@ describe("Header", () => {
     });
   });
 
-  it("renders transparent over the hero on the home page before scrolling", () => {
+  it("renders a solid background with the Monogram and nav links", () => {
     render(<Header />);
 
-    expect(screen.getByRole("banner")).toHaveClass("bg-transparent", "text-paper");
-  });
-
-  it("switches to a solid background once the page scrolls past the hero", () => {
-    render(<Header />);
-
-    Object.defineProperty(window, "scrollY", { value: 200, configurable: true });
-    fireEvent.scroll(window);
-
-    expect(screen.getByRole("banner")).toHaveClass("bg-paper/90", "text-ink");
-  });
-
-  it("renders solid on non-home pages regardless of scroll position", () => {
-    vi.mocked(usePathname).mockReturnValue("/presentes");
-    render(<Header />);
-
-    expect(screen.getByRole("banner")).toHaveClass("bg-paper/90", "text-ink");
+    const banner = screen.getByRole("banner");
+    expect(banner).toHaveClass("bg-paper/90", "text-ink");
+    expect(screen.getByText("S&J")).toBeInTheDocument();
   });
 });

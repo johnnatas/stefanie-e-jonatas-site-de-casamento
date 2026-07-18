@@ -1,36 +1,73 @@
 import { describe, expect, it } from "vitest";
 import { ConfirmRsvpUseCase } from "@/application/use-cases/rsvp/ConfirmRsvpUseCase";
 import { InMemoryGuestRepository } from "@/application/testing/InMemoryGuestRepository";
-import { InvalidGuestDataError } from "@/domain/errors/DomainError";
+import { Guest } from "@/domain/entities/Guest";
+import { GuestNotFoundError, InvalidGuestDataError } from "@/domain/errors/DomainError";
+
+async function seedPendingGuest(repository: InMemoryGuestRepository) {
+  return repository.save(
+    Guest.create({ fullName: "Ana Pereira", companionsCount: 0, attendanceStatus: "pending" })
+  );
+}
 
 describe("ConfirmRsvpUseCase", () => {
-  it("saves a confirmed guest and returns it with an id", async () => {
+  it("confirms a pending guest with companions and a message", async () => {
     const repository = new InMemoryGuestRepository();
+    const guest = await seedPendingGuest(repository);
     const useCase = new ConfirmRsvpUseCase(repository);
 
-    const guest = await useCase.execute({
-      fullName: "Ana Pereira",
-      email: "ana@example.com",
-      phone: "11988887777",
-      companionsCount: 1,
-      attendanceConfirmed: true,
+    const updated = await useCase.execute({
+      guestId: guest.id!,
+      attendanceStatus: "confirmed",
+      companionsCount: 2,
+      message: "Mal podemos esperar!",
     });
 
-    expect(guest.id).toBeDefined();
-    expect(await repository.findAll()).toHaveLength(1);
+    expect(updated.attendanceStatus).toBe("confirmed");
+    expect(updated.companionsCount).toBe(2);
+    expect(updated.message).toBe("Mal podemos esperar!");
   });
 
-  it("propagates domain validation errors", async () => {
+  it("declines a pending guest and forces companions to zero", async () => {
+    const repository = new InMemoryGuestRepository();
+    const guest = await seedPendingGuest(repository);
+    const useCase = new ConfirmRsvpUseCase(repository);
+
+    const updated = await useCase.execute({
+      guestId: guest.id!,
+      attendanceStatus: "declined",
+      companionsCount: 3,
+    });
+
+    expect(updated.attendanceStatus).toBe("declined");
+    expect(updated.companionsCount).toBe(0);
+  });
+
+  it("defaults companions to zero when confirming without a count", async () => {
+    const repository = new InMemoryGuestRepository();
+    const guest = await seedPendingGuest(repository);
+    const useCase = new ConfirmRsvpUseCase(repository);
+
+    const updated = await useCase.execute({ guestId: guest.id!, attendanceStatus: "confirmed" });
+
+    expect(updated.companionsCount).toBe(0);
+  });
+
+  it("throws GuestNotFoundError for an unknown guest id", async () => {
     const useCase = new ConfirmRsvpUseCase(new InMemoryGuestRepository());
 
     await expect(
-      useCase.execute({
-        fullName: "Al",
-        email: "ana@example.com",
-        phone: "11988887777",
-        companionsCount: 1,
-        attendanceConfirmed: true,
-      })
+      useCase.execute({ guestId: "does-not-exist", attendanceStatus: "confirmed" })
+    ).rejects.toThrow(GuestNotFoundError);
+  });
+
+  it("rejects a companions count above 10", async () => {
+    const repository = new InMemoryGuestRepository();
+    const guest = await seedPendingGuest(repository);
+    const useCase = new ConfirmRsvpUseCase(repository);
+
+    await expect(
+      useCase.execute({ guestId: guest.id!, attendanceStatus: "confirmed", companionsCount: 11 })
     ).rejects.toThrow(InvalidGuestDataError);
   });
 });

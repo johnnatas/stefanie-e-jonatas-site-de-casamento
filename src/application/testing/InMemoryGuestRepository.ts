@@ -1,5 +1,6 @@
 import { Guest } from "@/domain/entities/Guest";
-import { GuestRepository } from "@/domain/repositories/GuestRepository";
+import { GuestAttendanceUpdate, GuestPublicSummary, GuestRepository } from "@/domain/repositories/GuestRepository";
+import { GuestNotFoundError } from "@/domain/errors/DomainError";
 
 export class InMemoryGuestRepository implements GuestRepository {
   private guests: Guest[] = [];
@@ -13,5 +14,35 @@ export class InMemoryGuestRepository implements GuestRepository {
 
   async findAll(): Promise<Guest[]> {
     return [...this.guests];
+  }
+
+  async findAllPublicNames(): Promise<GuestPublicSummary[]> {
+    return this.guests.map((guest) => ({
+      id: guest.id!,
+      fullName: guest.fullName,
+      nickname: guest.nickname,
+    }));
+  }
+
+  async findById(id: string): Promise<Guest | null> {
+    return this.guests.find((guest) => guest.id === id) ?? null;
+  }
+
+  async updateAttendance(id: string, update: GuestAttendanceUpdate): Promise<Guest> {
+    const index = this.guests.findIndex((guest) => guest.id === id);
+    if (index === -1) {
+      throw new GuestNotFoundError("Guest not found.");
+    }
+
+    const existing = this.guests[index];
+    const updated = Guest.create({
+      ...existing,
+      attendanceStatus: update.attendanceStatus,
+      companionsCount: update.companionsCount ?? existing.companionsCount,
+      message: update.message ?? existing.message,
+    });
+
+    this.guests[index] = updated;
+    return updated;
   }
 }

@@ -3,15 +3,16 @@ import { render, screen } from "@testing-library/react";
 import { Monogram } from "@/components/ui/Monogram";
 
 describe("Monogram", () => {
-  it("renders the couple's initials inside the oval mark", () => {
+  it("renders the couple's logo image", () => {
     render(<Monogram />);
 
-    expect(screen.getByText("S&J")).toBeInTheDocument();
+    const img = screen.getByAltText("Stéfanie & Jonatas");
+    expect(img).toHaveAttribute("src", "/images/logo.png");
   });
 
-  it("forwards className to the wrapper for sizing/coloring", () => {
-    render(<Monogram className="text-gold" />);
+  it("forwards className to the image for sizing", () => {
+    render(<Monogram className="h-12 w-10" />);
 
-    expect(screen.getByText("S&J").parentElement).toHaveClass("text-gold");
+    expect(screen.getByAltText("Stéfanie & Jonatas")).toHaveClass("h-12", "w-10");
   });
 });

@@ -25,7 +25,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           className="fixed inset-0 z-50 bg-paper md:hidden"
         >
           <div className="flex items-center justify-between px-6 py-5">
-            <Monogram className="h-12 w-10 text-gold" />
+            <Monogram className="h-12 w-10" />
             <button
               type="button"
               onClick={onClose}

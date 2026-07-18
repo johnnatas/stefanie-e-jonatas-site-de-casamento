@@ -6,7 +6,7 @@ export function Footer() {
   return (
     <footer className="border-t border-line bg-paper">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-6 py-12 text-center">
-        <Monogram className="h-12 w-10 text-gold" />
+        <Monogram className="h-12 w-10" />
 
         <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
           {NAV_ITEMS.map((item) => (

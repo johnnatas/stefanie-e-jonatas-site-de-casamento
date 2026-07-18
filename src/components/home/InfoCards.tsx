@@ -36,16 +36,16 @@ const CARDS: InfoCard[] = [
 
 export function InfoCards() {
   return (
-    <section className="bg-cream-dark/40 py-24">
+    <section className="bg-paper-soft py-24">
       <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 px-6 sm:grid-cols-2 lg:grid-cols-3">
         {CARDS.map((card) => (
           <Link key={card.href} href={card.href} className="flip-card h-48">
             <div className="flip-card-inner h-full w-full">
-              <div className="flip-card-front flex h-full flex-col items-center justify-center rounded-lg border border-line bg-cream px-6 text-center">
+              <div className="flip-card-front flex h-full flex-col items-center justify-center border border-line bg-paper px-6 text-center">
                 <h3 className="font-serif text-2xl text-ink">{card.title}</h3>
               </div>
-              <div className="flip-card-back flex h-full flex-col items-center justify-center rounded-lg border border-rose bg-cream px-6 text-center">
-                <h3 className="font-serif text-xl text-rose">{card.title}</h3>
+              <div className="flip-card-back flex h-full flex-col items-center justify-center border border-gold bg-paper px-6 text-center">
+                <h3 className="font-serif text-xl text-gold">{card.title}</h3>
                 <p className="mt-3 font-sans text-sm text-ink-soft">{card.description}</p>
               </div>
             </div>

@@ -1,12 +1,19 @@
+import { SplitPanel } from "@/components/ui/SplitPanel";
+import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
+
 export default function CeremonyPage() {
   return (
-    <div className="flex flex-col gap-6 text-center font-sans text-ink-soft">
-      <h2 className="font-serif text-2xl text-ink">Local e horário</h2>
+    <SplitPanel
+      eyebrow="O grande dia"
+      title="Local e horário"
+      tone="dark"
+      image={<PlaceholderImage label="Local da cerimônia" className="absolute inset-0 h-full w-full" />}
+    >
       <p>
-        A cerimônia acontecerá às <strong className="text-ink">16h</strong>, seguida da recepção no
-        mesmo local. Chegue com 30 minutos de antecedência para aproveitar cada instante.
+        A cerimônia acontecerá às <strong className="text-paper">16h</strong>, seguida da recepção
+        no mesmo local. Chegue com 30 minutos de antecedência para aproveitar cada instante.
       </p>
-      <p className="italic">Endereço a confirmar.</p>
-    </div>
+      <p className="mt-3 italic">Endereço a confirmar.</p>
+    </SplitPanel>
   );
 }

@@ -1,12 +1,19 @@
+import { SplitPanel } from "@/components/ui/SplitPanel";
+import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
+
 export default function LodgingPage() {
   return (
-    <div className="flex flex-col gap-6 text-center font-sans text-ink-soft">
-      <h2 className="font-serif text-2xl text-ink">Onde se hospedar</h2>
+    <SplitPanel
+      eyebrow="Fique por perto"
+      title="Onde se hospedar"
+      tone="dark"
+      image={<PlaceholderImage label="Hospedagem" className="absolute inset-0 h-full w-full" />}
+    >
       <p>
         Separamos algumas sugestões de hotéis e pousadas próximas ao local da cerimônia, com
         conforto para todos os orçamentos.
       </p>
-      <p className="italic">Lista de hospedagens a confirmar.</p>
-    </div>
+      <p className="mt-3 italic">Lista de hospedagens a confirmar.</p>
+    </SplitPanel>
   );
 }

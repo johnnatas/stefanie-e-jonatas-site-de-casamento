@@ -11,7 +11,7 @@ describe("ListGuestsUseCase", () => {
       email: "one@example.com",
       phone: "11999990000",
       companionsCount: 0,
-      attendanceConfirmed: true,
+      attendanceStatus: "confirmed",
       createdAt: new Date("2026-01-01"),
     });
     const newer = Guest.create({
@@ -19,7 +19,7 @@ describe("ListGuestsUseCase", () => {
       email: "two@example.com",
       phone: "11999990001",
       companionsCount: 0,
-      attendanceConfirmed: true,
+      attendanceStatus: "confirmed",
       createdAt: new Date("2026-02-01"),
     });
     await repository.save(older);

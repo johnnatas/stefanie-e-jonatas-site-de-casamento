@@ -646,3 +646,25 @@ git commit -m "chore(header): fix lint/build issues from header/nav/footer plan"
   `Header.test.tsx` already exercises `MobileMenu`'s behavior, and
   `Footer` has no interactive behavior to test, consistent with this
   codebase's existing testing depth for static layout components.
+
+## Post-implementation addendum
+
+Task 3, as originally written above, specified scroll+pathname-based
+header transparency (transparent white header over the home hero before
+scrolling 80px, solid otherwise). This was implemented, task-reviewed, and
+approved — but the plan's whole-branch review caught a Critical defect:
+`header` uses `position: sticky`, which keeps it in normal document flow
+rather than overlaying the hero image below it, so the "transparent" state
+actually rendered invisible white nav/logo/hamburger on the page's cream
+body background instead of over a photo.
+
+Decision (confirmed with the site owner): the transparency feature was
+removed. `Header` now unconditionally renders its solid style
+(`bg-paper/90 text-ink`) on every page, including home. The real
+transparent-over-hero effect is deferred to the **Home Page Redesign**
+plan, which must take the header out of normal flow (`fixed`/`absolute`)
+and have the Hero section occupy the space behind it — the two need to be
+designed together. That plan should re-add the scroll+pathname
+transparency logic and its tests (transparent-before-scroll,
+solid-after-scroll, solid-on-non-home) once the Hero markup actually
+supports being overlaid.

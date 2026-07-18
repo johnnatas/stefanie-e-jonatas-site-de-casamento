@@ -6,6 +6,7 @@ export class DomainError extends Error {
 }
 
 export class InvalidGuestDataError extends DomainError {}
+export class GuestNotFoundError extends DomainError {}
 export class InvalidGiftDataError extends DomainError {}
 export class InvalidContributionDataError extends DomainError {}
 export class GiftNotAvailableError extends DomainError {}

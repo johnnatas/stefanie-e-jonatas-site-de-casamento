@@ -38,6 +38,8 @@ export default async function GiftsPage({ searchParams }: GiftsPageProps) {
 
   return (
     <div className="pb-20">
+      <h1 className="sr-only">Lista de Presentes</h1>
+
       <SplitPanel
         eyebrow="Com carinho"
         title="Lista de Presentes"

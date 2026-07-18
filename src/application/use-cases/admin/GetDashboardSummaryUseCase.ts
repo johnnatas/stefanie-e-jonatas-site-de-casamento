@@ -5,6 +5,7 @@ import { GiftRepository } from "@/domain/repositories/GiftRepository";
 export interface DashboardSummary {
   confirmedGuestsCount: number;
   declinedGuestsCount: number;
+  pendingGuestsCount: number;
   totalAttendeesCount: number;
   totalGiftsCount: number;
   paidGiftsCount: number;
@@ -25,11 +26,10 @@ export class GetDashboardSummaryUseCase {
       this.giftContributionRepository.findApproved(),
     ]);
 
-    const confirmedGuests = guests.filter((guest) => guest.attendanceConfirmed);
-
     return {
-      confirmedGuestsCount: confirmedGuests.length,
-      declinedGuestsCount: guests.length - confirmedGuests.length,
+      confirmedGuestsCount: guests.filter((guest) => guest.attendanceStatus === "confirmed").length,
+      declinedGuestsCount: guests.filter((guest) => guest.attendanceStatus === "declined").length,
+      pendingGuestsCount: guests.filter((guest) => guest.attendanceStatus === "pending").length,
       totalAttendeesCount: guests.reduce((total, guest) => total + guest.totalAttendeesCount(), 0),
       totalGiftsCount: gifts.length,
       paidGiftsCount: gifts.filter((gift) => gift.status === "paid").length,

@@ -28,11 +28,11 @@ export function GiftCard({ gift }: GiftCardProps) {
   const isAvailable = gift.status === "available";
 
   return (
-    <div className="flex flex-col rounded-lg border border-line bg-cream p-5">
+    <div className="flex flex-col rounded-lg border border-line bg-paper p-5">
       <PlaceholderImage label={gift.name} className="h-40 w-full rounded-md" />
       <h3 className="mt-4 font-serif text-xl text-ink">{gift.name}</h3>
       <p className="mt-1 flex-1 font-sans text-sm text-ink-soft">{gift.description}</p>
-      <p className="mt-3 font-serif text-lg text-rose">{formatCurrency(gift.price)}</p>
+      <p className="mt-3 font-serif text-lg text-gold">{formatCurrency(gift.price)}</p>
 
       {gift.status !== "available" && (
         <span className="mt-4 inline-block rounded-full bg-line px-4 py-2 text-center font-sans text-xs uppercase tracking-widest text-ink-soft">
@@ -44,7 +44,7 @@ export function GiftCard({ gift }: GiftCardProps) {
         <button
           type="button"
           onClick={() => setIsFormOpen(true)}
-          className="mt-4 rounded-full bg-rose px-4 py-2 font-sans text-xs uppercase tracking-widest text-white transition-colors hover:bg-rose-dark"
+          className="mt-4 rounded-full bg-gold px-4 py-2 font-sans text-xs uppercase tracking-widest text-paper transition-colors hover:bg-gold-soft"
         >
           Presentear
         </button>
@@ -58,24 +58,24 @@ export function GiftCard({ gift }: GiftCardProps) {
             placeholder="Seu nome"
             required
             minLength={3}
-            className="rounded-md border border-line bg-cream px-3 py-2 font-sans text-sm text-ink focus:border-rose focus:outline-none"
+            className="rounded-md border border-line bg-paper px-3 py-2 font-sans text-sm text-ink focus:border-gold focus:outline-none"
           />
           <input
             name="guestEmail"
             type="email"
             placeholder="Seu e-mail"
             required
-            className="rounded-md border border-line bg-cream px-3 py-2 font-sans text-sm text-ink focus:border-rose focus:outline-none"
+            className="rounded-md border border-line bg-paper px-3 py-2 font-sans text-sm text-ink focus:border-gold focus:outline-none"
           />
           <button
             type="submit"
             disabled={isPending}
-            className="rounded-full bg-rose px-4 py-2 font-sans text-xs uppercase tracking-widest text-white transition-colors hover:bg-rose-dark disabled:opacity-60"
+            className="rounded-full bg-gold px-4 py-2 font-sans text-xs uppercase tracking-widest text-paper transition-colors hover:bg-gold-soft disabled:opacity-60"
           >
             {isPending ? "Redirecionando..." : "Ir para pagamento"}
           </button>
           {state.status === "error" && (
-            <p role="alert" className="text-xs text-rose-dark">
+            <p role="alert" className="text-xs text-danger">
               {state.message}
             </p>
           )}

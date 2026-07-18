@@ -4,6 +4,8 @@ import { isBackendConfigured } from "@/infrastructure/config/env";
 import { mapGiftToDto, GiftDto } from "@/components/gifts/GiftDto";
 import { GiftGrid } from "@/components/gifts/GiftGrid";
 import { ConfigurationNotice } from "@/components/ui/ConfigurationNotice";
+import { SplitPanel } from "@/components/ui/SplitPanel";
+import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
 
 export const metadata: Metadata = {
   title: "Lista de Presentes | Stéfanie & Jonatas",
@@ -36,18 +38,21 @@ export default async function GiftsPage({ searchParams }: GiftsPageProps) {
 
   return (
     <div className="pb-20">
-      <section className="mx-auto max-w-2xl px-6 pt-20 text-center">
-        <span className="font-sans text-xs uppercase tracking-widest text-rose">Com carinho</span>
-        <h1 className="mt-3 font-serif text-4xl text-ink sm:text-5xl">Lista de Presentes</h1>
-        <p className="mt-6 font-sans text-ink-soft">
+      <SplitPanel
+        eyebrow="Com carinho"
+        title="Lista de Presentes"
+        tone="dark"
+        image={<PlaceholderImage label="Lista de presentes" className="absolute inset-0 h-full w-full" />}
+      >
+        <p>
           Sua presença já é o nosso maior presente. Mas se quiser nos ajudar a começar essa nova
           fase da vida, preparamos esta lista com muito carinho.
         </p>
-      </section>
+      </SplitPanel>
 
       {status && STATUS_MESSAGES[status] && (
         <div className="mx-auto mt-8 max-w-2xl px-6">
-          <p className="rounded-md border border-rose/40 bg-rose/10 px-4 py-3 text-center font-sans text-sm text-ink">
+          <p className="rounded-md border border-gold/40 bg-gold/10 px-4 py-3 text-center font-sans text-sm text-ink">
             {STATUS_MESSAGES[status]}
           </p>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NAV_ITEMS } from "@/shared/navigation";
@@ -17,7 +17,7 @@ export function Header() {
   const isHome = pathname === "/";
   const isTransparent = isHome && !isScrolled;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isHome) return;
 
     function handleScroll() {

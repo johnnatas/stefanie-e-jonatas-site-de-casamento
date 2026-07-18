@@ -40,30 +40,6 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Floating ornament — slow drifting rotation, mirrors a tumbling ring/petal */
-@keyframes float-rotate {
-  0% {
-    transform: rotateX(0deg) rotateY(0deg) rotate(23deg) scale(1);
-  }
-  25% {
-    transform: rotateX(15deg) rotateY(60deg) rotate(8deg) scale(1.08);
-  }
-  50% {
-    transform: rotateX(-10deg) rotateY(20deg) rotate(-12deg) scale(0.95);
-  }
-  75% {
-    transform: rotateX(20deg) rotateY(-40deg) rotate(15deg) scale(1.05);
-  }
-  100% {
-    transform: rotateX(0deg) rotateY(0deg) rotate(23deg) scale(1);
-  }
-}
-
-.animate-float-rotate {
-  animation: float-rotate 12s ease-in-out infinite;
-  transform-style: preserve-3d;
-}
-
 /* Flip card — 3D flip revealing the back face on hover */
 .flip-card {
   perspective: 1200px;

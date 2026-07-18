@@ -41,10 +41,7 @@ export function HomeHero() {
         </motion.div>
       </div>
 
-      <TornPaperDivider
-        fill="var(--color-paper)"
-        className="absolute inset-x-0 bottom-0 h-16 w-full sm:h-24 md:h-32"
-      />
+      <TornPaperDivider className="absolute inset-x-0 bottom-0 h-16 w-full sm:h-24 md:h-32" />
     </section>
   );
 }

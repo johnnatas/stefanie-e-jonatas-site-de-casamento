@@ -8,13 +8,13 @@ import { MILESTONES } from "@/shared/milestones";
 const HEADING_LINES = [
   { text: "Save", color: "var(--color-ink)" },
   { text: "the", color: "var(--color-ink-soft)" },
-  { text: "date!", color: "var(--color-line)" },
+  { text: "date!", color: "var(--color-gold-soft)" },
 ];
 
 export function SaveTheDateSection() {
   return (
     <section className="mx-auto flex max-w-5xl flex-col gap-12 px-6 py-24 md:flex-row md:items-center md:gap-16">
-      <div className="flex flex-col items-center gap-1 text-center md:items-start md:text-left">
+      <h2 className="flex flex-col items-center gap-1 text-center md:items-start md:text-left">
         {HEADING_LINES.map((line) => (
           <span
             key={line.text}
@@ -24,7 +24,7 @@ export function SaveTheDateSection() {
             {line.text}
           </span>
         ))}
-      </div>
+      </h2>
 
       <div className="grid flex-1 grid-cols-1 gap-6 sm:grid-cols-3">
         {MILESTONES.map((milestone, index) => (

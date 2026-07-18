@@ -3,21 +3,14 @@ import { render, screen } from "@testing-library/react";
 import { TornPaperDivider } from "@/components/ui/TornPaperDivider";
 
 describe("TornPaperDivider", () => {
-  it("defaults to the paper color when no fill is given", () => {
+  it("renders the torn paper image", () => {
     render(<TornPaperDivider />);
 
-    const path = screen.getByTestId("torn-paper-divider").querySelector("path");
-    expect(path).toHaveAttribute("fill", "var(--color-paper)");
+    const img = screen.getByTestId("torn-paper-divider").querySelector("img");
+    expect(img).toHaveAttribute("src", "/images/torn-paper.png");
   });
 
-  it("renders an svg path with a custom fill color", () => {
-    render(<TornPaperDivider fill="#14130f" />);
-
-    const path = screen.getByTestId("torn-paper-divider").querySelector("path");
-    expect(path).toHaveAttribute("fill", "#14130f");
-  });
-
-  it("forwards the className prop to the svg element", () => {
+  it("forwards the className prop to the wrapper", () => {
     render(<TornPaperDivider className="h-24 w-full" />);
 
     expect(screen.getByTestId("torn-paper-divider")).toHaveClass("h-24", "w-full");

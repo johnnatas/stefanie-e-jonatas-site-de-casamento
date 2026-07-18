@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+:root {
+  --color-cream: #faf7f2;
+  --color-cream-dark: #f1e6d8;
+  --color-ink: #2a2622;
+  --color-ink-soft: #5c554d;
+  --color-rose: #b76e79;
+  --color-rose-dark: #995563;
+  --color-gold: #c9a66b;
+  --color-line: #e4dcd1;
+  --color-paper: #ffffff;
+  --color-paper-soft: #f4f2ee;
+  --color-charcoal: #14130f;
+  --color-gold-soft: #d8c391;
+  --color-line-dark: #3a362f;
+  --color-danger: #b3413a;
+}
+
+@theme inline {
+  --color-background: var(--color-cream);
+  --color-foreground: var(--color-ink);
+  --color-cream: var(--color-cream);
+  --color-cream-dark: var(--color-cream-dark);
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-rose: var(--color-rose);
+  --color-rose-dark: var(--color-rose-dark);
+  --color-gold: var(--color-gold);
+  --color-line: var(--color-line);
+  --color-paper: var(--color-paper);
+  --color-paper-soft: var(--color-paper-soft);
+  --color-charcoal: var(--color-charcoal);
+  --color-gold-soft: var(--color-gold-soft);
+  --color-line-dark: var(--color-line-dark);
+  --color-danger: var(--color-danger);
+  --font-serif: var(--font-playfair);
+  --font-sans: var(--font-inter);
+  --font-script: var(--font-alex-brush);
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Decorative wave divider — two layers scrolling in opposite directions */
+@keyframes wave-scroll {
+  0% {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: 1000px;
+  }
+}
+
+@keyframes wave-scroll-reverse {
+  0% {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: -1000px;
+  }
+}
+
+.bg-wave {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='20' viewBox='0 0 100 20'%3E%3Cpath d='M0 10 Q 25 0 50 10 T 100 10' fill='none' stroke='%23c9a66b' stroke-width='1.5' stroke-opacity='0.35'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 100px 20px;
+  animation: wave-scroll 14s linear infinite;
+}
+
+.bg-wave-reverse {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='20' viewBox='0 0 100 20'%3E%3Cpath d='M0 10 Q 25 20 50 10 T 100 10' fill='none' stroke='%23b76e79' stroke-width='1.5' stroke-opacity='0.3'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 100px 20px;
+  animation: wave-scroll-reverse 18s linear infinite;
+}
+
+/* Floating ornament — slow drifting rotation, mirrors a tumbling ring/petal */
+@keyframes float-rotate {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg) rotate(23deg) scale(1);
+  }
+  25% {
+    transform: rotateX(15deg) rotateY(60deg) rotate(8deg) scale(1.08);
+  }
+  50% {
+    transform: rotateX(-10deg) rotateY(20deg) rotate(-12deg) scale(0.95);
+  }
+  75% {
+    transform: rotateX(20deg) rotateY(-40deg) rotate(15deg) scale(1.05);
+  }
+  100% {
+    transform: rotateX(0deg) rotateY(0deg) rotate(23deg) scale(1);
+  }
+}
+
+.animate-float-rotate {
+  animation: float-rotate 12s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+/* Flip card — 3D flip revealing the back face on hover */
+.flip-card {
+  perspective: 1200px;
+}
+
+.flip-card-inner {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+}
+
+.flip-card:hover .flip-card-inner,
+.flip-card:focus-within .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.flip-card-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+}
+
+/* Scroll-cue bounce */
+@keyframes nav-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-nav-bounce {
+  animation: nav-bounce 1.6s ease-in-out infinite;
+}

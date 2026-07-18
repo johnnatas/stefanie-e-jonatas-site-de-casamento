@@ -14,8 +14,6 @@ export interface LoginActionState {
   message?: string;
 }
 
-export const initialLoginActionState: LoginActionState = { status: "idle" };
-
 export async function loginAction(
   _prevState: LoginActionState,
   formData: FormData

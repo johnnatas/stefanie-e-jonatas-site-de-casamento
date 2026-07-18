@@ -16,8 +16,6 @@ export interface CreateGiftContributionActionState {
   message?: string;
 }
 
-export const initialGiftContributionActionState: CreateGiftContributionActionState = { status: "idle" };
-
 export async function createGiftContributionAction(
   _prevState: CreateGiftContributionActionState,
   formData: FormData

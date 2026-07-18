@@ -9,8 +9,6 @@ export interface UpsertGiftActionState {
   message?: string;
 }
 
-export const initialUpsertGiftActionState: UpsertGiftActionState = { status: "idle" };
-
 export async function upsertGiftAction(
   _prevState: UpsertGiftActionState,
   formData: FormData

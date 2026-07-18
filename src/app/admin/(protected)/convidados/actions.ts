@@ -9,8 +9,6 @@ export interface CreateGuestActionState {
   message?: string;
 }
 
-export const initialCreateGuestActionState: CreateGuestActionState = { status: "idle" };
-
 export async function createGuestAction(
   _prevState: CreateGuestActionState,
   formData: FormData

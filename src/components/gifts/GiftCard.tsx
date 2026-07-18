@@ -6,7 +6,7 @@ import { formatCurrency } from "@/shared/utils/formatCurrency";
 import { GiftDto } from "@/components/gifts/GiftDto";
 import {
   createGiftContributionAction,
-  initialGiftContributionActionState,
+  type CreateGiftContributionActionState,
 } from "@/app/presentes/actions";
 
 interface GiftCardProps {
@@ -17,6 +17,8 @@ const STATUS_LABEL: Record<Exclude<GiftDto["status"], "available">, string> = {
   reserved: "Reservado",
   paid: "Presenteado",
 };
+
+const initialGiftContributionActionState: CreateGiftContributionActionState = { status: "idle" };
 
 export function GiftCard({ gift }: GiftCardProps) {
   const [isFormOpen, setIsFormOpen] = useState(false);

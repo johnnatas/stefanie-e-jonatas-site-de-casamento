@@ -2,12 +2,14 @@
 
 import { useActionState } from "react";
 import {
-  initialCreateGuestActionState,
   createGuestAction,
+  type CreateGuestActionState,
 } from "@/app/admin/(protected)/convidados/actions";
 
 const inputClassName =
   "mt-1 w-full rounded-md border border-line bg-paper px-4 py-2 font-sans text-ink focus:border-gold focus:outline-none";
+
+const initialCreateGuestActionState: CreateGuestActionState = { status: "idle" };
 
 export function GuestForm() {
   const [state, formAction, isPending] = useActionState(createGuestAction, initialCreateGuestActionState);

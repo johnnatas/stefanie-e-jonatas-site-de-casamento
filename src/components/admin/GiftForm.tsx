@@ -2,8 +2,8 @@
 
 import { useActionState } from "react";
 import {
-  initialUpsertGiftActionState,
   upsertGiftAction,
+  type UpsertGiftActionState,
 } from "@/app/admin/(protected)/presentes/actions";
 import { GiftFormValues } from "@/components/admin/giftFormSchema";
 
@@ -13,6 +13,8 @@ interface GiftFormProps {
 
 const inputClassName =
   "mt-1 w-full rounded-md border border-line bg-paper px-4 py-2 font-sans text-ink focus:border-gold focus:outline-none";
+
+const initialUpsertGiftActionState: UpsertGiftActionState = { status: "idle" };
 
 export function GiftForm({ defaultValues }: GiftFormProps) {
   const [state, formAction, isPending] = useActionState(upsertGiftAction, initialUpsertGiftActionState);

@@ -1,7 +1,9 @@
 "use client";
 
 import { useActionState } from "react";
-import { initialLoginActionState, loginAction } from "@/app/admin/login/actions";
+import { loginAction, type LoginActionState } from "@/app/admin/login/actions";
+
+const initialLoginActionState: LoginActionState = { status: "idle" };
 
 export function LoginForm() {
   const [state, formAction, isPending] = useActionState(loginAction, initialLoginActionState);

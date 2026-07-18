@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NAV_ITEMS } from "@/shared/navigation";
@@ -8,13 +8,35 @@ import { MobileMenu } from "@/components/layout/MobileMenu";
 import { Monogram } from "@/components/ui/Monogram";
 import { cn } from "@/shared/utils/cn";
 
+const TRANSPARENT_SCROLL_THRESHOLD_PX = 80;
+
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const isHome = pathname === "/";
+  const isTransparent = isHome && !isScrolled;
+
+  useLayoutEffect(() => {
+    if (!isHome) return;
+
+    function handleScroll() {
+      setIsScrolled(window.scrollY > TRANSPARENT_SCROLL_THRESHOLD_PX);
+    }
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isHome]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-paper/90 text-ink backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+    <header
+      className={cn(
+        "fixed inset-x-0 top-0 z-40 flex h-[72px] items-center transition-colors",
+        isTransparent ? "bg-transparent text-paper" : "border-b border-line bg-paper/90 text-ink backdrop-blur"
+      )}
+    >
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6">
         <Link href="/" aria-label="Início" className="text-current">
           <Monogram />
         </Link>

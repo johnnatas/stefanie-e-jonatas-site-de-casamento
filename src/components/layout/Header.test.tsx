@@ -1,11 +1,17 @@
-import { describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { describe, expect, it, vi, beforeEach } from "vitest";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { usePathname } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 
 vi.mock("next/navigation", () => ({
-  usePathname: () => "/",
+  usePathname: vi.fn(() => "/"),
 }));
+
+beforeEach(() => {
+  vi.mocked(usePathname).mockReturnValue("/");
+  Object.defineProperty(window, "scrollY", { value: 0, configurable: true });
+});
 
 describe("Header", () => {
   it("opens the mobile menu when the hamburger button is clicked", async () => {
@@ -31,11 +37,38 @@ describe("Header", () => {
     });
   });
 
-  it("renders a solid background with the Monogram and nav links", () => {
+  it("is fixed out of flow with a 72px height so it can overlay page content", () => {
     render(<Header />);
 
-    const banner = screen.getByRole("banner");
-    expect(banner).toHaveClass("bg-paper/90", "text-ink");
-    expect(screen.getByText("S&J")).toBeInTheDocument();
+    expect(screen.getByRole("banner")).toHaveClass("fixed", "inset-x-0", "top-0", "h-[72px]");
+  });
+
+  it("renders transparent over the hero on the home page before scrolling", () => {
+    render(<Header />);
+
+    expect(screen.getByRole("banner")).toHaveClass("bg-transparent", "text-paper");
+  });
+
+  it("switches to a solid background once the page scrolls past the hero", () => {
+    render(<Header />);
+
+    Object.defineProperty(window, "scrollY", { value: 200, configurable: true });
+    fireEvent.scroll(window);
+
+    expect(screen.getByRole("banner")).toHaveClass("bg-paper/90", "text-ink");
+  });
+
+  it("renders solid immediately when the page loads already scrolled past the hero", () => {
+    Object.defineProperty(window, "scrollY", { value: 200, configurable: true });
+    render(<Header />);
+
+    expect(screen.getByRole("banner")).toHaveClass("bg-paper/90", "text-ink");
+  });
+
+  it("renders solid on non-home pages regardless of scroll position", () => {
+    vi.mocked(usePathname).mockReturnValue("/presentes");
+    render(<Header />);
+
+    expect(screen.getByRole("banner")).toHaveClass("bg-paper/90", "text-ink");
   });
 });

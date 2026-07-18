@@ -65,7 +65,7 @@ export function StoryTimeline({ showReadMoreLink = true, showHeading = true }: S
         <div className="mt-16 text-center">
           <Link
             href="/nossa-historia"
-            className="font-sans text-sm uppercase tracking-widest text-rose underline underline-offset-4 hover:text-rose-dark"
+            className="font-sans text-sm uppercase tracking-widest text-gold underline underline-offset-4 hover:text-gold-dark"
           >
             Leia a história completa
           </Link>

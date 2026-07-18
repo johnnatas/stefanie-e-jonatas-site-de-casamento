@@ -8,6 +8,8 @@ import { ListGiftsUseCase } from "@/application/use-cases/gifts/ListGiftsUseCase
 import { CreateGiftContributionUseCase } from "@/application/use-cases/gifts/CreateGiftContributionUseCase";
 import { ConfirmGiftPaymentUseCase } from "@/application/use-cases/gifts/ConfirmGiftPaymentUseCase";
 import { ListGuestsUseCase } from "@/application/use-cases/admin/ListGuestsUseCase";
+import { SearchGuestsUseCase } from "@/application/use-cases/rsvp/SearchGuestsUseCase";
+import { CreateGuestUseCase } from "@/application/use-cases/admin/CreateGuestUseCase";
 import { GetDashboardSummaryUseCase } from "@/application/use-cases/admin/GetDashboardSummaryUseCase";
 import { UpsertGiftUseCase } from "@/application/use-cases/admin/UpsertGiftUseCase";
 
@@ -55,4 +57,12 @@ export function createGetDashboardSummaryUseCase(): GetDashboardSummaryUseCase {
 
 export function createUpsertGiftUseCase(): UpsertGiftUseCase {
   return new UpsertGiftUseCase(repositories().giftRepository);
+}
+
+export function createSearchGuestsUseCase(): SearchGuestsUseCase {
+  return new SearchGuestsUseCase(repositories().guestRepository);
+}
+
+export function createCreateGuestUseCase(): CreateGuestUseCase {
+  return new CreateGuestUseCase(repositories().guestRepository);
 }

@@ -2112,3 +2112,23 @@ git commit -m "chore(rsvp): fix lint/build issues from RSVP guest-search plan"
   — those are the Secondary Pages plan's job.
 - Does not remove `--color-cream`/`--color-rose` from `globals.css` —
   other pages still use them until the final cleanup plan.
+
+## Post-implementation addendum: accepted security tradeoff
+
+The whole-branch review flagged (Important) that `confirmRsvpAction` /
+`ConfirmRsvpUseCase` have no authorization check: the public name list
+ships every guest's `id` to the browser (required for client-side fuzzy
+matching), and anyone who inspects the page can call the action with any
+guest's `id` to confirm/decline/edit their companions count or message —
+not just their own. This is the direct, inherent consequence of the
+approved design (open name search, no guest login/token) — not a
+regression introduced by the implementation, and every task matched its
+brief exactly.
+
+This is being recorded as a **known, accepted tradeoff** for a small,
+closed-guest-list wedding site, not fixed in this plan. If the couple
+wants a mitigation later, the cheapest options are: a per-guest token
+appended to a personalized link (shared individually instead of one
+public URL), or simply reconciling the guest list manually against
+expected responses. Revisit if this site's audience or guest count grows
+beyond "people we personally know."

@@ -34,7 +34,7 @@ export default async function AdminGiftsPage() {
         <h1 className="font-serif text-3xl text-ink">Presentes</h1>
         <Link
           href="/admin/presentes/novo"
-          className="rounded-full bg-rose px-5 py-2 font-sans text-xs uppercase tracking-widest text-white transition-colors hover:bg-rose-dark"
+          className="rounded-full bg-gold px-5 py-2 font-sans text-xs uppercase tracking-widest text-paper transition-colors hover:bg-gold-soft"
         >
           Novo presente
         </Link>
@@ -72,7 +72,7 @@ export default async function AdminGiftsPage() {
                   <td className="py-3 pr-4 text-ink-soft">{formatCurrency(gift.price)}</td>
                   <td className="py-3 pr-4 text-ink-soft">{STATUS_LABEL[gift.status]}</td>
                   <td className="py-3 pr-4">
-                    <Link href={`/admin/presentes/${gift.id}`} className="text-rose hover:text-rose-dark">
+                    <Link href={`/admin/presentes/${gift.id}`} className="text-gold hover:text-gold-soft">
                       Editar
                     </Link>
                   </td>

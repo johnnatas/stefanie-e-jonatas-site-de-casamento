@@ -17,7 +17,7 @@ export function LoginForm() {
           name="email"
           type="email"
           required
-          className="mt-1 w-full rounded-md border border-line bg-cream px-4 py-2 font-sans text-ink focus:border-rose focus:outline-none"
+          className="mt-1 w-full rounded-md border border-line bg-paper px-4 py-2 font-sans text-ink focus:border-gold focus:outline-none"
         />
       </div>
 
@@ -30,20 +30,20 @@ export function LoginForm() {
           name="password"
           type="password"
           required
-          className="mt-1 w-full rounded-md border border-line bg-cream px-4 py-2 font-sans text-ink focus:border-rose focus:outline-none"
+          className="mt-1 w-full rounded-md border border-line bg-paper px-4 py-2 font-sans text-ink focus:border-gold focus:outline-none"
         />
       </div>
 
       <button
         type="submit"
         disabled={isPending}
-        className="rounded-full bg-rose px-8 py-3 font-sans text-sm uppercase tracking-widest text-white transition-colors hover:bg-rose-dark disabled:opacity-60"
+        className="rounded-full bg-gold px-8 py-3 font-sans text-sm uppercase tracking-widest text-paper transition-colors hover:bg-gold-soft disabled:opacity-60"
       >
         {isPending ? "Entrando..." : "Entrar"}
       </button>
 
       {state.status === "error" && (
-        <p role="alert" className="text-center font-sans text-xs text-rose-dark">
+        <p role="alert" className="text-center font-sans text-xs text-danger">
           {state.message}
         </p>
       )}

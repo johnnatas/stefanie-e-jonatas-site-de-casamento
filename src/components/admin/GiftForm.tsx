@@ -12,7 +12,7 @@ interface GiftFormProps {
 }
 
 const inputClassName =
-  "mt-1 w-full rounded-md border border-line bg-cream px-4 py-2 font-sans text-ink focus:border-rose focus:outline-none";
+  "mt-1 w-full rounded-md border border-line bg-paper px-4 py-2 font-sans text-ink focus:border-gold focus:outline-none";
 
 export function GiftForm({ defaultValues }: GiftFormProps) {
   const [state, formAction, isPending] = useActionState(upsertGiftAction, initialUpsertGiftActionState);
@@ -87,13 +87,13 @@ export function GiftForm({ defaultValues }: GiftFormProps) {
       <button
         type="submit"
         disabled={isPending}
-        className="rounded-full bg-rose px-8 py-3 font-sans text-sm uppercase tracking-widest text-white transition-colors hover:bg-rose-dark disabled:opacity-60"
+        className="rounded-full bg-gold px-8 py-3 font-sans text-sm uppercase tracking-widest text-paper transition-colors hover:bg-gold-soft disabled:opacity-60"
       >
         {isPending ? "Salvando..." : "Salvar presente"}
       </button>
 
       {state.status === "error" && (
-        <p role="alert" className="text-xs text-rose-dark">
+        <p role="alert" className="text-xs text-danger">
           {state.message}
         </p>
       )}

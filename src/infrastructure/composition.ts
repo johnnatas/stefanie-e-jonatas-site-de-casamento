@@ -19,6 +19,9 @@ import { CreateGuestUseCase } from "@/application/use-cases/admin/CreateGuestUse
 import { GetDashboardSummaryUseCase } from "@/application/use-cases/admin/GetDashboardSummaryUseCase";
 import { UpsertGiftUseCase } from "@/application/use-cases/admin/UpsertGiftUseCase";
 
+export { uploadSiteContentPhoto, InvalidPhotoUploadError } from "@/infrastructure/supabase/uploadSiteContentPhoto";
+export { resolvePhotoField } from "@/infrastructure/supabase/resolvePhotoField";
+
 /**
  * Composition root: wires domain/application use-cases to their Supabase and
  * Mercado Pago implementations. Only import this from Server Actions, Route

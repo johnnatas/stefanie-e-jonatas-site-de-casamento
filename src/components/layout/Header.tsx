@@ -13,7 +13,6 @@ const TRANSPARENT_SCROLL_THRESHOLD_PX = 80;
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [hoveredHref, setHoveredHref] = useState<string | null>(null);
   const pathname = usePathname();
   const isHome = pathname === "/";
   const isTransparent = isHome && !isScrolled;
@@ -45,21 +44,18 @@ export function Header() {
         <nav className="hidden items-center gap-8 md:flex">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
-            const showActiveStyle = isActive || hoveredHref === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                onMouseEnter={() => setHoveredHref(item.href)}
-                onMouseLeave={() => setHoveredHref(null)}
                 className={cn(
                   "text-sm transition-colors",
-                  showActiveStyle
+                  isActive
                     ? "font-script text-lg italic text-moss"
-                    : "font-serif uppercase tracking-[0.2em] text-current/80"
+                    : "font-serif uppercase tracking-[0.2em] text-current/80 hover:text-moss"
                 )}
               >
-                {showActiveStyle ? item.label.toLowerCase() : item.label}
+                {isActive ? item.label.toLowerCase() : item.label}
               </Link>
             );
           })}

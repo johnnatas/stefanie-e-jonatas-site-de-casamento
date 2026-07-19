@@ -4,12 +4,15 @@ import { motion } from "framer-motion";
 import { HeroCarousel } from "@/components/home/HeroCarousel";
 import { CountdownTimer } from "@/components/home/CountdownTimer";
 import { PillButton } from "@/components/ui/PillButton";
-import { TornPaperDivider } from "@/components/ui/TornPaperDivider";
 import { COUPLE_NAMES, WEDDING_DATE_LABEL, WEDDING_LOCATION_LABEL } from "@/shared/navigation";
 
 export function HomeHero() {
   return (
-    <section className="relative -mt-[72px] overflow-hidden">
+    <section
+      className="relative -mt-[72px] overflow-hidden after:pointer-events-none after:absolute after:inset-0
+        after:h-full after:w-full after:bg-[url('/images/torn-paper.png')] after:bg-contain after:bg-bottom
+        after:bg-no-repeat after:content-['']"
+    >
       <HeroCarousel />
 
       <div className="relative flex flex-col items-center gap-20 px-6 pb-28 pt-[136px] text-center text-paper">
@@ -40,8 +43,6 @@ export function HomeHero() {
           <CountdownTimer />
         </motion.div>
       </div>
-
-      <TornPaperDivider className="absolute inset-x-0 bottom-0 h-16 w-full sm:h-24 md:h-32" />
     </section>
   );
 }

@@ -72,30 +72,24 @@ describe("Header", () => {
     expect(screen.getByRole("banner")).toHaveClass("bg-[#f3f3f3]", "text-forest");
   });
 
-  it("applies the active-link style to a nav item on hover", async () => {
-    const user = userEvent.setup();
+  it("only changes color on hover for an inactive nav item, not font or casing", () => {
     vi.mocked(usePathname).mockReturnValue("/presentes");
     render(<Header />);
 
     const link = screen.getByRole("link", { name: "Nossa História" });
-    expect(link).toHaveClass("font-serif", "uppercase");
 
-    await user.hover(link);
-
-    expect(link).toHaveClass("font-script", "italic", "text-moss");
-    expect(link).toHaveTextContent("nossa história");
+    expect(link).toHaveClass("font-serif", "uppercase", "hover:text-moss");
+    expect(link).not.toHaveClass("font-script", "italic");
+    expect(link).toHaveTextContent("Nossa História");
   });
 
-  it("reverts to the inactive style when the mouse leaves", async () => {
-    const user = userEvent.setup();
+  it("renders the active nav item in the script style regardless of hover", () => {
     vi.mocked(usePathname).mockReturnValue("/presentes");
     render(<Header />);
 
-    const link = screen.getByRole("link", { name: "Nossa História" });
-    await user.hover(link);
-    await user.unhover(link);
+    const link = screen.getByRole("link", { name: "presentes" });
 
-    expect(link).toHaveClass("font-serif", "uppercase");
-    expect(link).toHaveTextContent("Nossa História");
+    expect(link).toHaveClass("font-script", "italic", "text-moss");
+    expect(link).not.toHaveClass("hover:text-moss");
   });
 });

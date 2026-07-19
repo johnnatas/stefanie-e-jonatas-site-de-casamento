@@ -2,6 +2,12 @@ import { getSupabaseServiceRoleClient } from "@/infrastructure/supabase/serviceR
 import { SupabaseGuestRepository } from "@/infrastructure/supabase/SupabaseGuestRepository";
 import { SupabaseGiftRepository } from "@/infrastructure/supabase/SupabaseGiftRepository";
 import { SupabaseGiftContributionRepository } from "@/infrastructure/supabase/SupabaseGiftContributionRepository";
+import { SupabaseSiteContentRepository } from "@/infrastructure/supabase/SupabaseSiteContentRepository";
+import { GetSiteContentUseCase } from "@/application/use-cases/content/GetSiteContentUseCase";
+import { UpdateSiteContentUseCase } from "@/application/use-cases/content/UpdateSiteContentUseCase";
+import { isBackendConfigured } from "@/infrastructure/config/env";
+import { SITE_CONTENT_SCHEMAS, SiteContentSlug } from "@/application/content/schemas";
+import { z } from "zod";
 import { MercadoPagoGateway } from "@/infrastructure/payments/MercadoPagoGateway";
 import { ConfirmRsvpUseCase } from "@/application/use-cases/rsvp/ConfirmRsvpUseCase";
 import { ListGiftsUseCase } from "@/application/use-cases/gifts/ListGiftsUseCase";
@@ -24,6 +30,7 @@ function repositories() {
     guestRepository: new SupabaseGuestRepository(client),
     giftRepository: new SupabaseGiftRepository(client),
     giftContributionRepository: new SupabaseGiftContributionRepository(client),
+    siteContentRepository: new SupabaseSiteContentRepository(client),
     paymentGateway: new MercadoPagoGateway(),
   };
 }
@@ -65,4 +72,33 @@ export function createSearchGuestsUseCase(): SearchGuestsUseCase {
 
 export function createCreateGuestUseCase(): CreateGuestUseCase {
   return new CreateGuestUseCase(repositories().guestRepository);
+}
+
+export function createGetSiteContentUseCase(): GetSiteContentUseCase {
+  return new GetSiteContentUseCase(repositories().siteContentRepository);
+}
+
+export function createUpdateSiteContentUseCase(): UpdateSiteContentUseCase {
+  return new UpdateSiteContentUseCase(repositories().siteContentRepository);
+}
+
+/**
+ * Fetches content for a slug, falling back to the slug's schema defaults
+ * when Supabase isn't configured or the fetch fails — public pages must
+ * never break because content hasn't been saved yet.
+ */
+export async function getSiteContentOrDefault<Slug extends SiteContentSlug>(
+  slug: Slug
+): Promise<z.output<(typeof SITE_CONTENT_SCHEMAS)[Slug]>> {
+  const schema = SITE_CONTENT_SCHEMAS[slug];
+
+  if (!isBackendConfigured()) {
+    return schema.parse({}) as z.output<(typeof SITE_CONTENT_SCHEMAS)[Slug]>;
+  }
+
+  try {
+    return await createGetSiteContentUseCase().execute(slug);
+  } catch {
+    return schema.parse({}) as z.output<(typeof SITE_CONTENT_SCHEMAS)[Slug]>;
+  }
 }

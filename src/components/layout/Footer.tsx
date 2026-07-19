@@ -13,14 +13,14 @@ export function Footer() {
             <Link
               key={item.href}
               href={item.href}
-              className="font-serif text-xs uppercase tracking-[0.2em] text-ink-soft hover:text-gold"
+              className="font-serif text-xs uppercase tracking-[0.2em] text-forest/70 hover:text-moss"
             >
               {item.label}
             </Link>
           ))}
         </nav>
 
-        <p className="font-sans text-xs text-ink-soft">
+        <p className="font-sans text-xs text-forest/70">
           Feito com carinho para celebrar o nosso grande dia.
         </p>
       </div>

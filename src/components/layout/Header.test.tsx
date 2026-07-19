@@ -55,20 +55,47 @@ describe("Header", () => {
     Object.defineProperty(window, "scrollY", { value: 200, configurable: true });
     fireEvent.scroll(window);
 
-    expect(screen.getByRole("banner")).toHaveClass("bg-paper/90", "text-ink");
+    expect(screen.getByRole("banner")).toHaveClass("bg-paper/90", "text-forest");
   });
 
   it("renders solid immediately when the page loads already scrolled past the hero", () => {
     Object.defineProperty(window, "scrollY", { value: 200, configurable: true });
     render(<Header />);
 
-    expect(screen.getByRole("banner")).toHaveClass("bg-paper/90", "text-ink");
+    expect(screen.getByRole("banner")).toHaveClass("bg-paper/90", "text-forest");
   });
 
   it("renders solid on non-home pages regardless of scroll position", () => {
     vi.mocked(usePathname).mockReturnValue("/presentes");
     render(<Header />);
 
-    expect(screen.getByRole("banner")).toHaveClass("bg-paper/90", "text-ink");
+    expect(screen.getByRole("banner")).toHaveClass("bg-paper/90", "text-forest");
+  });
+
+  it("applies the active-link style to a nav item on hover", async () => {
+    const user = userEvent.setup();
+    vi.mocked(usePathname).mockReturnValue("/presentes");
+    render(<Header />);
+
+    const link = screen.getByRole("link", { name: "Nossa História" });
+    expect(link).toHaveClass("font-serif", "uppercase");
+
+    await user.hover(link);
+
+    expect(link).toHaveClass("font-script", "italic", "text-moss");
+    expect(link).toHaveTextContent("nossa história");
+  });
+
+  it("reverts to the inactive style when the mouse leaves", async () => {
+    const user = userEvent.setup();
+    vi.mocked(usePathname).mockReturnValue("/presentes");
+    render(<Header />);
+
+    const link = screen.getByRole("link", { name: "Nossa História" });
+    await user.hover(link);
+    await user.unhover(link);
+
+    expect(link).toHaveClass("font-serif", "uppercase");
+    expect(link).toHaveTextContent("Nossa História");
   });
 });

@@ -13,6 +13,7 @@ const TRANSPARENT_SCROLL_THRESHOLD_PX = 80;
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [hoveredHref, setHoveredHref] = useState<string | null>(null);
   const pathname = usePathname();
   const isHome = pathname === "/";
   const isTransparent = isHome && !isScrolled;
@@ -33,7 +34,7 @@ export function Header() {
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-40 flex h-[72px] items-center transition-colors",
-        isTransparent ? "bg-transparent text-paper" : "border-b border-line bg-paper/90 text-ink backdrop-blur"
+        isTransparent ? "bg-transparent text-paper" : "border-b border-line bg-paper/90 text-forest backdrop-blur"
       )}
     >
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6">
@@ -44,18 +45,21 @@ export function Header() {
         <nav className="hidden items-center gap-8 md:flex">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
+            const showActiveStyle = isActive || hoveredHref === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
+                onMouseEnter={() => setHoveredHref(item.href)}
+                onMouseLeave={() => setHoveredHref(null)}
                 className={cn(
-                  "text-sm",
-                  isActive
-                    ? "font-script text-lg italic text-gold"
-                    : "font-serif uppercase tracking-[0.2em] text-current/80 transition-colors hover:text-gold"
+                  "text-sm transition-colors",
+                  showActiveStyle
+                    ? "font-script text-lg italic text-moss"
+                    : "font-serif uppercase tracking-[0.2em] text-current/80"
                 )}
               >
-                {isActive ? item.label.toLowerCase() : item.label}
+                {showActiveStyle ? item.label.toLowerCase() : item.label}
               </Link>
             );
           })}

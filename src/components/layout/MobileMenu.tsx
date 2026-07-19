@@ -30,7 +30,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               type="button"
               onClick={onClose}
               aria-label="Fechar menu"
-              className="text-ink text-3xl leading-none"
+              className="text-forest text-3xl leading-none"
             >
               &times;
             </button>
@@ -47,7 +47,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   href={item.href}
                   onClick={onClose}
                   className={`font-serif text-2xl uppercase tracking-wide ${
-                    pathname === item.href ? "text-gold" : "text-ink"
+                    pathname === item.href ? "text-moss" : "text-forest"
                   }`}
                 >
                   {item.label}

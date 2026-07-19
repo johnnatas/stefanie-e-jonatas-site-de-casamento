@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { updateHomeMilestonePhotosAction } from "@/app/admin/(protected)/conteudo/marcos/actions";
-import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
+import { PhotoUploadField } from "@/components/admin/PhotoUploadField";
 import { MILESTONES } from "@/shared/milestones";
 import type { SiteContentActionState } from "@/application/content/actionState";
 import type { HomeMilestonePhotosContent } from "@/application/content/schemas";
@@ -29,19 +29,7 @@ export function HomeMilestonePhotosForm({ defaultValues }: HomeMilestonePhotosFo
         return (
           <div key={key} className="flex flex-col gap-2 border-b border-line pb-4">
             <span className="font-sans text-sm text-forest">{milestone.title}</span>
-            <input type="hidden" name={`${key}CurrentUrl`} value={currentUrl ?? ""} />
-            <PhotoOrPlaceholder
-              src={currentUrl}
-              label={`Foto — ${milestone.title}`}
-              className="h-24 w-full rounded-md"
-            />
-            <input type="file" name={`${key}File`} accept="image/*" className="font-sans text-sm text-forest" />
-            {currentUrl && (
-              <label className="flex items-center gap-2 font-sans text-xs text-forest/70">
-                <input type="checkbox" name={`${key}Remove`} />
-                Remover esta foto
-              </label>
-            )}
+            <PhotoUploadField name={key} currentUrl={currentUrl} label={`Foto — ${milestone.title}`} />
           </div>
         );
       })}

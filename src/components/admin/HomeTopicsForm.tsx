@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { updateHomeTopicsAction } from "@/app/admin/(protected)/conteudo/carrossel/actions";
-import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
+import { PhotoUploadField } from "@/components/admin/PhotoUploadField";
 import type { SiteContentActionState } from "@/application/content/actionState";
 import type { HomeTopicsContent } from "@/application/content/schemas";
 
@@ -61,19 +61,7 @@ export function HomeTopicsForm({ defaultValues }: HomeTopicsFormProps) {
               />
             </div>
 
-            <input type="hidden" name={`${key}CurrentUrl`} value={entry.photo ?? ""} />
-            <PhotoOrPlaceholder
-              src={entry.photo}
-              label={`Foto — ${TOPIC_LABELS[key]}`}
-              className="h-24 w-full rounded-md"
-            />
-            <input type="file" name={`${key}File`} accept="image/*" className="font-sans text-sm text-forest" />
-            {entry.photo && (
-              <label className="flex items-center gap-2 font-sans text-xs text-forest/70">
-                <input type="checkbox" name={`${key}Remove`} />
-                Remover esta foto
-              </label>
-            )}
+            <PhotoUploadField name={key} currentUrl={entry.photo} label={`Foto — ${TOPIC_LABELS[key]}`} />
           </fieldset>
         );
       })}

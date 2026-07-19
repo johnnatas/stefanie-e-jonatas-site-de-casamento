@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
+import { PhotoUploadField } from "@/components/admin/PhotoUploadField";
 import type { SiteContentActionState } from "@/application/content/actionState";
 import type { TipsContent } from "@/application/content/schemas";
 
@@ -49,17 +49,12 @@ export function TipsContentForm({ defaultValues, action, photoLabel }: TipsConte
         />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <input type="hidden" name="photoCurrentUrl" value={defaultValues.photo ?? ""} />
-        <PhotoOrPlaceholder src={defaultValues.photo} label={photoLabel} className="h-32 w-full rounded-md" />
-        <input type="file" name="photoFile" accept="image/*" className="font-sans text-sm text-forest" />
-        {defaultValues.photo && (
-          <label className="flex items-center gap-2 font-sans text-xs text-forest/70">
-            <input type="checkbox" name="photoRemove" />
-            Remover esta foto
-          </label>
-        )}
-      </div>
+      <PhotoUploadField
+        name="photo"
+        currentUrl={defaultValues.photo}
+        label={photoLabel}
+        className="h-32 w-full rounded-md"
+      />
 
       <button
         type="submit"

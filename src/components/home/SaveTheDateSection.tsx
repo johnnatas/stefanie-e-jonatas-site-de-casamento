@@ -6,9 +6,9 @@ import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
 import { MILESTONES } from "@/shared/milestones";
 
 const HEADING_LINES = [
-  { text: "Save", color: "var(--color-forest)" },
-  { text: "the", color: "var(--color-moss)" },
-  { text: "date!", color: "var(--color-moss)" },
+  { text: "Save", color: "var(--color-forest)", opacity: 1 },
+  { text: "the", color: "var(--color-forest)", opacity: 0.7 },
+  { text: "date!", color: "var(--color-moss)", opacity: 1 },
 ];
 
 export function SaveTheDateSection() {
@@ -20,7 +20,7 @@ export function SaveTheDateSection() {
             <span
               key={line.text}
               className="font-serif text-6xl uppercase leading-none sm:text-7xl"
-              style={{ color: line.color }}
+              style={{ color: line.color, opacity: line.opacity }}
             >
               {line.text}
             </span>

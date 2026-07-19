@@ -30,7 +30,7 @@ export function CountdownTimer({ weddingDateIso }: CountdownTimerProps) {
           </div>
         ))}
       </div>
-      <p className="font-script text-3xl text-moss">mal podemos esperar</p>
+      <p className="font-script text-3xl text-paper">mal podemos esperar</p>
     </div>
   );
 }

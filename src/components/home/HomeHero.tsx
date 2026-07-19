@@ -22,7 +22,7 @@ export function HomeHero({ heroContent, settings }: HomeHeroProps) {
     >
       <HeroCarousel photos={heroContent.photos} />
 
-      <div className="relative flex flex-col items-center gap-20 px-6 pb-28 pt-[136px] text-center text-paper">
+      <div className="relative flex flex-col items-center gap-12 px-6 pb-28 pt-[136px] text-center text-paper">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -31,7 +31,7 @@ export function HomeHero({ heroContent, settings }: HomeHeroProps) {
         >
           <span className="font-sans text-xs uppercase tracking-[0.3em] text-paper/90">{heroContent.eyebrow}</span>
           <h1>
-            <Monogram light className="h-32 w-auto sm:h-44" />
+            <Monogram light className="h-20 w-auto sm:h-28" />
           </h1>
           <span aria-hidden="true" className="h-px w-16 bg-moss" />
           <p className="font-script text-2xl text-paper/90">{heroContent.tagline}</p>

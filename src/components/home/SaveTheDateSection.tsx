@@ -6,8 +6,8 @@ import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
 import { MILESTONES } from "@/shared/milestones";
 
 const HEADING_LINES = [
-  { text: "Save", color: "var(--color-ink)" },
-  { text: "the", color: "var(--color-ink-soft)" },
+  { text: "Save", color: "var(--color-forest)" },
+  { text: "the", color: "var(--color-moss)" },
   { text: "date!", color: "var(--color-moss)" },
 ];
 

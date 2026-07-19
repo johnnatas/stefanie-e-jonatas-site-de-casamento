@@ -14,11 +14,11 @@ export function PlaceholderImage({ label, className }: PlaceholderImageProps) {
   return (
     <div
       className={cn(
-        "flex items-center justify-center bg-gradient-to-br from-gold/25 via-paper-soft to-charcoal/15",
+        "flex items-center justify-center bg-gradient-to-br from-moss/25 via-paper-soft to-forest/15",
         className
       )}
     >
-      <span className="px-4 text-center font-serif text-sm italic text-ink-soft">{label}</span>
+      <span className="px-4 text-center font-serif text-sm italic text-forest/70">{label}</span>
     </div>
   );
 }

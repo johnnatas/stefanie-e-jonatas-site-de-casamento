@@ -17,8 +17,8 @@ interface PillButtonProps {
 }
 
 const VARIANT_CLASSES: Record<PillButtonVariant, string> = {
-  primary: "border-gold text-gold hover:bg-gold hover:text-paper",
-  secondary: "border-line-dark/20 text-ink-soft hover:border-ink-soft hover:text-ink",
+  primary: "border-moss text-moss hover:bg-moss hover:text-paper",
+  secondary: "border-forest/20 text-forest/70 hover:border-forest/70 hover:text-forest",
 };
 
 export function PillButton({

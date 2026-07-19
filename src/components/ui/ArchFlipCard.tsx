@@ -25,8 +25,8 @@ export function ArchFlipCard({ number, image, title, date, description, classNam
           {image}
           <span className="absolute bottom-3 right-4 font-serif text-3xl text-paper">{number}</span>
         </div>
-        <div className="flip-card-back flex h-full w-full flex-col items-center justify-center gap-2 rounded-t-[999px] rounded-b-lg bg-charcoal px-6 text-center">
-          <span className="font-sans text-xs uppercase tracking-widest text-gold-soft">{date}</span>
+        <div className="flip-card-back flex h-full w-full flex-col items-center justify-center gap-2 rounded-t-[999px] rounded-b-lg bg-forest px-6 text-center">
+          <span className="font-sans text-xs uppercase tracking-widest text-moss">{date}</span>
           <h3 className="font-serif text-2xl text-paper">{title}</h3>
           <p className="font-sans text-sm leading-relaxed text-paper/80">{description}</p>
         </div>

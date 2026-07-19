@@ -36,7 +36,7 @@ export function SplitPanel({
     <section
       className={cn(
         "grid grid-cols-1 md:grid-cols-2",
-        isDark ? "bg-charcoal text-paper" : "bg-paper-soft text-ink",
+        isDark ? "bg-forest text-paper" : "bg-paper-soft text-forest",
         className
       )}
     >
@@ -50,14 +50,14 @@ export function SplitPanel({
           <span
             className={cn(
               "font-serif text-xs uppercase tracking-[0.2em]",
-              isDark ? "text-gold-soft" : "text-gold"
+              isDark ? "text-moss" : "text-moss"
             )}
           >
             {eyebrow}
           </span>
         )}
         <h2 className="font-serif text-3xl sm:text-4xl">{title}</h2>
-        <div className={cn("font-sans text-sm leading-relaxed", isDark ? "text-paper/80" : "text-ink-soft")}>
+        <div className={cn("font-sans text-sm leading-relaxed", isDark ? "text-paper/80" : "text-forest/70")}>
           {children}
         </div>
         {ctaLabel && ctaHref && (
@@ -65,7 +65,7 @@ export function SplitPanel({
             <PillButton
               href={ctaHref}
               variant={isDark ? "secondary" : "primary"}
-              className={isDark ? "border-paper/40 text-paper hover:bg-paper hover:text-charcoal" : undefined}
+              className={isDark ? "border-paper/40 text-paper hover:bg-paper hover:text-forest" : undefined}
             >
               {ctaLabel}
             </PillButton>

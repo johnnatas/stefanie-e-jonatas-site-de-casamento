@@ -44,6 +44,6 @@ describe("SplitPanel", () => {
       </SplitPanel>
     );
 
-    expect(screen.getByText("Título").closest("section")).toHaveClass("bg-charcoal", "text-paper");
+    expect(screen.getByText("Título").closest("section")).toHaveClass("bg-forest", "text-paper");
   });
 });

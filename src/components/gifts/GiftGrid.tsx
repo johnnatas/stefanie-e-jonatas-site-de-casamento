@@ -8,7 +8,7 @@ interface GiftGridProps {
 export function GiftGrid({ gifts }: GiftGridProps) {
   if (gifts.length === 0) {
     return (
-      <p className="text-center font-sans text-ink-soft">
+      <p className="text-center font-sans text-forest/70">
         A lista de presentes ainda está sendo preparada.
       </p>
     );

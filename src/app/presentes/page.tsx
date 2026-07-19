@@ -54,7 +54,7 @@ export default async function GiftsPage({ searchParams }: GiftsPageProps) {
 
       {status && STATUS_MESSAGES[status] && (
         <div className="mx-auto mt-8 max-w-2xl px-6">
-          <p className="rounded-md border border-gold/40 bg-gold/10 px-4 py-3 text-center font-sans text-sm text-ink">
+          <p className="rounded-md border border-moss/40 bg-moss/10 px-4 py-3 text-center font-sans text-sm text-forest">
             {STATUS_MESSAGES[status]}
           </p>
         </div>

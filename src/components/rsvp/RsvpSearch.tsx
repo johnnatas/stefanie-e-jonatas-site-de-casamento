@@ -81,13 +81,13 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
 
       <div className="relative flex w-full max-w-lg flex-col items-center gap-6">
         {step === "done" ? (
-          <p role="status" className="font-serif text-2xl text-ink">
+          <p role="status" className="font-serif text-2xl text-forest">
             {feedback}
           </p>
         ) : (
           <>
             <div className="w-full">
-              <label htmlFor="guest-search" className="block font-sans text-xs uppercase tracking-widest text-ink-soft">
+              <label htmlFor="guest-search" className="block font-sans text-xs uppercase tracking-widest text-forest/70">
                 Digite seu nome
               </label>
               <input
@@ -95,19 +95,19 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 autoComplete="off"
-                className="mt-2 w-full border-b border-line bg-transparent py-2 text-center font-serif text-4xl text-ink focus:border-gold focus:outline-none"
+                className="mt-2 w-full border-b border-line bg-transparent py-2 text-center font-serif text-4xl text-forest focus:border-moss focus:outline-none"
               />
-              <p className="mt-3 font-script text-xl italic text-ink-soft">
+              <p className="mt-3 font-script text-xl italic text-forest/70">
                 Pedimos que confirme o mais rápido que puder, assim que tiver certeza!
               </p>
             </div>
 
             {trimmedQuery.length >= 2 && match && step === "searching" && (
               <div className="flex flex-col items-center gap-4">
-                <p className="font-script text-2xl italic text-gold">
+                <p className="font-script text-2xl italic text-moss">
                   {match.nickname ?? match.fullName}
                 </p>
-                <p className="font-serif text-xl text-ink">{displayName}? Que bom que você apareceu! :)</p>
+                <p className="font-serif text-xl text-forest">{displayName}? Que bom que você apareceu! :)</p>
                 <div className="flex flex-col items-center gap-3 sm:flex-row">
                   <PillButton onClick={() => setStep("confirming")} disabled={isSubmitting}>
                     Confirmar presença
@@ -120,7 +120,7 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
             )}
 
             {trimmedQuery.length >= 2 && !match && (
-              <p className="font-sans text-sm text-ink-soft">
+              <p className="font-sans text-sm text-forest/70">
                 Não encontramos esse nome — confira a grafia ou fale com a gente.
               </p>
             )}
@@ -134,7 +134,7 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
                 className="flex w-full flex-col gap-4 text-left"
               >
                 <div>
-                  <label htmlFor="companionsCount" className="block font-sans text-sm text-ink">
+                  <label htmlFor="companionsCount" className="block font-sans text-sm text-forest">
                     Número de acompanhantes
                   </label>
                   <input
@@ -144,11 +144,11 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
                     max={10}
                     value={companionsCount}
                     onChange={(event) => setCompanionsCount(Number(event.target.value))}
-                    className="mt-1 w-full border border-line bg-paper px-4 py-2 font-sans text-ink focus:border-gold focus:outline-none"
+                    className="mt-1 w-full border border-line bg-paper px-4 py-2 font-sans text-forest focus:border-moss focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label htmlFor="message" className="block font-sans text-sm text-ink">
+                  <label htmlFor="message" className="block font-sans text-sm text-forest">
                     Mensagem para o casal (opcional)
                   </label>
                   <textarea
@@ -156,7 +156,7 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
                     rows={3}
                     value={message}
                     onChange={(event) => setMessage(event.target.value)}
-                    className="mt-1 w-full border border-line bg-paper px-4 py-2 font-sans text-ink focus:border-gold focus:outline-none"
+                    className="mt-1 w-full border border-line bg-paper px-4 py-2 font-sans text-forest focus:border-moss focus:outline-none"
                   />
                 </div>
                 <PillButton type="submit" disabled={isSubmitting} className="self-center">

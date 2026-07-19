@@ -1,13 +1,13 @@
 import { HomeHero } from "@/components/home/HomeHero";
 import { SaveTheDateSection } from "@/components/home/SaveTheDateSection";
-import { InfoCards } from "@/components/home/InfoCards";
+import { TopicsCarousel } from "@/components/home/TopicsCarousel";
 
 export default function HomePage() {
   return (
     <>
       <HomeHero />
       <SaveTheDateSection />
-      <InfoCards />
+      <TopicsCarousel />
     </>
   );
 }

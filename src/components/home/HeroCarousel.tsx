@@ -12,11 +12,12 @@ interface HeroCarouselProps {
 }
 
 /**
- * Pure background layer for the home hero: rotating photo carousel, dark
- * overlay, and slide-position dots. Must render inside a `relative`
- * parent — see HomeHero, which composes this with the foreground content.
- * Renders exactly `photos.length` slides, or `FALLBACK_SLIDE_COUNT`
- * placeholder slides when no photos have been uploaded yet.
+ * Pure background layer for the home hero: rotating photo carousel (shown
+ * at its original colors, no tint/filter) and slide-position dots. Must
+ * render inside a `relative` parent — see HomeHero, which composes this
+ * with the foreground content. Renders exactly `photos.length` slides, or
+ * `FALLBACK_SLIDE_COUNT` placeholder slides when no photos have been
+ * uploaded yet.
  */
 export function HeroCarousel({ photos }: HeroCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
@@ -47,16 +48,11 @@ export function HeroCarousel({ photos }: HeroCarouselProps) {
         <div className="flex h-full">
           {slides.map((photo, index) => (
             <div key={index} className="relative h-full min-w-0 flex-[0_0_100%]">
-              <PhotoOrPlaceholder
-                src={photo}
-                label={`Foto do casal ${index + 1}`}
-                className="h-full w-full grayscale"
-              />
+              <PhotoOrPlaceholder src={photo} label={`Foto do casal ${index + 1}`} className="h-full w-full" />
             </div>
           ))}
         </div>
       </div>
-      <div className="absolute inset-0 bg-forest/50" />
 
       <div className="absolute bottom-14 left-1/2 flex -translate-x-1/2 gap-2">
         {slides.map((_, index) => (

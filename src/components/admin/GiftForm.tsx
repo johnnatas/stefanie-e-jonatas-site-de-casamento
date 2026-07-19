@@ -6,6 +6,7 @@ import {
   type UpsertGiftActionState,
 } from "@/app/admin/(protected)/presentes/actions";
 import { GiftFormValues } from "@/components/admin/giftFormSchema";
+import { PhotoUploadField } from "@/components/admin/PhotoUploadField";
 
 interface GiftFormProps {
   defaultValues?: GiftFormValues;
@@ -44,18 +45,13 @@ export function GiftForm({ defaultValues }: GiftFormProps) {
         />
       </div>
 
-      <div>
-        <label htmlFor="imageUrl" className="block font-sans text-sm text-forest">
-          URL da imagem
-        </label>
-        <input
-          id="imageUrl"
-          name="imageUrl"
-          defaultValue={defaultValues?.imageUrl ?? "/placeholder-gift.jpg"}
-          required
-          className={inputClassName}
-        />
-      </div>
+      <PhotoUploadField
+        name="image"
+        currentUrl={defaultValues?.imageUrl ?? null}
+        label="Foto do presente"
+        className="h-40 w-full rounded-md"
+        showRemoveCheckbox={false}
+      />
 
       <div>
         <label htmlFor="price" className="block font-sans text-sm text-forest">

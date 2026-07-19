@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createUpsertGiftUseCase } from "@/infrastructure/composition";
+import { createUpsertGiftUseCase, resolvePhotoField } from "@/infrastructure/composition";
 import { giftFormSchema } from "@/components/admin/giftFormSchema";
 
 export interface UpsertGiftActionState {
@@ -13,11 +13,18 @@ export async function upsertGiftAction(
   _prevState: UpsertGiftActionState,
   formData: FormData
 ): Promise<UpsertGiftActionState> {
+  const currentImageUrl = (formData.get("imageCurrentUrl") as string) || null;
+  const imageUrl = await resolvePhotoField("gifts", "image", formData, currentImageUrl, "imageFile", "imageRemove");
+
+  if (!imageUrl) {
+    return { status: "error", message: "Selecione uma foto para o presente." };
+  }
+
   const parsed = giftFormSchema.safeParse({
     id: formData.get("id") || undefined,
     name: formData.get("name"),
     description: formData.get("description"),
-    imageUrl: formData.get("imageUrl"),
+    imageUrl,
     price: formData.get("price"),
     category: formData.get("category"),
   });

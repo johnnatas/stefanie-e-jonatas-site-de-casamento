@@ -5,6 +5,7 @@ const ADMIN_NAV = [
   { label: "Dashboard", href: "/admin/dashboard" },
   { label: "Convidados", href: "/admin/convidados" },
   { label: "Presentes", href: "/admin/presentes" },
+  { label: "Conteúdo", href: "/admin/conteudo" },
 ];
 
 export default function AdminProtectedLayout({ children }: { children: React.ReactNode }) {

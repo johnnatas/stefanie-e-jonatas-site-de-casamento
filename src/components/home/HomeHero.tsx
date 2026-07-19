@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 import { HeroCarousel } from "@/components/home/HeroCarousel";
 import { CountdownTimer } from "@/components/home/CountdownTimer";
 import { PillButton } from "@/components/ui/PillButton";
-import { Monogram } from "@/components/ui/Monogram";
 import { formatWeddingDateLabel } from "@/shared/utils/formatWeddingDateLabel";
+import { COUPLE_NAMES } from "@/shared/navigation";
 import type { HomeHeroContent, SettingsContent } from "@/application/content/schemas";
 
 interface HomeHeroProps {
@@ -30,9 +30,7 @@ export function HomeHero({ heroContent, settings }: HomeHeroProps) {
           className="flex flex-col items-center gap-6"
         >
           <span className="font-sans text-xs uppercase tracking-[0.3em] text-paper/90">{heroContent.eyebrow}</span>
-          <h1>
-            <Monogram light className="h-20 w-auto sm:h-28" />
-          </h1>
+          <h1 className="font-serif text-5xl sm:text-7xl">{COUPLE_NAMES}</h1>
           <span aria-hidden="true" className="h-px w-16 bg-moss" />
           <p className="font-script text-2xl text-paper/90">{heroContent.tagline}</p>
           <p className="font-serif text-sm uppercase tracking-widest text-paper/90">

@@ -12,7 +12,7 @@ export async function uploadSiteContentPhoto(slug: string, field: string, file: 
   }
 
   if (file.size > MAX_PHOTO_BYTES) {
-    throw new InvalidPhotoUploadError("A imagem deve ter no máximo 5 MB.");
+    throw new InvalidPhotoUploadError("A imagem deve ter no máximo 15 MB.");
   }
 
   const extension = file.type.split("/")[1] ?? "jpg";

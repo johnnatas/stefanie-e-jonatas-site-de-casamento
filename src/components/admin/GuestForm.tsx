@@ -7,7 +7,7 @@ import {
 } from "@/app/admin/(protected)/convidados/actions";
 
 const inputClassName =
-  "mt-1 w-full rounded-md border border-line bg-paper px-4 py-2 font-sans text-ink focus:border-gold focus:outline-none";
+  "mt-1 w-full rounded-md border border-line bg-paper px-4 py-2 font-sans text-forest focus:border-moss focus:outline-none";
 
 const initialCreateGuestActionState: CreateGuestActionState = { status: "idle" };
 
@@ -17,14 +17,14 @@ export function GuestForm() {
   return (
     <form action={formAction} className="flex max-w-md flex-col gap-4">
       <div>
-        <label htmlFor="fullName" className="block font-sans text-sm text-ink">
+        <label htmlFor="fullName" className="block font-sans text-sm text-forest">
           Nome completo
         </label>
         <input id="fullName" name="fullName" required className={inputClassName} />
       </div>
 
       <div>
-        <label htmlFor="nickname" className="block font-sans text-sm text-ink">
+        <label htmlFor="nickname" className="block font-sans text-sm text-forest">
           Apelido (como aparece na busca, opcional)
         </label>
         <input id="nickname" name="nickname" className={inputClassName} />
@@ -33,7 +33,7 @@ export function GuestForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="rounded-full bg-gold px-8 py-3 font-sans text-sm uppercase tracking-widest text-paper transition-colors hover:bg-gold-soft disabled:opacity-60"
+        className="rounded-full bg-moss px-8 py-3 font-sans text-sm uppercase tracking-widest text-paper transition-colors hover:bg-moss/80 disabled:opacity-60"
       >
         {isPending ? "Salvando..." : "Cadastrar convidado"}
       </button>

@@ -12,7 +12,7 @@ interface GiftFormProps {
 }
 
 const inputClassName =
-  "mt-1 w-full rounded-md border border-line bg-paper px-4 py-2 font-sans text-ink focus:border-gold focus:outline-none";
+  "mt-1 w-full rounded-md border border-line bg-paper px-4 py-2 font-sans text-forest focus:border-moss focus:outline-none";
 
 const initialUpsertGiftActionState: UpsertGiftActionState = { status: "idle" };
 
@@ -24,14 +24,14 @@ export function GiftForm({ defaultValues }: GiftFormProps) {
       {defaultValues?.id && <input type="hidden" name="id" value={defaultValues.id} />}
 
       <div>
-        <label htmlFor="name" className="block font-sans text-sm text-ink">
+        <label htmlFor="name" className="block font-sans text-sm text-forest">
           Nome
         </label>
         <input id="name" name="name" defaultValue={defaultValues?.name} required className={inputClassName} />
       </div>
 
       <div>
-        <label htmlFor="description" className="block font-sans text-sm text-ink">
+        <label htmlFor="description" className="block font-sans text-sm text-forest">
           Descrição
         </label>
         <textarea
@@ -45,7 +45,7 @@ export function GiftForm({ defaultValues }: GiftFormProps) {
       </div>
 
       <div>
-        <label htmlFor="imageUrl" className="block font-sans text-sm text-ink">
+        <label htmlFor="imageUrl" className="block font-sans text-sm text-forest">
           URL da imagem
         </label>
         <input
@@ -58,7 +58,7 @@ export function GiftForm({ defaultValues }: GiftFormProps) {
       </div>
 
       <div>
-        <label htmlFor="price" className="block font-sans text-sm text-ink">
+        <label htmlFor="price" className="block font-sans text-sm text-forest">
           Valor (R$)
         </label>
         <input
@@ -74,7 +74,7 @@ export function GiftForm({ defaultValues }: GiftFormProps) {
       </div>
 
       <div>
-        <label htmlFor="category" className="block font-sans text-sm text-ink">
+        <label htmlFor="category" className="block font-sans text-sm text-forest">
           Categoria
         </label>
         <input
@@ -89,7 +89,7 @@ export function GiftForm({ defaultValues }: GiftFormProps) {
       <button
         type="submit"
         disabled={isPending}
-        className="rounded-full bg-gold px-8 py-3 font-sans text-sm uppercase tracking-widest text-paper transition-colors hover:bg-gold-soft disabled:opacity-60"
+        className="rounded-full bg-moss px-8 py-3 font-sans text-sm uppercase tracking-widest text-paper transition-colors hover:bg-moss/80 disabled:opacity-60"
       >
         {isPending ? "Salvando..." : "Salvar presente"}
       </button>

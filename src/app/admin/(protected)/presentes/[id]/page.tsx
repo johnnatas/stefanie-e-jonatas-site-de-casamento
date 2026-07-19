@@ -22,7 +22,7 @@ export default async function EditGiftPage({ params }: EditGiftPageProps) {
 
   return (
     <div>
-      <h1 className="font-serif text-3xl text-ink">Editar presente</h1>
+      <h1 className="font-serif text-3xl text-forest">Editar presente</h1>
       <div className="mt-6">
         <GiftForm
           defaultValues={{

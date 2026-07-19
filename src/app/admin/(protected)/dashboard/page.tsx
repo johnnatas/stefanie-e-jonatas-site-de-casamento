@@ -23,7 +23,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <div>
-      <h1 className="font-serif text-3xl text-ink">Resumo</h1>
+      <h1 className="font-serif text-3xl text-forest">Resumo</h1>
       <div className="mt-6">
         {summary ? (
           <DashboardStats summary={summary} />

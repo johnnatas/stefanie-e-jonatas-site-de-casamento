@@ -31,10 +31,10 @@ export default async function AdminGiftsPage() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h1 className="font-serif text-3xl text-ink">Presentes</h1>
+        <h1 className="font-serif text-3xl text-forest">Presentes</h1>
         <Link
           href="/admin/presentes/novo"
-          className="rounded-full bg-gold px-5 py-2 font-sans text-xs uppercase tracking-widest text-paper transition-colors hover:bg-gold-soft"
+          className="rounded-full bg-moss px-5 py-2 font-sans text-xs uppercase tracking-widest text-paper transition-colors hover:bg-moss/80"
         >
           Novo presente
         </Link>
@@ -51,12 +51,12 @@ export default async function AdminGiftsPage() {
           />
         </div>
       ) : gifts.length === 0 ? (
-        <p className="mt-6 font-sans text-ink-soft">Nenhum presente cadastrado ainda.</p>
+        <p className="mt-6 font-sans text-forest/70">Nenhum presente cadastrado ainda.</p>
       ) : (
         <div className="mt-6 overflow-x-auto">
           <table className="w-full min-w-[560px] border-collapse font-sans text-sm">
             <thead>
-              <tr className="border-b border-line text-left text-ink-soft">
+              <tr className="border-b border-line text-left text-forest/70">
                 <th className="py-2 pr-4">Nome</th>
                 <th className="py-2 pr-4">Categoria</th>
                 <th className="py-2 pr-4">Valor</th>
@@ -67,12 +67,12 @@ export default async function AdminGiftsPage() {
             <tbody>
               {gifts.map((gift) => (
                 <tr key={gift.id} className="border-b border-line">
-                  <td className="py-3 pr-4 text-ink">{gift.name}</td>
-                  <td className="py-3 pr-4 text-ink-soft">{gift.category}</td>
-                  <td className="py-3 pr-4 text-ink-soft">{formatCurrency(gift.price)}</td>
-                  <td className="py-3 pr-4 text-ink-soft">{STATUS_LABEL[gift.status]}</td>
+                  <td className="py-3 pr-4 text-forest">{gift.name}</td>
+                  <td className="py-3 pr-4 text-forest/70">{gift.category}</td>
+                  <td className="py-3 pr-4 text-forest/70">{formatCurrency(gift.price)}</td>
+                  <td className="py-3 pr-4 text-forest/70">{STATUS_LABEL[gift.status]}</td>
                   <td className="py-3 pr-4">
-                    <Link href={`/admin/presentes/${gift.id}`} className="text-gold hover:text-gold-soft">
+                    <Link href={`/admin/presentes/${gift.id}`} className="text-moss hover:text-moss/80">
                       Editar
                     </Link>
                   </td>

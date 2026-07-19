@@ -30,10 +30,10 @@ export default async function AdminGuestsPage() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h1 className="font-serif text-3xl text-ink">Convidados</h1>
+        <h1 className="font-serif text-3xl text-forest">Convidados</h1>
         <Link
           href="/admin/convidados/novo"
-          className="font-sans text-sm uppercase tracking-widest text-gold hover:text-ink"
+          className="font-sans text-sm uppercase tracking-widest text-gold hover:text-forest"
         >
           + Novo convidado
         </Link>
@@ -50,12 +50,12 @@ export default async function AdminGuestsPage() {
           />
         </div>
       ) : guests.length === 0 ? (
-        <p className="mt-6 font-sans text-ink-soft">Nenhum convidado cadastrado ainda.</p>
+        <p className="mt-6 font-sans text-forest/70">Nenhum convidado cadastrado ainda.</p>
       ) : (
         <div className="mt-6 overflow-x-auto">
           <table className="w-full min-w-[560px] border-collapse font-sans text-sm">
             <thead>
-              <tr className="border-b border-line text-left text-ink-soft">
+              <tr className="border-b border-line text-left text-forest/70">
                 <th className="py-2 pr-4">Nome</th>
                 <th className="py-2 pr-4">Contato</th>
                 <th className="py-2 pr-4">Acompanhantes</th>
@@ -65,15 +65,15 @@ export default async function AdminGuestsPage() {
             <tbody>
               {guests.map((guest) => (
                 <tr key={guest.id} className="border-b border-line">
-                  <td className="py-3 pr-4 text-ink">
+                  <td className="py-3 pr-4 text-forest">
                     {guest.fullName}
-                    {guest.nickname && <span className="text-ink-soft"> ({guest.nickname})</span>}
+                    {guest.nickname && <span className="text-forest/70"> ({guest.nickname})</span>}
                   </td>
-                  <td className="py-3 pr-4 text-ink-soft">
+                  <td className="py-3 pr-4 text-forest/70">
                     {[guest.email, guest.phone].filter(Boolean).join(" · ") || "—"}
                   </td>
-                  <td className="py-3 pr-4 text-ink-soft">{guest.companionsCount}</td>
-                  <td className="py-3 pr-4 text-ink-soft">{STATUS_LABELS[guest.attendanceStatus]}</td>
+                  <td className="py-3 pr-4 text-forest/70">{guest.companionsCount}</td>
+                  <td className="py-3 pr-4 text-forest/70">{STATUS_LABELS[guest.attendanceStatus]}</td>
                 </tr>
               ))}
             </tbody>

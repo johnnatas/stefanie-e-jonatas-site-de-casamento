@@ -15,7 +15,7 @@ export default function AdminProtectedLayout({ children }: { children: React.Rea
           <Link
             key={item.href}
             href={item.href}
-            className="font-sans text-sm uppercase tracking-widest text-ink-soft hover:text-gold"
+            className="font-sans text-sm uppercase tracking-widest text-forest/70 hover:text-moss"
           >
             {item.label}
           </Link>
@@ -23,7 +23,7 @@ export default function AdminProtectedLayout({ children }: { children: React.Rea
         <form action={logoutAction}>
           <button
             type="submit"
-            className="font-sans text-sm uppercase tracking-widest text-ink-soft hover:text-gold"
+            className="font-sans text-sm uppercase tracking-widest text-forest/70 hover:text-moss"
           >
             Sair
           </button>

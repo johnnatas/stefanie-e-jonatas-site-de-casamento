@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 export default function NewGiftPage() {
   return (
     <div>
-      <h1 className="font-serif text-3xl text-ink">Novo presente</h1>
+      <h1 className="font-serif text-3xl text-forest">Novo presente</h1>
       <div className="mt-6">
         <GiftForm />
       </div>

@@ -20,8 +20,8 @@ export function DashboardStats({ summary }: DashboardStatsProps) {
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
       {items.map((item) => (
         <div key={item.label} className="rounded-lg border border-line bg-paper p-5 text-center">
-          <p className="font-serif text-3xl text-ink">{item.value}</p>
-          <p className="mt-1 font-sans text-xs uppercase tracking-widest text-ink-soft">
+          <p className="font-serif text-3xl text-forest">{item.value}</p>
+          <p className="mt-1 font-sans text-xs uppercase tracking-widest text-forest/70">
             {item.label}
           </p>
         </div>

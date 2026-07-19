@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 export default function NewGuestPage() {
   return (
     <div>
-      <h1 className="font-serif text-3xl text-ink">Novo convidado</h1>
+      <h1 className="font-serif text-3xl text-forest">Novo convidado</h1>
       <div className="mt-6">
         <GuestForm />
       </div>

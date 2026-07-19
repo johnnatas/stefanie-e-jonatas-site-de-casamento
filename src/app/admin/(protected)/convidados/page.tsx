@@ -33,7 +33,7 @@ export default async function AdminGuestsPage() {
         <h1 className="font-serif text-3xl text-forest">Convidados</h1>
         <Link
           href="/admin/convidados/novo"
-          className="font-sans text-sm uppercase tracking-widest text-gold hover:text-forest"
+          className="font-sans text-sm uppercase tracking-widest text-moss hover:text-forest"
         >
           + Novo convidado
         </Link>

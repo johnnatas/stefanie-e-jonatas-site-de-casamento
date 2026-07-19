@@ -48,10 +48,7 @@ export function SplitPanel({
       >
         {eyebrow && (
           <span
-            className={cn(
-              "font-serif text-xs uppercase tracking-[0.2em]",
-              isDark ? "text-moss" : "text-moss"
-            )}
+            className="font-serif text-xs uppercase tracking-[0.2em] text-moss"
           >
             {eyebrow}
           </span>

@@ -76,14 +76,18 @@ function useScrollDrivenTranslate(sectionRef: RefObject<HTMLElement | null>, max
   return translateVw;
 }
 
+function getPrefersReducedMotion() {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 function usePrefersReducedMotion() {
-  const [prefersReduced, setPrefersReduced] = useState(false);
+  const [prefersReduced, setPrefersReduced] = useState(getPrefersReducedMotion);
 
   useEffect(() => {
     if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
 
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReduced(query.matches);
     const listener = (event: MediaQueryListEvent) => setPrefersReduced(event.matches);
     query.addEventListener("change", listener);
     return () => query.removeEventListener("change", listener);

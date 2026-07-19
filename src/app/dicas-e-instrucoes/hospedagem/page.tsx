@@ -1,19 +1,19 @@
 import { SplitPanel } from "@/components/ui/SplitPanel";
-import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
+import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
+import { renderMarkdown } from "@/shared/utils/renderMarkdown";
+import { getSiteContentOrDefault } from "@/infrastructure/composition";
 
-export default function LodgingPage() {
+export default async function LodgingPage() {
+  const content = await getSiteContentOrDefault("tips-hospedagem");
+
   return (
     <SplitPanel
-      eyebrow="Fique por perto"
-      title="Onde se hospedar"
+      eyebrow={content.eyebrow ?? undefined}
+      title={content.title}
       tone="dark"
-      image={<PlaceholderImage label="Hospedagem" className="absolute inset-0 h-full w-full" />}
+      image={<PhotoOrPlaceholder src={content.photo} label="Hospedagem" className="absolute inset-0 h-full w-full" />}
     >
-      <p>
-        Separamos algumas sugestões de hotéis e pousadas próximas ao local da cerimônia, com
-        conforto para todos os orçamentos.
-      </p>
-      <p className="mt-3 italic">Lista de hospedagens a confirmar.</p>
+      {renderMarkdown(content.body)}
     </SplitPanel>
   );
 }

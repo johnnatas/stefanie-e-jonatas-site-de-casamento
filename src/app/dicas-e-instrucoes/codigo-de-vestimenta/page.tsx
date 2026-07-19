@@ -1,22 +1,26 @@
 import { SplitPanel } from "@/components/ui/SplitPanel";
-import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
+import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
+import { renderMarkdown } from "@/shared/utils/renderMarkdown";
+import { getSiteContentOrDefault } from "@/infrastructure/composition";
 
-export default function DressCodePage() {
+export default async function DressCodePage() {
+  const content = await getSiteContentOrDefault("tips-traje");
+
   return (
     <SplitPanel
-      eyebrow="Como se vestir"
-      title="Traje esporte fino"
+      eyebrow={content.eyebrow ?? undefined}
+      title={content.title}
       tone="light"
       imageSide="left"
-      image={<PlaceholderImage label="Inspiração de traje" className="absolute inset-0 h-full w-full" />}
+      image={
+        <PhotoOrPlaceholder
+          src={content.photo}
+          label="Inspiração de traje"
+          className="absolute inset-0 h-full w-full"
+        />
+      }
     >
-      <p>
-        Pedimos que evitem branco e tons muito claros, para não competir com o vestido da noiva.
-        Tons terrosos, pastéis e clássicos são muito bem-vindos.
-      </p>
-      <p className="mt-3">
-        A festa acontece em ambiente misto (aberto e fechado) — leve um casaco leve para a noite.
-      </p>
+      {renderMarkdown(content.body)}
     </SplitPanel>
   );
 }

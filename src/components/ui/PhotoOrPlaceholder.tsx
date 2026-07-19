@@ -9,7 +9,7 @@ interface PhotoOrPlaceholderProps {
 
 export function PhotoOrPlaceholder({ src, label, className }: PhotoOrPlaceholderProps) {
   if (src) {
-    return <img src={src} alt="" className={cn("object-cover", className)} />;
+    return <img src={src} alt={label} className={cn("object-cover", className)} />;
   }
 
   return <PlaceholderImage label={label} className={className} />;

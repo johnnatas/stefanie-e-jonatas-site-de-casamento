@@ -16,9 +16,9 @@ interface HomeHeroProps {
 export function HomeHero({ heroContent, settings }: HomeHeroProps) {
   return (
     <section
-      className="relative -mt-[72px] overflow-hidden after:pointer-events-none after:absolute after:inset-0
-        after:h-full after:w-full after:bg-[url('/images/torn-paper.png')] after:bg-contain after:bg-bottom
-        after:bg-no-repeat after:content-['']"
+      className="relative -mt-[72px] overflow-hidden after:pointer-events-none after:absolute after:inset-x-0
+        after:bottom-0 after:h-16 after:w-full after:bg-[url('/images/torn-paper.png')] after:bg-contain
+        after:bg-bottom after:bg-no-repeat after:content-[''] sm:after:h-24 md:after:h-32"
     >
       <HeroCarousel photos={heroContent.photos} />
 

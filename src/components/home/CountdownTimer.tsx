@@ -1,7 +1,6 @@
 "use client";
 
 import { useCountdown } from "@/hooks/useCountdown";
-import { WEDDING_DATE_ISO } from "@/shared/navigation";
 
 const UNITS = [
   { key: "days", label: "Dias" },
@@ -10,8 +9,12 @@ const UNITS = [
   { key: "seconds", label: "Segundos" },
 ] as const;
 
-export function CountdownTimer() {
-  const countdown = useCountdown(WEDDING_DATE_ISO);
+interface CountdownTimerProps {
+  weddingDateIso: string;
+}
+
+export function CountdownTimer({ weddingDateIso }: CountdownTimerProps) {
+  const countdown = useCountdown(weddingDateIso);
 
   return (
     <div className="flex flex-col items-center gap-3">

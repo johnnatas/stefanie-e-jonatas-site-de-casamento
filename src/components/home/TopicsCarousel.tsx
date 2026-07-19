@@ -3,46 +3,43 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import Link from "next/link";
 import useEmblaCarousel from "embla-carousel-react";
-import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
+import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
+import type { HomeTopicsContent } from "@/application/content/schemas";
 
 interface Topic {
   title: string;
   description: string;
+  photo: string | null;
   href: string;
 }
 
-const TOPICS: Topic[] = [
-  {
-    title: "Cerimônia",
-    description: "Horário, local e tudo sobre a celebração.",
-    href: "/dicas-e-instrucoes/cerimonia",
-  },
-  {
-    title: "Lista de presentes",
-    description: "Ajude a construir o começo da nossa nova casa.",
-    href: "/presentes",
-  },
-  {
-    title: "Traje",
-    description: "Código de vestimenta para o grande dia.",
-    href: "/dicas-e-instrucoes/codigo-de-vestimenta",
-  },
-  {
-    title: "Hospedagem",
-    description: "Sugestões de hotéis e pousadas próximas.",
-    href: "/dicas-e-instrucoes/hospedagem",
-  },
-  {
-    title: "Nossa história",
-    description: "Como tudo começou até chegarmos aqui.",
-    href: "/nossa-historia",
-  },
-];
+const TOPIC_KEYS = ["cerimonia", "presentes", "traje", "hospedagem", "nossaHistoria"] as const;
+
+const TOPIC_HREFS: Record<(typeof TOPIC_KEYS)[number], string> = {
+  cerimonia: "/dicas-e-instrucoes/cerimonia",
+  presentes: "/presentes",
+  traje: "/dicas-e-instrucoes/codigo-de-vestimenta",
+  hospedagem: "/dicas-e-instrucoes/hospedagem",
+  nossaHistoria: "/nossa-historia",
+};
+
+function buildTopics(content: HomeTopicsContent): Topic[] {
+  return TOPIC_KEYS.map((key) => ({
+    title: content[key].title,
+    description: content[key].description,
+    photo: content[key].photo,
+    href: TOPIC_HREFS[key],
+  }));
+}
 
 function TopicPanel({ topic, className }: { topic: Topic; className?: string }) {
   return (
     <Link href={topic.href} className={`group relative block h-full overflow-hidden ${className ?? ""}`}>
-      <PlaceholderImage label={`Foto — ${topic.title}`} className="absolute inset-0 h-full w-full" />
+      <PhotoOrPlaceholder
+        src={topic.photo}
+        label={`Foto — ${topic.title}`}
+        className="absolute inset-0 h-full w-full"
+      />
       <div className="absolute inset-0 bg-forest/40 transition-colors group-hover:bg-forest/55" />
       <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-8 text-paper">
         <h3 className="font-serif text-3xl">{topic.title}</h3>
@@ -96,9 +93,9 @@ function usePrefersReducedMotion() {
   return prefersReduced;
 }
 
-function DesktopScrollCarousel() {
+function DesktopScrollCarousel({ topics }: { topics: Topic[] }) {
   const sectionRef = useRef<HTMLElement>(null);
-  const rowWidthVw = TOPICS.length * 50;
+  const rowWidthVw = topics.length * 50;
   const maxTranslateVw = Math.max(rowWidthVw - 100, 0);
   const translateVw = useScrollDrivenTranslate(sectionRef, maxTranslateVw);
 
@@ -109,7 +106,7 @@ function DesktopScrollCarousel() {
           className="flex h-full"
           style={{ transform: `translateX(-${translateVw}vw)`, width: `${rowWidthVw}vw` }}
         >
-          {TOPICS.map((topic) => (
+          {topics.map((topic) => (
             <TopicPanel key={topic.href} topic={topic} className="w-[50vw] flex-shrink-0" />
           ))}
         </div>
@@ -118,13 +115,13 @@ function DesktopScrollCarousel() {
   );
 }
 
-function SwipeCarousel() {
+function SwipeCarousel({ topics }: { topics: Topic[] }) {
   const [emblaRef] = useEmblaCarousel({ loop: false, align: "start" });
 
   return (
     <div className="overflow-hidden" ref={emblaRef}>
       <div className="flex h-[70vh]">
-        {TOPICS.map((topic) => (
+        {topics.map((topic) => (
           <TopicPanel
             key={topic.href}
             topic={topic}
@@ -144,16 +141,21 @@ function SwipeCarousel() {
  * full-height photo treatment this mirrors (local design reference, not
  * in the repo).
  */
-export function TopicsCarousel() {
+interface TopicsCarouselProps {
+  content: HomeTopicsContent;
+}
+
+export function TopicsCarousel({ content }: TopicsCarouselProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const topics = buildTopics(content);
 
   return (
     <>
       <div className="hidden md:block">
-        {prefersReducedMotion ? <SwipeCarousel /> : <DesktopScrollCarousel />}
+        {prefersReducedMotion ? <SwipeCarousel topics={topics} /> : <DesktopScrollCarousel topics={topics} />}
       </div>
       <div className="md:hidden">
-        <SwipeCarousel />
+        <SwipeCarousel topics={topics} />
       </div>
     </>
   );

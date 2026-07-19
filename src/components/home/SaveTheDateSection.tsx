@@ -2,8 +2,9 @@
 
 import { motion } from "framer-motion";
 import { ArchFlipCard } from "@/components/ui/ArchFlipCard";
-import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
+import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
 import { MILESTONES } from "@/shared/milestones";
+import type { HomeMilestonePhotosContent } from "@/application/content/schemas";
 
 const HEADING_LINES = [
   { text: "Save", color: "var(--color-forest)", opacity: 1 },
@@ -11,7 +12,13 @@ const HEADING_LINES = [
   { text: "date!", color: "var(--color-moss)", opacity: 1 },
 ];
 
-export function SaveTheDateSection() {
+const MILESTONE_KEYS = ["beginning", "proposal", "wedding"] as const;
+
+interface SaveTheDateSectionProps {
+  milestonePhotos: HomeMilestonePhotosContent;
+}
+
+export function SaveTheDateSection({ milestonePhotos }: SaveTheDateSectionProps) {
   return (
     <section className="bg-[#ffffff] px-6 py-24">
       <div className="mx-auto flex max-w-5xl flex-col gap-12 md:flex-row md:items-center md:gap-16">
@@ -39,7 +46,8 @@ export function SaveTheDateSection() {
               <ArchFlipCard
                 number={`0${index + 1}.`}
                 image={
-                  <PlaceholderImage
+                  <PhotoOrPlaceholder
+                    src={milestonePhotos[MILESTONE_KEYS[index]]}
                     label={`Foto — ${milestone.title}`}
                     className="absolute inset-0 h-full w-full"
                   />

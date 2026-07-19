@@ -2,19 +2,26 @@
 
 import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
+import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
 
-const SLIDE_LABELS = ["Foto do casal 1", "Foto do casal 2", "Foto do casal 3"];
 const AUTOPLAY_INTERVAL_MS = 5000;
+const FALLBACK_SLIDE_COUNT = 3;
+
+interface HeroCarouselProps {
+  photos: string[];
+}
 
 /**
  * Pure background layer for the home hero: rotating photo carousel, dark
  * overlay, and slide-position dots. Must render inside a `relative`
  * parent — see HomeHero, which composes this with the foreground content.
+ * Renders exactly `photos.length` slides, or `FALLBACK_SLIDE_COUNT`
+ * placeholder slides when no photos have been uploaded yet.
  */
-export function HeroCarousel() {
+export function HeroCarousel({ photos }: HeroCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const slides: (string | null)[] = photos.length > 0 ? photos : Array.from({ length: FALLBACK_SLIDE_COUNT }, () => null);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -38,9 +45,13 @@ export function HeroCarousel() {
     <div className="absolute inset-0 overflow-hidden" data-testid="hero-carousel">
       <div className="h-full" ref={emblaRef}>
         <div className="flex h-full">
-          {SLIDE_LABELS.map((label) => (
-            <div key={label} className="relative h-full min-w-0 flex-[0_0_100%]">
-              <PlaceholderImage label={label} className="h-full w-full grayscale" />
+          {slides.map((photo, index) => (
+            <div key={index} className="relative h-full min-w-0 flex-[0_0_100%]">
+              <PhotoOrPlaceholder
+                src={photo}
+                label={`Foto do casal ${index + 1}`}
+                className="h-full w-full grayscale"
+              />
             </div>
           ))}
         </div>
@@ -48,9 +59,9 @@ export function HeroCarousel() {
       <div className="absolute inset-0 bg-forest/50" />
 
       <div className="absolute bottom-14 left-1/2 flex -translate-x-1/2 gap-2">
-        {SLIDE_LABELS.map((label, index) => (
+        {slides.map((_, index) => (
           <span
-            key={label}
+            key={index}
             className={`h-1.5 w-1.5 rounded-full transition-colors ${
               index === selectedIndex ? "bg-paper" : "bg-paper/40"
             }`}

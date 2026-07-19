@@ -12,6 +12,3 @@ export const NAV_ITEMS: NavItem[] = [
 ];
 
 export const COUPLE_NAMES = "Stéfanie & Jonatas";
-export const WEDDING_DATE_ISO = "2027-06-19T16:00:00-03:00";
-export const WEDDING_DATE_LABEL = "19 de junho de 2027";
-export const WEDDING_LOCATION_LABEL = "Minas Gerais, Brasil";

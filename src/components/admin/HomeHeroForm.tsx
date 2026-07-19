@@ -1,8 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { updateHomeHeroAction } from "@/app/admin/(protected)/conteudo/hero/actions";
-import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
+import { PhotoUploadField } from "@/components/admin/PhotoUploadField";
 import type { SiteContentActionState } from "@/application/content/actionState";
 import type { HomeHeroContent } from "@/application/content/schemas";
 
@@ -17,9 +17,35 @@ const MAX_PHOTOS = 5;
 
 const initialHomeHeroActionState: SiteContentActionState = { status: "idle" };
 
+interface Slot {
+  key: string;
+  currentUrl: string | null;
+}
+
+function createSlotKey(): string {
+  return typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `slot-${Math.random()}`;
+}
+
+function initialSlots(photos: string[]): Slot[] {
+  if (photos.length === 0) {
+    return [{ key: createSlotKey(), currentUrl: null }];
+  }
+  return photos.map((url) => ({ key: createSlotKey(), currentUrl: url }));
+}
+
 export function HomeHeroForm({ defaultValues }: HomeHeroFormProps) {
   const [state, formAction, isPending] = useActionState(updateHomeHeroAction, initialHomeHeroActionState);
-  const existingPhotos = defaultValues.photos;
+  const [slots, setSlots] = useState<Slot[]>(() => initialSlots(defaultValues.photos));
+
+  function addSlot() {
+    setSlots((current) =>
+      current.length >= MAX_PHOTOS ? current : [...current, { key: createSlotKey(), currentUrl: null }]
+    );
+  }
+
+  function removeSlot(key: string) {
+    setSlots((current) => current.filter((slot) => slot.key !== key));
+  }
 
   return (
     <form action={formAction} className="flex max-w-md flex-col gap-4">
@@ -52,27 +78,35 @@ export function HomeHeroForm({ defaultValues }: HomeHeroFormProps) {
       <fieldset className="flex flex-col gap-4">
         <legend className="font-sans text-sm text-forest">Fotos do carrossel (1 a {MAX_PHOTOS})</legend>
 
-        {Array.from({ length: MAX_PHOTOS }, (_, index) => {
-          const currentUrl = existingPhotos[index] ?? null;
-          return (
-            <div key={index} className="flex flex-col gap-2 border-b border-line pb-4">
-              <input type="hidden" name={`photo${index}CurrentUrl`} value={currentUrl ?? ""} />
-              <PhotoOrPlaceholder src={currentUrl} label={`Foto ${index + 1}`} className="h-24 w-full rounded-md" />
-              <input
-                type="file"
-                name={`photo${index}File`}
-                accept="image/*"
-                className="font-sans text-sm text-forest"
-              />
-              {currentUrl && (
-                <label className="flex items-center gap-2 font-sans text-xs text-forest/70">
-                  <input type="checkbox" name={`photo${index}Remove`} />
-                  Remover esta foto
-                </label>
-              )}
-            </div>
-          );
-        })}
+        {slots.map((slot, index) => (
+          <div key={slot.key} className="flex flex-col gap-2 border-b border-line pb-4">
+            <PhotoUploadField
+              name={`photo${index}`}
+              currentUrl={slot.currentUrl}
+              label={`Foto ${index + 1}`}
+              showRemoveCheckbox={false}
+            />
+            {index > 0 && (
+              <button
+                type="button"
+                onClick={() => removeSlot(slot.key)}
+                className="self-start font-sans text-xs uppercase tracking-widest text-forest/70 hover:text-moss"
+              >
+                × Remover esta foto
+              </button>
+            )}
+          </div>
+        ))}
+
+        {slots.length < MAX_PHOTOS && (
+          <button
+            type="button"
+            onClick={addSlot}
+            className="self-start font-sans text-xs uppercase tracking-widest text-moss hover:text-forest"
+          >
+            + Adicionar foto
+          </button>
+        )}
       </fieldset>
 
       <button

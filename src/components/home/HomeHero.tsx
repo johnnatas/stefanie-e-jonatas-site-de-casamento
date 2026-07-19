@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import { HeroCarousel } from "@/components/home/HeroCarousel";
 import { CountdownTimer } from "@/components/home/CountdownTimer";
 import { PillButton } from "@/components/ui/PillButton";
-import { COUPLE_NAMES, WEDDING_DATE_LABEL, WEDDING_LOCATION_LABEL } from "@/shared/navigation";
+import { Monogram } from "@/components/ui/Monogram";
+import { WEDDING_DATE_LABEL, WEDDING_LOCATION_LABEL } from "@/shared/navigation";
 
 export function HomeHero() {
   return (
@@ -25,7 +26,9 @@ export function HomeHero() {
           <span className="font-sans text-xs uppercase tracking-[0.3em] text-paper/90">
             Estamos nos casando
           </span>
-          <h1 className="font-serif text-5xl sm:text-7xl">{COUPLE_NAMES}</h1>
+          <h1>
+            <Monogram light className="h-32 w-auto sm:h-44" />
+          </h1>
           <span aria-hidden="true" className="h-px w-16 bg-moss" />
           <p className="font-script text-2xl text-paper/90">nas ditas linhas em que nos encontramos</p>
           <p className="font-serif text-sm uppercase tracking-widest text-paper/90">

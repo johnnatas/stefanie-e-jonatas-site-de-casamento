@@ -3,19 +3,21 @@
 :root {
   --color-ink: #2a2622;
   --color-ink-soft: #5c554d;
-  --color-gold: #c9a66b;
-  --color-line: #e4dcd1;
-  --color-paper: #ffffff;
-  --color-paper-soft: #f4f2ee;
+  --color-gold: #d4af37;
+  --color-line: #d0d7aa;
+  --color-paper: #feffed;
+  --color-paper-soft: #e3e8c8;
   --color-charcoal: #14130f;
   --color-gold-soft: #d8c391;
   --color-line-dark: #3a362f;
   --color-danger: #b3413a;
+  --color-moss: #4a5335;
+  --color-forest: #242a16;
 }
 
 @theme inline {
   --color-background: var(--color-paper);
-  --color-foreground: var(--color-ink);
+  --color-foreground: var(--color-forest);
   --color-ink: var(--color-ink);
   --color-ink-soft: var(--color-ink-soft);
   --color-gold: var(--color-gold);
@@ -26,6 +28,8 @@
   --color-gold-soft: var(--color-gold-soft);
   --color-line-dark: var(--color-line-dark);
   --color-danger: var(--color-danger);
+  --color-moss: var(--color-moss);
+  --color-forest: var(--color-forest);
   --font-serif: var(--font-playfair);
   --font-sans: var(--font-inter);
   --font-script: var(--font-alex-brush);

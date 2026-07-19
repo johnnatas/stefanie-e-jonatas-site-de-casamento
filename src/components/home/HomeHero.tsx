@@ -23,7 +23,7 @@ export function HomeHero() {
             Estamos nos casando
           </span>
           <h1 className="font-serif text-5xl sm:text-7xl">{COUPLE_NAMES}</h1>
-          <span aria-hidden="true" className="h-px w-16 bg-gold" />
+          <span aria-hidden="true" className="h-px w-16 bg-moss" />
           <p className="font-script text-2xl text-paper/90">nas ditas linhas em que nos encontramos</p>
           <p className="font-serif text-sm uppercase tracking-widest text-paper/90">
             {WEDDING_DATE_LABEL} · {WEDDING_LOCATION_LABEL}

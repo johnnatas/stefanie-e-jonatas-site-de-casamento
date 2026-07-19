@@ -8,7 +8,7 @@ import { MILESTONES } from "@/shared/milestones";
 const HEADING_LINES = [
   { text: "Save", color: "var(--color-ink)" },
   { text: "the", color: "var(--color-ink-soft)" },
-  { text: "date!", color: "var(--color-gold-soft)" },
+  { text: "date!", color: "var(--color-moss)" },
 ];
 
 export function SaveTheDateSection() {

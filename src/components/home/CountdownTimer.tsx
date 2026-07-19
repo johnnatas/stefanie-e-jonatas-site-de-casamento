@@ -27,7 +27,7 @@ export function CountdownTimer() {
           </div>
         ))}
       </div>
-      <p className="font-script text-3xl text-gold">mal podemos esperar</p>
+      <p className="font-script text-3xl text-moss">mal podemos esperar</p>
     </div>
   );
 }

@@ -45,7 +45,7 @@ export function HeroCarousel() {
           ))}
         </div>
       </div>
-      <div className="absolute inset-0 bg-charcoal/50" />
+      <div className="absolute inset-0 bg-forest/50" />
 
       <div className="absolute bottom-14 left-1/2 flex -translate-x-1/2 gap-2">
         {SLIDE_LABELS.map((label, index) => (

@@ -51,7 +51,7 @@ export function Header() {
                 className={cn(
                   "text-sm transition-colors",
                   isActive
-                    ? "font-script text-lg italic text-moss"
+                    ? cn("font-script text-lg italic", isTransparent ? "text-paper" : "text-moss")
                     : "font-serif uppercase tracking-[0.2em] text-current/80 hover:text-moss"
                 )}
               >

@@ -55,21 +55,21 @@ describe("Header", () => {
     Object.defineProperty(window, "scrollY", { value: 200, configurable: true });
     fireEvent.scroll(window);
 
-    expect(screen.getByRole("banner")).toHaveClass("bg-[#f3f3f3]", "text-forest");
+    expect(screen.getByRole("banner")).toHaveClass("bg-[#ffffff]", "text-forest");
   });
 
   it("renders solid immediately when the page loads already scrolled past the hero", () => {
     Object.defineProperty(window, "scrollY", { value: 200, configurable: true });
     render(<Header />);
 
-    expect(screen.getByRole("banner")).toHaveClass("bg-[#f3f3f3]", "text-forest");
+    expect(screen.getByRole("banner")).toHaveClass("bg-[#ffffff]", "text-forest");
   });
 
   it("renders solid on non-home pages regardless of scroll position", () => {
     vi.mocked(usePathname).mockReturnValue("/presentes");
     render(<Header />);
 
-    expect(screen.getByRole("banner")).toHaveClass("bg-[#f3f3f3]", "text-forest");
+    expect(screen.getByRole("banner")).toHaveClass("bg-[#ffffff]", "text-forest");
   });
 
   it("only changes color on hover for an inactive nav item, not font or casing", () => {

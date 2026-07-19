@@ -13,7 +13,7 @@ const HEADING_LINES = [
 
 export function SaveTheDateSection() {
   return (
-    <section className="bg-[#f3f3f3] px-6 py-24">
+    <section className="bg-[#ffffff] px-6 py-24">
       <div className="mx-auto flex max-w-5xl flex-col gap-12 md:flex-row md:items-center md:gap-16">
         <h2 className="flex flex-col items-center gap-1 text-center md:items-start md:text-left">
           {HEADING_LINES.map((line) => (

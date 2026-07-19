@@ -10,3 +10,4 @@ export class GuestNotFoundError extends DomainError {}
 export class InvalidGiftDataError extends DomainError {}
 export class InvalidContributionDataError extends DomainError {}
 export class GiftNotAvailableError extends DomainError {}
+export class InvalidSiteContentError extends DomainError {}

@@ -55,21 +55,21 @@ describe("Header", () => {
     Object.defineProperty(window, "scrollY", { value: 200, configurable: true });
     fireEvent.scroll(window);
 
-    expect(screen.getByRole("banner")).toHaveClass("bg-paper/90", "text-forest");
+    expect(screen.getByRole("banner")).toHaveClass("bg-[#f3f3f3]", "text-forest");
   });
 
   it("renders solid immediately when the page loads already scrolled past the hero", () => {
     Object.defineProperty(window, "scrollY", { value: 200, configurable: true });
     render(<Header />);
 
-    expect(screen.getByRole("banner")).toHaveClass("bg-paper/90", "text-forest");
+    expect(screen.getByRole("banner")).toHaveClass("bg-[#f3f3f3]", "text-forest");
   });
 
   it("renders solid on non-home pages regardless of scroll position", () => {
     vi.mocked(usePathname).mockReturnValue("/presentes");
     render(<Header />);
 
-    expect(screen.getByRole("banner")).toHaveClass("bg-paper/90", "text-forest");
+    expect(screen.getByRole("banner")).toHaveClass("bg-[#f3f3f3]", "text-forest");
   });
 
   it("applies the active-link style to a nav item on hover", async () => {

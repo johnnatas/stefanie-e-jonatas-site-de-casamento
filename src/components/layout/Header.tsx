@@ -34,12 +34,12 @@ export function Header() {
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-40 flex h-[72px] items-center transition-colors",
-        isTransparent ? "bg-transparent text-paper" : "border-b border-line bg-paper/90 text-forest backdrop-blur"
+        isTransparent ? "bg-transparent text-paper" : "border-b border-line bg-[#f3f3f3] text-forest"
       )}
     >
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6">
         <Link href="/" aria-label="Início" className="text-current">
-          <Monogram />
+          <Monogram light={isTransparent} />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">

@@ -13,14 +13,14 @@ interface Topic {
 
 const TOPICS: Topic[] = [
   {
-    title: "Lista de presentes",
-    description: "Ajude a construir o começo da nossa nova casa.",
-    href: "/presentes",
-  },
-  {
     title: "Cerimônia",
     description: "Horário, local e tudo sobre a celebração.",
     href: "/dicas-e-instrucoes/cerimonia",
+  },
+  {
+    title: "Lista de presentes",
+    description: "Ajude a construir o começo da nossa nova casa.",
+    href: "/presentes",
   },
   {
     title: "Traje",

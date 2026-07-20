@@ -10,6 +10,8 @@ export interface GiftProps {
   price: number;
   category: string;
   status?: GiftStatus;
+  mercadoPagoPreferenceId?: string;
+  mercadoPagoCheckoutUrl?: string | null;
   createdAt?: Date;
 }
 
@@ -21,6 +23,8 @@ export class Gift {
   readonly price: number;
   readonly category: string;
   readonly status: GiftStatus;
+  readonly mercadoPagoPreferenceId?: string;
+  readonly mercadoPagoCheckoutUrl: string | null;
   readonly createdAt: Date;
 
   private constructor(props: GiftProps) {
@@ -31,6 +35,8 @@ export class Gift {
     this.price = props.price;
     this.category = props.category.trim();
     this.status = props.status ?? "available";
+    this.mercadoPagoPreferenceId = props.mercadoPagoPreferenceId;
+    this.mercadoPagoCheckoutUrl = props.mercadoPagoCheckoutUrl ?? null;
     this.createdAt = props.createdAt ?? new Date();
   }
 

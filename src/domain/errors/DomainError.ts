@@ -12,3 +12,4 @@ export class InvalidContributionDataError extends DomainError {}
 export class GiftNotAvailableError extends DomainError {}
 export class InvalidSiteContentError extends DomainError {}
 export class GiftHasContributionsError extends DomainError {}
+export class InvalidSecurityCredentialError extends DomainError {}

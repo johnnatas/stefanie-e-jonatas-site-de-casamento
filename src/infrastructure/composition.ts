@@ -16,6 +16,9 @@ import { ConfirmGiftPaymentUseCase } from "@/application/use-cases/gifts/Confirm
 import { ListGuestsUseCase } from "@/application/use-cases/admin/ListGuestsUseCase";
 import { SearchGuestsUseCase } from "@/application/use-cases/rsvp/SearchGuestsUseCase";
 import { CreateGuestUseCase } from "@/application/use-cases/admin/CreateGuestUseCase";
+import { UpdateGuestUseCase } from "@/application/use-cases/admin/UpdateGuestUseCase";
+import { DeleteGuestUseCase } from "@/application/use-cases/admin/DeleteGuestUseCase";
+import { DeleteGiftUseCase } from "@/application/use-cases/admin/DeleteGiftUseCase";
 import { GetDashboardSummaryUseCase } from "@/application/use-cases/admin/GetDashboardSummaryUseCase";
 import { UpsertGiftUseCase } from "@/application/use-cases/admin/UpsertGiftUseCase";
 
@@ -75,6 +78,18 @@ export function createSearchGuestsUseCase(): SearchGuestsUseCase {
 
 export function createCreateGuestUseCase(): CreateGuestUseCase {
   return new CreateGuestUseCase(repositories().guestRepository);
+}
+
+export function createUpdateGuestUseCase(): UpdateGuestUseCase {
+  return new UpdateGuestUseCase(repositories().guestRepository);
+}
+
+export function createDeleteGuestUseCase(): DeleteGuestUseCase {
+  return new DeleteGuestUseCase(repositories().guestRepository);
+}
+
+export function createDeleteGiftUseCase(): DeleteGiftUseCase {
+  return new DeleteGiftUseCase(repositories().giftRepository);
 }
 
 export function createGetSiteContentUseCase(): GetSiteContentUseCase {

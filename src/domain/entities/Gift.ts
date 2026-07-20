@@ -6,7 +6,7 @@ export interface GiftProps {
   id?: string;
   name: string;
   description: string;
-  imageUrl: string;
+  imageUrl: string | null;
   price: number;
   category: string;
   status?: GiftStatus;
@@ -17,7 +17,7 @@ export class Gift {
   readonly id?: string;
   readonly name: string;
   readonly description: string;
-  readonly imageUrl: string;
+  readonly imageUrl: string | null;
   readonly price: number;
   readonly category: string;
   readonly status: GiftStatus;

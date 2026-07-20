@@ -57,7 +57,7 @@ export default async function EditGiftPage({ params }: EditGiftPageProps) {
             id: gift.id,
             name: gift.name,
             description: gift.description,
-            imageUrl: gift.imageUrl,
+            imageUrl: gift.imageUrl ?? "",
             price: gift.price,
             category: gift.category,
           }}

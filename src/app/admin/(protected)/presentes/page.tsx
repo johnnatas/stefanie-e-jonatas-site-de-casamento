@@ -33,12 +33,20 @@ export default async function AdminGiftsPage() {
     <div>
       <div className="flex items-center justify-between">
         <h1 className="font-serif text-3xl text-forest">Presentes</h1>
-        <Link
-          href="/admin/presentes/novo"
-          className="rounded-full bg-moss px-5 py-2 font-sans text-xs uppercase tracking-widest text-paper transition-colors hover:bg-moss/80"
-        >
-          Novo presente
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/admin/presentes/importar"
+            className="font-sans text-sm uppercase tracking-widest text-moss hover:text-forest"
+          >
+            Importar CSV
+          </Link>
+          <Link
+            href="/admin/presentes/novo"
+            className="rounded-full bg-moss px-5 py-2 font-sans text-xs uppercase tracking-widest text-paper transition-colors hover:bg-moss/80"
+          >
+            Novo presente
+          </Link>
+        </div>
       </div>
 
       {!gifts ? (

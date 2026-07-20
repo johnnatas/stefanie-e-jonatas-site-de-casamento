@@ -6,7 +6,7 @@ export interface UpsertGiftInput {
   id?: string;
   name: string;
   description: string;
-  imageUrl: string;
+  imageUrl: string | null;
   price: number;
   category: string;
 }

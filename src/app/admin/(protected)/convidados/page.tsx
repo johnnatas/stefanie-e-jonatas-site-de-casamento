@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { createListGuestsUseCase } from "@/infrastructure/composition";
 import { isBackendConfigured } from "@/infrastructure/config/env";
 import { ConfigurationNotice } from "@/components/ui/ConfigurationNotice";
@@ -55,17 +56,19 @@ export default async function AdminGuestsPage() {
       ) : guests.length === 0 ? (
         <p className="mt-6 font-sans text-forest/70">Nenhum convidado cadastrado ainda.</p>
       ) : (
-        <GuestsTable
-          guests={guests.map((guest) => ({
-            id: guest.id!,
-            fullName: guest.fullName,
-            nickname: guest.nickname,
-            email: guest.email,
-            phone: guest.phone,
-            companionsCount: guest.companionsCount,
-            attendanceStatus: guest.attendanceStatus,
-          }))}
-        />
+        <Suspense fallback={<p className="mt-6 font-sans text-forest/70">Carregando...</p>}>
+          <GuestsTable
+            guests={guests.map((guest) => ({
+              id: guest.id!,
+              fullName: guest.fullName,
+              nickname: guest.nickname,
+              email: guest.email,
+              phone: guest.phone,
+              companionsCount: guest.companionsCount,
+              attendanceStatus: guest.attendanceStatus,
+            }))}
+          />
+        </Suspense>
       )}
     </div>
   );

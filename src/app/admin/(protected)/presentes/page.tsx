@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { createListGiftsUseCase } from "@/infrastructure/composition";
 import { isBackendConfigured } from "@/infrastructure/config/env";
 import { ConfigurationNotice } from "@/components/ui/ConfigurationNotice";
@@ -55,15 +56,17 @@ export default async function AdminGiftsPage() {
       ) : gifts.length === 0 ? (
         <p className="mt-6 font-sans text-forest/70">Nenhum presente cadastrado ainda.</p>
       ) : (
-        <GiftsTable
-          gifts={gifts.map((gift) => ({
-            id: gift.id!,
-            name: gift.name,
-            category: gift.category,
-            price: gift.price,
-            status: gift.status,
-          }))}
-        />
+        <Suspense fallback={<p className="mt-6 font-sans text-forest/70">Carregando...</p>}>
+          <GiftsTable
+            gifts={gifts.map((gift) => ({
+              id: gift.id!,
+              name: gift.name,
+              category: gift.category,
+              price: gift.price,
+              status: gift.status,
+            }))}
+          />
+        </Suspense>
       )}
     </div>
   );

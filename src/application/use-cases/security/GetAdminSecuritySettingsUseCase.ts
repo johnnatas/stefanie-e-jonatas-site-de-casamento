@@ -1,0 +1,20 @@
+import { AdminSecuritySettingsRepository } from "@/domain/repositories/AdminSecuritySettingsRepository";
+
+export interface AdminSecuritySettingsSummary {
+  mercadoPagoAccessTokenLast4: string | null;
+  hasSecretKey: boolean;
+}
+
+export class GetAdminSecuritySettingsUseCase {
+  constructor(private readonly securitySettingsRepository: AdminSecuritySettingsRepository) {}
+
+  async execute(): Promise<AdminSecuritySettingsSummary> {
+    const settings = await this.securitySettingsRepository.getSettings();
+    return {
+      mercadoPagoAccessTokenLast4: settings.mercadoPagoAccessToken
+        ? settings.mercadoPagoAccessToken.slice(-4)
+        : null,
+      hasSecretKey: Boolean(settings.priceChangeSecretHash),
+    };
+  }
+}

@@ -5,10 +5,13 @@ import { GiftRepository } from "@/domain/repositories/GiftRepository";
 import { InvalidGiftDataError } from "@/domain/errors/DomainError";
 import { PaymentGateway } from "@/application/ports/PaymentGateway";
 
+export const AUTO_CHECKOUT_RESERVATION_MINUTES = 30;
+
 export interface CreateGiftContributionInput {
   giftId: string;
   guestName: string;
   guestEmail: string;
+  expectedPaymentDate?: Date;
 }
 
 export interface CreateGiftContributionOutput {
@@ -29,7 +32,9 @@ export class CreateGiftContributionUseCase {
       throw new InvalidGiftDataError(`Gift with id ${input.giftId} was not found.`);
     }
 
-    const reservedGift = await this.giftRepository.update(gift.reserve());
+    const reservedUntil =
+      input.expectedPaymentDate ?? new Date(Date.now() + AUTO_CHECKOUT_RESERVATION_MINUTES * 60 * 1000);
+    const reservedGift = await this.giftRepository.update(gift.reserve(reservedUntil));
 
     const contribution = await this.giftContributionRepository.save(
       GiftContribution.create({
@@ -37,6 +42,7 @@ export class CreateGiftContributionUseCase {
         guestName: input.guestName,
         guestEmail: input.guestEmail,
         amount: gift.price,
+        expectedPaymentDate: input.expectedPaymentDate ?? null,
       })
     );
 

@@ -80,4 +80,32 @@ describe("CreateGiftContributionUseCase", () => {
       useCase.execute({ giftId: "gift-1", guestName: "Outro", guestEmail: "outro@example.com" })
     ).rejects.toThrow(GiftNotAvailableError);
   });
+
+  it("reserves the gift for about 30 minutes by default", async () => {
+    const before = Date.now();
+
+    await useCase.execute({ giftId: "gift-1", guestName: "Carla Nunes", guestEmail: "carla@example.com" });
+
+    const after = Date.now();
+    const gift = await giftRepository.findById("gift-1");
+    const reservedUntilMs = gift!.reservedUntil!.getTime();
+
+    expect(reservedUntilMs).toBeGreaterThanOrEqual(before + 29 * 60 * 1000);
+    expect(reservedUntilMs).toBeLessThanOrEqual(after + 31 * 60 * 1000);
+  });
+
+  it("reserves until the guest's chosen date and stores it on the contribution when provided", async () => {
+    const expectedPaymentDate = new Date("2027-05-01T23:59:59-03:00");
+
+    const result = await useCase.execute({
+      giftId: "gift-1",
+      guestName: "Carla Nunes",
+      guestEmail: "carla@example.com",
+      expectedPaymentDate,
+    });
+
+    expect(result.contribution.expectedPaymentDate).toEqual(expectedPaymentDate);
+    const gift = await giftRepository.findById("gift-1");
+    expect(gift?.reservedUntil).toEqual(expectedPaymentDate);
+  });
 });

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createListGuestsUseCase } from "@/infrastructure/composition";
 import { isBackendConfigured } from "@/infrastructure/config/env";
 import { ConfigurationNotice } from "@/components/ui/ConfigurationNotice";
+import { DeleteGuestButton } from "@/components/admin/DeleteGuestButton";
 import type { Guest } from "@/domain/entities/Guest";
 
 export const metadata: Metadata = {
@@ -60,6 +61,8 @@ export default async function AdminGuestsPage() {
                 <th className="py-2 pr-4">Contato</th>
                 <th className="py-2 pr-4">Acompanhantes</th>
                 <th className="py-2 pr-4">Status</th>
+                <th className="py-2 pr-4" />
+                <th className="py-2 pr-4" />
               </tr>
             </thead>
             <tbody>
@@ -74,6 +77,14 @@ export default async function AdminGuestsPage() {
                   </td>
                   <td className="py-3 pr-4 text-forest/70">{guest.companionsCount}</td>
                   <td className="py-3 pr-4 text-forest/70">{STATUS_LABELS[guest.attendanceStatus]}</td>
+                  <td className="py-3 pr-4">
+                    <Link href={`/admin/convidados/${guest.id}`} className="text-moss hover:text-moss/80">
+                      Editar
+                    </Link>
+                  </td>
+                  <td className="py-3 pr-4">
+                    <DeleteGuestButton guestId={guest.id!} guestName={guest.fullName} />
+                  </td>
                 </tr>
               ))}
             </tbody>

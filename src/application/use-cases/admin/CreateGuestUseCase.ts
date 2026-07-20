@@ -1,9 +1,14 @@
-import { Guest } from "@/domain/entities/Guest";
+import { AttendanceStatus, Guest } from "@/domain/entities/Guest";
 import { GuestRepository } from "@/domain/repositories/GuestRepository";
 
 export interface CreateGuestInput {
   fullName: string;
   nickname?: string;
+  email?: string;
+  phone?: string;
+  companionsCount?: number;
+  attendanceStatus?: AttendanceStatus;
+  message?: string;
 }
 
 export class CreateGuestUseCase {
@@ -13,8 +18,11 @@ export class CreateGuestUseCase {
     const guest = Guest.create({
       fullName: input.fullName,
       nickname: input.nickname,
-      companionsCount: 0,
-      attendanceStatus: "pending",
+      email: input.email,
+      phone: input.phone,
+      companionsCount: input.companionsCount ?? 0,
+      attendanceStatus: input.attendanceStatus ?? "pending",
+      message: input.message,
     });
 
     return this.guestRepository.save(guest);

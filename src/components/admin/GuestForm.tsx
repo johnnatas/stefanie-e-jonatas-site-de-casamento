@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Link from "next/link";
 import {
   upsertGuestAction,
   type UpsertGuestActionState,
@@ -108,9 +109,9 @@ export function GuestForm({ defaultValues }: GuestFormProps) {
         >
           {isPending ? "Salvando..." : "Salvar convidado"}
         </button>
-        <a href="/admin/convidados" className="font-sans text-sm text-forest/70 hover:text-forest">
+        <Link href="/admin/convidados" className="font-sans text-sm text-forest/70 hover:text-forest">
           Cancelar
-        </a>
+        </Link>
       </div>
 
       {state.status === "error" && (

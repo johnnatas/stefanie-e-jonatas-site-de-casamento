@@ -55,7 +55,8 @@ export function createConfirmRsvpUseCase(): ConfirmRsvpUseCase {
 }
 
 export function createListGiftsUseCase(): ListGiftsUseCase {
-  return new ListGiftsUseCase(repositories().giftRepository);
+  const { giftRepository, giftContributionRepository } = repositories();
+  return new ListGiftsUseCase(giftRepository, giftContributionRepository);
 }
 
 export function createGiftContributionUseCase(): CreateGiftContributionUseCase {

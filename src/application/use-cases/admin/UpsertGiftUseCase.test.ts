@@ -25,7 +25,7 @@ describe("UpsertGiftUseCase", () => {
   it("updates an existing gift preserving its current status, flagging a price change", async () => {
     const repository = new InMemoryGiftRepository();
     const created = (await new UpsertGiftUseCase(repository).execute(baseInput)).gift;
-    const reserved = await repository.update(created.reserve());
+    const reserved = await repository.update(created.reserve(new Date(Date.now() + 60 * 60 * 1000)));
 
     const result = await new UpsertGiftUseCase(repository).execute({ ...baseInput, id: reserved.id, price: 220 });
 

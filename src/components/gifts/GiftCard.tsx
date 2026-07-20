@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useState } from "react";
 import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
 import { formatCurrency } from "@/shared/utils/formatCurrency";
 import { GiftDto } from "@/components/gifts/GiftDto";
@@ -26,7 +26,7 @@ const initialReserveForLaterActionState: ReserveGiftForLaterActionState = { stat
 
 export function GiftCard({ gift, canReserveForLater }: GiftCardProps) {
   const [activeForm, setActiveForm] = useState<"none" | "now" | "later">("none");
-  const [modalOpen, setModalOpen] = useState(false);
+  const [modalDismissed, setModalDismissed] = useState(false);
 
   const [nowState, nowFormAction, isNowPending] = useActionState(
     createGiftContributionAction,
@@ -37,12 +37,7 @@ export function GiftCard({ gift, canReserveForLater }: GiftCardProps) {
     initialReserveForLaterActionState
   );
 
-  useEffect(() => {
-    if (laterState.status === "success") {
-      setModalOpen(true);
-    }
-  }, [laterState]);
-
+  const showConfirmationModal = laterState.status === "success" && !modalDismissed;
   const isAvailable = gift.status === "available";
 
   return (
@@ -153,7 +148,7 @@ export function GiftCard({ gift, canReserveForLater }: GiftCardProps) {
         </form>
       )}
 
-      {modalOpen && laterState.status === "success" && (
+      {showConfirmationModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-forest/40 px-4">
           <div className="w-full max-w-sm rounded-lg bg-paper p-6">
             <h4 className="font-serif text-lg text-forest">Presente reservado!</h4>
@@ -174,7 +169,7 @@ export function GiftCard({ gift, canReserveForLater }: GiftCardProps) {
               <button
                 type="button"
                 onClick={() => {
-                  setModalOpen(false);
+                  setModalDismissed(true);
                   setActiveForm("none");
                 }}
                 className="rounded-full border border-line px-4 py-2 font-sans text-xs uppercase tracking-widest text-forest transition-colors hover:border-moss"

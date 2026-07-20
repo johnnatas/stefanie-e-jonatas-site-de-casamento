@@ -11,6 +11,8 @@ interface GiftRow {
   price: number;
   category: string;
   status: GiftStatus;
+  mercado_pago_preference_id: string | null;
+  mercado_pago_checkout_url: string | null;
   created_at: string;
 }
 
@@ -23,6 +25,8 @@ function toEntity(row: GiftRow): Gift {
     price: row.price,
     category: row.category,
     status: row.status,
+    mercadoPagoPreferenceId: row.mercado_pago_preference_id ?? undefined,
+    mercadoPagoCheckoutUrl: row.mercado_pago_checkout_url,
     createdAt: new Date(row.created_at),
   });
 }
@@ -40,6 +44,8 @@ export class SupabaseGiftRepository implements GiftRepository {
         price: gift.price,
         category: gift.category,
         status: gift.status,
+        mercado_pago_preference_id: gift.mercadoPagoPreferenceId ?? null,
+        mercado_pago_checkout_url: gift.mercadoPagoCheckoutUrl,
       })
       .select()
       .single();
@@ -61,6 +67,8 @@ export class SupabaseGiftRepository implements GiftRepository {
         price: gift.price,
         category: gift.category,
         status: gift.status,
+        mercado_pago_preference_id: gift.mercadoPagoPreferenceId ?? null,
+        mercado_pago_checkout_url: gift.mercadoPagoCheckoutUrl,
       })
       .eq("id", gift.id)
       .select()

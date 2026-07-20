@@ -1,13 +1,19 @@
 "use server";
 
-import { createListGiftsUseCase, createUpsertGiftUseCase } from "@/infrastructure/composition";
+import {
+  createListGiftsUseCase,
+  createUpsertGiftUseCase,
+  createRefreshGiftPaymentLinkUseCase,
+} from "@/infrastructure/composition";
 import { UpsertGiftUseCase } from "@/application/use-cases/admin/UpsertGiftUseCase";
+import { RefreshGiftPaymentLinkUseCase } from "@/application/use-cases/gifts/RefreshGiftPaymentLinkUseCase";
 import { GiftRepository } from "@/domain/repositories/GiftRepository";
 import { parseXlsx } from "@/shared/utils/parseXlsx";
 
 export interface ImportResult {
   created: number;
   skipped: number;
+  withoutPaymentLink: number;
   errors: { row: number; message: string }[];
 }
 
@@ -26,14 +32,15 @@ function parseBrazilianDecimal(raw: string): number {
   return Number(trimmed);
 }
 
-/** Exported for testing: processes already-parsed rows against injected repository/use-case. */
+/** Exported for testing: processes already-parsed rows against injected repository/use-cases. */
 export async function importGiftRows(
   rows: { [column: string]: string }[],
   giftRepository: Pick<GiftRepository, "findAll">,
-  upsertGiftUseCase: Pick<UpsertGiftUseCase, "execute">
+  upsertGiftUseCase: Pick<UpsertGiftUseCase, "execute">,
+  refreshGiftPaymentLinkUseCase: Pick<RefreshGiftPaymentLinkUseCase, "execute">
 ): Promise<ImportResult> {
   const existingNames = new Set((await giftRepository.findAll()).map((gift) => gift.name.toLowerCase()));
-  const result: ImportResult = { created: 0, skipped: 0, errors: [] };
+  const result: ImportResult = { created: 0, skipped: 0, withoutPaymentLink: 0, errors: [] };
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
@@ -58,9 +65,15 @@ export async function importGiftRows(
       continue;
     }
 
-    await upsertGiftUseCase.execute({ name, description, category, price, imageUrl: null });
+    const { gift } = await upsertGiftUseCase.execute({ name, description, category, price, imageUrl: null });
     existingNames.add(name.toLowerCase());
     result.created++;
+
+    try {
+      await refreshGiftPaymentLinkUseCase.execute(gift);
+    } catch {
+      result.withoutPaymentLink++;
+    }
   }
 
   return result;
@@ -79,7 +92,12 @@ export async function importGiftsAction(
   const rows = await parseXlsx(fileBuffer);
 
   try {
-    const result = await importGiftRows(rows, { findAll: () => createListGiftsUseCase().execute() }, createUpsertGiftUseCase());
+    const result = await importGiftRows(
+      rows,
+      { findAll: () => createListGiftsUseCase().execute() },
+      createUpsertGiftUseCase(),
+      createRefreshGiftPaymentLinkUseCase()
+    );
     return { status: "done", result };
   } catch {
     return { status: "error", message: "Não foi possível importar os presentes agora." };

@@ -47,6 +47,12 @@ export function ImportGiftsForm() {
         <div className="rounded-md border border-line bg-paper p-4 font-sans text-sm text-forest">
           <p>{state.result.created} presente(s) importado(s).</p>
           <p>{state.result.skipped} ignorado(s) por já existir.</p>
+          {state.result.withoutPaymentLink > 0 && (
+            <p>
+              {state.result.withoutPaymentLink} presente(s) importado(s) sem link de pagamento — edite e salve
+              para gerar.
+            </p>
+          )}
           {state.result.errors.length > 0 && (
             <div className="mt-2">
               <p className="text-danger">{state.result.errors.length} linha(s) com erro:</p>

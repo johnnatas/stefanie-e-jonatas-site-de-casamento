@@ -1,6 +1,7 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { Gift, GiftStatus } from "@/domain/entities/Gift";
 import { GiftRepository } from "@/domain/repositories/GiftRepository";
+import { GiftHasContributionsError } from "@/domain/errors/DomainError";
 
 interface GiftRow {
   id: string;
@@ -70,6 +71,23 @@ export class SupabaseGiftRepository implements GiftRepository {
     }
 
     return toEntity(data as GiftRow);
+  }
+
+  async delete(id: string): Promise<void> {
+    const { error, count } = await this.client.from("gifts").delete({ count: "exact" }).eq("id", id);
+
+    if (error) {
+      if (error.code === "23503") {
+        throw new GiftHasContributionsError(
+          "Não é possível excluir: este presente já tem contribuições registradas."
+        );
+      }
+      throw new Error(`Failed to delete gift: ${error.message}`);
+    }
+
+    if (!count) {
+      throw new Error(`Gift with id ${id} not found.`);
+    }
   }
 
   async findAll(): Promise<Gift[]> {

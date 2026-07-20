@@ -1,10 +1,11 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useRef, useState } from "react";
 import {
   upsertGiftAction,
   type UpsertGiftActionState,
 } from "@/app/admin/(protected)/presentes/actions";
+import { fetchGiftLinkMetadataAction } from "@/app/admin/(protected)/presentes/linkAutofillAction";
 import { GiftFormValues } from "@/components/admin/giftFormSchema";
 import { PhotoUploadField } from "@/components/admin/PhotoUploadField";
 
@@ -18,18 +19,104 @@ const inputClassName =
 
 const initialUpsertGiftActionState: UpsertGiftActionState = { status: "idle" };
 
+interface LinkFetchState {
+  status: "idle" | "pending" | "success" | "error";
+  message?: string;
+}
+
+const initialLinkFetchState: LinkFetchState = { status: "idle" };
+
 export function GiftForm({ defaultValues, checkoutUrl }: GiftFormProps) {
   const [state, formAction, isPending] = useActionState(upsertGiftAction, initialUpsertGiftActionState);
+  const [imageUrl, setImageUrl] = useState<string | null>(defaultValues?.imageUrl ?? null);
+  const [linkFetchState, setLinkFetchState] = useState<LinkFetchState>(initialLinkFetchState);
+
+  const productLinkRef = useRef<HTMLInputElement>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const priceInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleFetchLinkMetadata() {
+    const url = productLinkRef.current?.value.trim();
+    if (!url) return;
+
+    setLinkFetchState({ status: "pending" });
+    const result = await fetchGiftLinkMetadataAction(url);
+
+    if (result.status === "error") {
+      setLinkFetchState({ status: "error", message: result.message ?? "Não foi possível buscar dados desse link." });
+      return;
+    }
+
+    const found: string[] = [];
+    if (result.title && nameInputRef.current) {
+      nameInputRef.current.value = result.title;
+      found.push("título");
+    }
+    if (result.price !== undefined && priceInputRef.current) {
+      priceInputRef.current.value = String(result.price);
+      found.push("valor");
+    }
+    if (result.imageUrl) {
+      setImageUrl(result.imageUrl);
+      found.push("imagem");
+    }
+
+    const allFields = ["título", "valor", "imagem"];
+    const missing = allFields.filter((field) => !found.includes(field));
+    const message =
+      missing.length === 0
+        ? "Título, valor e imagem encontrados."
+        : `${found.length > 0 ? found.join(", ") + " encontrado(s). " : ""}Preencha ${missing.join(", ")} manualmente.`;
+
+    setLinkFetchState({ status: "success", message });
+  }
 
   return (
     <form action={formAction} className="flex max-w-md flex-col gap-4">
       {defaultValues?.id && <input type="hidden" name="id" value={defaultValues.id} />}
 
       <div>
+        <label htmlFor="productLink" className="block font-sans text-sm text-forest">
+          Link do produto (opcional)
+        </label>
+        <div className="mt-1 flex items-center gap-2">
+          <input
+            id="productLink"
+            ref={productLinkRef}
+            type="url"
+            placeholder="Cole o link do produto"
+            className={inputClassName}
+          />
+          <button
+            type="button"
+            onClick={handleFetchLinkMetadata}
+            disabled={linkFetchState.status === "pending"}
+            className="shrink-0 rounded-full border border-line px-4 py-2 font-sans text-xs uppercase tracking-widest text-forest transition-colors hover:border-moss disabled:opacity-60"
+          >
+            {linkFetchState.status === "pending" ? "Buscando..." : "Buscar dados do link"}
+          </button>
+        </div>
+        {linkFetchState.message && (
+          <p
+            className={`mt-1 font-sans text-xs ${linkFetchState.status === "error" ? "text-danger" : "text-moss"}`}
+          >
+            {linkFetchState.message}
+          </p>
+        )}
+      </div>
+
+      <div>
         <label htmlFor="name" className="block font-sans text-sm text-forest">
           Nome
         </label>
-        <input id="name" name="name" defaultValue={defaultValues?.name} required className={inputClassName} />
+        <input
+          id="name"
+          name="name"
+          ref={nameInputRef}
+          defaultValue={defaultValues?.name}
+          required
+          className={inputClassName}
+        />
       </div>
 
       <div>
@@ -48,7 +135,7 @@ export function GiftForm({ defaultValues, checkoutUrl }: GiftFormProps) {
 
       <PhotoUploadField
         name="image"
-        currentUrl={defaultValues?.imageUrl ?? null}
+        currentUrl={imageUrl}
         label="Foto do presente"
         className="h-40 w-full rounded-md"
         showRemoveCheckbox={false}
@@ -61,6 +148,7 @@ export function GiftForm({ defaultValues, checkoutUrl }: GiftFormProps) {
         <input
           id="price"
           name="price"
+          ref={priceInputRef}
           type="number"
           min={0}
           step="0.01"

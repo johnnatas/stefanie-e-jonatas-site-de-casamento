@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { createListGiftsUseCase } from "@/infrastructure/composition";
+import { isBackendConfigured } from "@/infrastructure/config/env";
+import { ConfigurationNotice } from "@/components/ui/ConfigurationNotice";
 import { GiftForm } from "@/components/admin/GiftForm";
 
 export const metadata: Metadata = {
@@ -13,7 +15,33 @@ interface EditGiftPageProps {
 
 export default async function EditGiftPage({ params }: EditGiftPageProps) {
   const { id } = await params;
-  const gifts = await createListGiftsUseCase().execute();
+  const backendConfigured = isBackendConfigured();
+
+  if (!backendConfigured) {
+    return (
+      <div>
+        <h1 className="font-serif text-3xl text-forest">Editar presente</h1>
+        <div className="mt-6">
+          <ConfigurationNotice message="Configure o Supabase (.env.local) para editar presentes." />
+        </div>
+      </div>
+    );
+  }
+
+  let gifts;
+  try {
+    gifts = await createListGiftsUseCase().execute();
+  } catch {
+    return (
+      <div>
+        <h1 className="font-serif text-3xl text-forest">Editar presente</h1>
+        <div className="mt-6">
+          <ConfigurationNotice message="Não foi possível carregar este presente agora." />
+        </div>
+      </div>
+    );
+  }
+
   const gift = gifts.find((candidate) => candidate.id === id);
 
   if (!gift) {

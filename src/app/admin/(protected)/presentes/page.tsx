@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createListGiftsUseCase } from "@/infrastructure/composition";
 import { isBackendConfigured } from "@/infrastructure/config/env";
 import { ConfigurationNotice } from "@/components/ui/ConfigurationNotice";
+import { DeleteGiftButton } from "@/components/admin/DeleteGiftButton";
 import { formatCurrency } from "@/shared/utils/formatCurrency";
 import type { Gift, GiftStatus } from "@/domain/entities/Gift";
 
@@ -62,6 +63,7 @@ export default async function AdminGiftsPage() {
                 <th className="py-2 pr-4">Valor</th>
                 <th className="py-2 pr-4">Status</th>
                 <th className="py-2 pr-4" />
+                <th className="py-2 pr-4" />
               </tr>
             </thead>
             <tbody>
@@ -75,6 +77,9 @@ export default async function AdminGiftsPage() {
                     <Link href={`/admin/presentes/${gift.id}`} className="text-moss hover:text-moss/80">
                       Editar
                     </Link>
+                  </td>
+                  <td className="py-3 pr-4">
+                    <DeleteGiftButton giftId={gift.id!} giftName={gift.name} />
                   </td>
                 </tr>
               ))}

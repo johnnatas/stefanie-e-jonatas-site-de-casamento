@@ -31,7 +31,7 @@ export default async function AdminGuestsPage() {
             href="/admin/convidados/importar"
             className="font-sans text-sm uppercase tracking-widest text-moss hover:text-forest"
           >
-            Importar CSV
+            Importar
           </Link>
           <Link
             href="/admin/convidados/novo"

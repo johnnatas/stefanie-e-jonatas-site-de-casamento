@@ -58,6 +58,45 @@ export class SupabaseGuestRepository implements GuestRepository {
     return toEntity(data as GuestRow);
   }
 
+  async update(guest: Guest): Promise<Guest> {
+    const { data, error } = await this.client
+      .from("guests")
+      .update({
+        full_name: guest.fullName,
+        nickname: guest.nickname ?? null,
+        email: guest.email ?? null,
+        phone: guest.phone ?? null,
+        companions_count: guest.companionsCount,
+        message: guest.message ?? null,
+        attendance_status: guest.attendanceStatus,
+      })
+      .eq("id", guest.id)
+      .select()
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Failed to update guest: ${error.message}`);
+    }
+
+    if (!data) {
+      throw new GuestNotFoundError("Guest not found.");
+    }
+
+    return toEntity(data as GuestRow);
+  }
+
+  async delete(id: string): Promise<void> {
+    const { error, count } = await this.client.from("guests").delete({ count: "exact" }).eq("id", id);
+
+    if (error) {
+      throw new Error(`Failed to delete guest: ${error.message}`);
+    }
+
+    if (!count) {
+      throw new GuestNotFoundError("Guest not found.");
+    }
+  }
+
   async findAll(): Promise<Guest[]> {
     const { data, error } = await this.client
       .from("guests")

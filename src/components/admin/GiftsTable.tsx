@@ -3,12 +3,20 @@
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import type { Gift, GiftStatus } from "@/domain/entities/Gift";
+import type { GiftStatus } from "@/domain/entities/Gift";
 import { formatCurrency } from "@/shared/utils/formatCurrency";
 import { DeleteGiftButton } from "@/components/admin/DeleteGiftButton";
 
+export interface GiftListItem {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  status: GiftStatus;
+}
+
 interface GiftsTableProps {
-  gifts: Gift[];
+  gifts: GiftListItem[];
 }
 
 const STATUS_LABEL: Record<GiftStatus, string> = {
@@ -142,7 +150,7 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
                     </Link>
                   </td>
                   <td className="py-3 pr-4">
-                    <DeleteGiftButton giftId={gift.id!} giftName={gift.name} />
+                    <DeleteGiftButton giftId={gift.id} giftName={gift.name} />
                   </td>
                 </tr>
               ))}

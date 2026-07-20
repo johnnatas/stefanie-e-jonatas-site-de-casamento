@@ -55,7 +55,15 @@ export default async function AdminGiftsPage() {
       ) : gifts.length === 0 ? (
         <p className="mt-6 font-sans text-forest/70">Nenhum presente cadastrado ainda.</p>
       ) : (
-        <GiftsTable gifts={gifts} />
+        <GiftsTable
+          gifts={gifts.map((gift) => ({
+            id: gift.id!,
+            name: gift.name,
+            category: gift.category,
+            price: gift.price,
+            status: gift.status,
+          }))}
+        />
       )}
     </div>
   );

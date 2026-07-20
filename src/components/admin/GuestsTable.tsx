@@ -3,14 +3,24 @@
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import type { Guest } from "@/domain/entities/Guest";
+import type { AttendanceStatus } from "@/domain/entities/Guest";
 import { DeleteGuestButton } from "@/components/admin/DeleteGuestButton";
 
-interface GuestsTableProps {
-  guests: Guest[];
+export interface GuestListItem {
+  id: string;
+  fullName: string;
+  nickname?: string;
+  email?: string;
+  phone?: string;
+  companionsCount: number;
+  attendanceStatus: AttendanceStatus;
 }
 
-const STATUS_LABELS: Record<Guest["attendanceStatus"], string> = {
+interface GuestsTableProps {
+  guests: GuestListItem[];
+}
+
+const STATUS_LABELS: Record<AttendanceStatus, string> = {
   pending: "Pendente",
   confirmed: "Confirmado",
   declined: "Recusado",
@@ -19,7 +29,7 @@ const STATUS_LABELS: Record<Guest["attendanceStatus"], string> = {
 const inputClassName =
   "mt-1 w-full rounded-md border border-line bg-paper px-4 py-2 font-sans text-forest focus:border-moss focus:outline-none";
 
-function isValidStatus(value: string | null): value is Guest["attendanceStatus"] {
+function isValidStatus(value: string | null): value is AttendanceStatus {
   return value === "pending" || value === "confirmed" || value === "declined";
 }
 
@@ -28,11 +38,11 @@ export function GuestsTable({ guests }: GuestsTableProps) {
   const searchParams = useSearchParams();
 
   const [search, setSearch] = useState(searchParams.get("search") ?? "");
-  const [status, setStatus] = useState<Guest["attendanceStatus"] | "all">(
-    isValidStatus(searchParams.get("status")) ? (searchParams.get("status") as Guest["attendanceStatus"]) : "all"
+  const [status, setStatus] = useState<AttendanceStatus | "all">(
+    isValidStatus(searchParams.get("status")) ? (searchParams.get("status") as AttendanceStatus) : "all"
   );
 
-  function syncUrl(nextSearch: string, nextStatus: Guest["attendanceStatus"] | "all") {
+  function syncUrl(nextSearch: string, nextStatus: AttendanceStatus | "all") {
     const params = new URLSearchParams();
     if (nextSearch) params.set("search", nextSearch);
     if (nextStatus !== "all") params.set("status", nextStatus);
@@ -76,7 +86,7 @@ export function GuestsTable({ guests }: GuestsTableProps) {
             id="guest-status"
             value={status}
             onChange={(event) => {
-              const nextStatus = event.target.value as Guest["attendanceStatus"] | "all";
+              const nextStatus = event.target.value as AttendanceStatus | "all";
               setStatus(nextStatus);
               syncUrl(search, nextStatus);
             }}
@@ -123,7 +133,7 @@ export function GuestsTable({ guests }: GuestsTableProps) {
                     </Link>
                   </td>
                   <td className="py-3 pr-4">
-                    <DeleteGuestButton guestId={guest.id!} guestName={guest.fullName} />
+                    <DeleteGuestButton guestId={guest.id} guestName={guest.fullName} />
                   </td>
                 </tr>
               ))}

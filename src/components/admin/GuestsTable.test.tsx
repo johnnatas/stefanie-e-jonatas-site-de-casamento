@@ -1,15 +1,14 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { GuestsTable } from "@/components/admin/GuestsTable";
-import type { Guest } from "@/domain/entities/Guest";
+import { GuestsTable, type GuestListItem } from "@/components/admin/GuestsTable";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: vi.fn() }),
   useSearchParams: () => new URLSearchParams(),
 }));
 
-function makeGuest(overrides: Partial<Guest>): Guest {
+function makeGuest(overrides: Partial<GuestListItem>): GuestListItem {
   return {
     id: "1",
     fullName: "Ana Silva",
@@ -17,15 +16,12 @@ function makeGuest(overrides: Partial<Guest>): Guest {
     email: undefined,
     phone: undefined,
     companionsCount: 0,
-    message: undefined,
     attendanceStatus: "pending",
-    createdAt: new Date(),
-    totalAttendeesCount: () => 0,
     ...overrides,
-  } as Guest;
+  };
 }
 
-const guests: Guest[] = [
+const guests: GuestListItem[] = [
   makeGuest({ id: "1", fullName: "Ana Silva", attendanceStatus: "confirmed" }),
   makeGuest({ id: "2", fullName: "Bruno Costa", attendanceStatus: "pending" }),
   makeGuest({ id: "3", fullName: "Carla Nunes", nickname: "Carlinha", attendanceStatus: "declined" }),

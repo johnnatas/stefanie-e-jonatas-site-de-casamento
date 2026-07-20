@@ -1,33 +1,25 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { GiftsTable } from "@/components/admin/GiftsTable";
-import type { Gift } from "@/domain/entities/Gift";
+import { GiftsTable, type GiftListItem } from "@/components/admin/GiftsTable";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: vi.fn() }),
   useSearchParams: () => new URLSearchParams(),
 }));
 
-function makeGift(overrides: Partial<Gift>): Gift {
+function makeGift(overrides: Partial<GiftListItem>): GiftListItem {
   return {
     id: "1",
     name: "Jogo de panelas",
-    description: "5 panelas",
-    imageUrl: "/a.jpg",
     price: 200,
     category: "cozinha",
     status: "available",
-    createdAt: new Date(),
-    isAvailable: () => true,
-    reserve: () => makeGift(overrides),
-    markAsPaid: () => makeGift(overrides),
-    releaseToAvailable: () => makeGift(overrides),
     ...overrides,
-  } as Gift;
+  };
 }
 
-const gifts: Gift[] = [
+const gifts: GiftListItem[] = [
   makeGift({ id: "1", name: "Jogo de panelas", category: "cozinha", status: "available" }),
   makeGift({ id: "2", name: "Aspirador robô", category: "casa", status: "reserved" }),
   makeGift({ id: "3", name: "Jogo de taças", category: "cozinha", status: "paid" }),

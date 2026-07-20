@@ -55,7 +55,17 @@ export default async function AdminGuestsPage() {
       ) : guests.length === 0 ? (
         <p className="mt-6 font-sans text-forest/70">Nenhum convidado cadastrado ainda.</p>
       ) : (
-        <GuestsTable guests={guests} />
+        <GuestsTable
+          guests={guests.map((guest) => ({
+            id: guest.id!,
+            fullName: guest.fullName,
+            nickname: guest.nickname,
+            email: guest.email,
+            phone: guest.phone,
+            companionsCount: guest.companionsCount,
+            attendanceStatus: guest.attendanceStatus,
+          }))}
+        />
       )}
     </div>
   );

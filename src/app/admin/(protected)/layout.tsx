@@ -5,6 +5,7 @@ const ADMIN_NAV = [
   { label: "Dashboard", href: "/admin/dashboard" },
   { label: "Convidados", href: "/admin/convidados" },
   { label: "Presentes", href: "/admin/presentes" },
+  { label: "Pagamentos", href: "/admin/pagamentos" },
   { label: "Conteúdo", href: "/admin/conteudo" },
   { label: "Integrações", href: "/admin/integracoes" },
 ];

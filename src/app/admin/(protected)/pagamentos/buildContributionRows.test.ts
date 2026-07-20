@@ -50,4 +50,33 @@ describe("buildContributionRows", () => {
 
     expect(rows[0].giftName).toBe("—");
   });
+
+  it("carries the expected payment date through when present", () => {
+    const contribution = GiftContribution.create({
+      id: "c-1",
+      giftId: "missing-gift",
+      guestName: "Ana",
+      guestEmail: "ana@example.com",
+      amount: 100,
+      expectedPaymentDate: new Date("2027-05-01T23:59:59-03:00"),
+    });
+
+    const rows = buildContributionRows([contribution], []);
+
+    expect(rows[0].expectedPaymentDate).toEqual(new Date("2027-05-01T23:59:59-03:00"));
+  });
+
+  it("defaults expectedPaymentDate to null when absent", () => {
+    const contribution = GiftContribution.create({
+      id: "c-1",
+      giftId: "missing-gift",
+      guestName: "Ana",
+      guestEmail: "ana@example.com",
+      amount: 100,
+    });
+
+    const rows = buildContributionRows([contribution], []);
+
+    expect(rows[0].expectedPaymentDate).toBeNull();
+  });
 });

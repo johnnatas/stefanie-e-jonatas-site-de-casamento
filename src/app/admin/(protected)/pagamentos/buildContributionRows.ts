@@ -7,6 +7,7 @@ export interface ContributionRow {
   giftName: string;
   amount: number;
   status: GiftContribution["status"];
+  expectedPaymentDate: Date | null;
   createdAt: Date;
 }
 
@@ -21,6 +22,7 @@ export function buildContributionRows(contributions: GiftContribution[], gifts: 
       giftName: giftNameById.get(contribution.giftId) ?? "—",
       amount: contribution.amount,
       status: contribution.status,
+      expectedPaymentDate: contribution.expectedPaymentDate,
       createdAt: contribution.createdAt,
     }));
 }

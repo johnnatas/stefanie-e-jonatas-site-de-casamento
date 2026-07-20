@@ -13,6 +13,7 @@ const STATUS_LABEL: Record<ContributionRow["status"], string> = {
   pending: "Pendente",
   approved: "Aprovado",
   rejected: "Rejeitado",
+  expired: "Expirada",
 };
 
 export default async function AdminPagamentosPage() {
@@ -49,13 +50,14 @@ export default async function AdminPagamentosPage() {
         <p className="mt-6 font-sans text-forest/70">Nenhuma contribuição registrada ainda.</p>
       ) : (
         <div className="mt-6 overflow-x-auto">
-          <table className="w-full min-w-[560px] border-collapse font-sans text-sm">
+          <table className="w-full min-w-[640px] border-collapse font-sans text-sm">
             <thead>
               <tr className="border-b border-line text-left text-forest/70">
                 <th className="py-2 pr-4">Convidado</th>
                 <th className="py-2 pr-4">Presente</th>
                 <th className="py-2 pr-4">Valor</th>
                 <th className="py-2 pr-4">Status</th>
+                <th className="py-2 pr-4">Data prevista de pagamento</th>
                 <th className="py-2 pr-4">Data</th>
               </tr>
             </thead>
@@ -66,6 +68,9 @@ export default async function AdminPagamentosPage() {
                   <td className="py-3 pr-4 text-forest/70">{row.giftName}</td>
                   <td className="py-3 pr-4 text-forest/70">{formatCurrency(row.amount)}</td>
                   <td className="py-3 pr-4 text-forest/70">{STATUS_LABEL[row.status]}</td>
+                  <td className="py-3 pr-4 text-forest/70">
+                    {row.expectedPaymentDate ? row.expectedPaymentDate.toLocaleDateString("pt-BR") : "—"}
+                  </td>
                   <td className="py-3 pr-4 text-forest/70">{row.createdAt.toLocaleDateString("pt-BR")}</td>
                 </tr>
               ))}

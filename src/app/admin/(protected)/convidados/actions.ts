@@ -1,21 +1,27 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createCreateGuestUseCase } from "@/infrastructure/composition";
+import { createCreateGuestUseCase, createUpdateGuestUseCase } from "@/infrastructure/composition";
 import { guestFormSchema } from "@/components/admin/guestFormSchema";
 
-export interface CreateGuestActionState {
+export interface UpsertGuestActionState {
   status: "idle" | "error";
   message?: string;
 }
 
-export async function createGuestAction(
-  _prevState: CreateGuestActionState,
+export async function upsertGuestAction(
+  _prevState: UpsertGuestActionState,
   formData: FormData
-): Promise<CreateGuestActionState> {
+): Promise<UpsertGuestActionState> {
   const parsed = guestFormSchema.safeParse({
+    id: formData.get("id") || undefined,
     fullName: formData.get("fullName"),
     nickname: formData.get("nickname") || undefined,
+    email: formData.get("email") || undefined,
+    phone: formData.get("phone") || undefined,
+    companionsCount: formData.get("companionsCount") || 0,
+    attendanceStatus: formData.get("attendanceStatus") || "pending",
+    message: formData.get("message") || undefined,
   });
 
   if (!parsed.success) {
@@ -23,9 +29,13 @@ export async function createGuestAction(
   }
 
   try {
-    await createCreateGuestUseCase().execute(parsed.data);
+    if (parsed.data.id) {
+      await createUpdateGuestUseCase().execute({ ...parsed.data, id: parsed.data.id });
+    } else {
+      await createCreateGuestUseCase().execute(parsed.data);
+    }
   } catch {
-    return { status: "error", message: "Não foi possível cadastrar o convidado agora." };
+    return { status: "error", message: "Não foi possível salvar o convidado agora." };
   }
 
   redirect("/admin/convidados");

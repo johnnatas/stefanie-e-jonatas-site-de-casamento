@@ -3,6 +3,7 @@ import { SupabaseGuestRepository } from "@/infrastructure/supabase/SupabaseGuest
 import { SupabaseGiftRepository } from "@/infrastructure/supabase/SupabaseGiftRepository";
 import { SupabaseGiftContributionRepository } from "@/infrastructure/supabase/SupabaseGiftContributionRepository";
 import { SupabaseSiteContentRepository } from "@/infrastructure/supabase/SupabaseSiteContentRepository";
+import { SupabaseAdminSecuritySettingsRepository } from "@/infrastructure/supabase/SupabaseAdminSecuritySettingsRepository";
 import { GetSiteContentUseCase } from "@/application/use-cases/content/GetSiteContentUseCase";
 import { UpdateSiteContentUseCase } from "@/application/use-cases/content/UpdateSiteContentUseCase";
 import { isBackendConfigured } from "@/infrastructure/config/env";
@@ -21,6 +22,11 @@ import { DeleteGuestUseCase } from "@/application/use-cases/admin/DeleteGuestUse
 import { DeleteGiftUseCase } from "@/application/use-cases/admin/DeleteGiftUseCase";
 import { GetDashboardSummaryUseCase } from "@/application/use-cases/admin/GetDashboardSummaryUseCase";
 import { UpsertGiftUseCase } from "@/application/use-cases/admin/UpsertGiftUseCase";
+import { RefreshGiftPaymentLinkUseCase } from "@/application/use-cases/gifts/RefreshGiftPaymentLinkUseCase";
+import { VerifyPriceChangeSecretUseCase } from "@/application/use-cases/security/VerifyPriceChangeSecretUseCase";
+import { UpdateSecretKeyUseCase } from "@/application/use-cases/security/UpdateSecretKeyUseCase";
+import { UpdateMercadoPagoAccessTokenUseCase } from "@/application/use-cases/security/UpdateMercadoPagoAccessTokenUseCase";
+import { GetAdminSecuritySettingsUseCase } from "@/application/use-cases/security/GetAdminSecuritySettingsUseCase";
 
 export { uploadSiteContentPhoto, InvalidPhotoUploadError } from "@/infrastructure/supabase/uploadSiteContentPhoto";
 export { resolvePhotoField } from "@/infrastructure/supabase/resolvePhotoField";
@@ -32,12 +38,14 @@ export { resolvePhotoField } from "@/infrastructure/supabase/resolvePhotoField";
  */
 function repositories() {
   const client = getSupabaseServiceRoleClient();
+  const securitySettingsRepository = new SupabaseAdminSecuritySettingsRepository(client);
   return {
     guestRepository: new SupabaseGuestRepository(client),
     giftRepository: new SupabaseGiftRepository(client),
     giftContributionRepository: new SupabaseGiftContributionRepository(client),
     siteContentRepository: new SupabaseSiteContentRepository(client),
-    paymentGateway: new MercadoPagoGateway(),
+    securitySettingsRepository,
+    paymentGateway: new MercadoPagoGateway(securitySettingsRepository),
   };
 }
 
@@ -70,6 +78,27 @@ export function createGetDashboardSummaryUseCase(): GetDashboardSummaryUseCase {
 
 export function createUpsertGiftUseCase(): UpsertGiftUseCase {
   return new UpsertGiftUseCase(repositories().giftRepository);
+}
+
+export function createRefreshGiftPaymentLinkUseCase(): RefreshGiftPaymentLinkUseCase {
+  const { giftRepository, paymentGateway } = repositories();
+  return new RefreshGiftPaymentLinkUseCase(giftRepository, paymentGateway);
+}
+
+export function createVerifyPriceChangeSecretUseCase(): VerifyPriceChangeSecretUseCase {
+  return new VerifyPriceChangeSecretUseCase(repositories().securitySettingsRepository);
+}
+
+export function createUpdateSecretKeyUseCase(): UpdateSecretKeyUseCase {
+  return new UpdateSecretKeyUseCase(repositories().securitySettingsRepository);
+}
+
+export function createUpdateMercadoPagoAccessTokenUseCase(): UpdateMercadoPagoAccessTokenUseCase {
+  return new UpdateMercadoPagoAccessTokenUseCase(repositories().securitySettingsRepository);
+}
+
+export function createGetAdminSecuritySettingsUseCase(): GetAdminSecuritySettingsUseCase {
+  return new GetAdminSecuritySettingsUseCase(repositories().securitySettingsRepository);
 }
 
 export function createSearchGuestsUseCase(): SearchGuestsUseCase {

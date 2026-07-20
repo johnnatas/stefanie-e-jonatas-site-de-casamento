@@ -3,7 +3,7 @@
 import { createListGiftsUseCase, createUpsertGiftUseCase } from "@/infrastructure/composition";
 import { UpsertGiftUseCase } from "@/application/use-cases/admin/UpsertGiftUseCase";
 import { GiftRepository } from "@/domain/repositories/GiftRepository";
-import { parseCsv } from "@/shared/utils/parseCsv";
+import { parseXlsx } from "@/shared/utils/parseXlsx";
 
 export interface ImportResult {
   created: number;
@@ -72,11 +72,11 @@ export async function importGiftsAction(
 ): Promise<ImportGiftsActionState> {
   const file = formData.get("file");
   if (!(file instanceof File) || file.size === 0) {
-    return { status: "error", message: "Selecione um arquivo CSV." };
+    return { status: "error", message: "Selecione um arquivo Excel (.xlsx)." };
   }
 
-  const fileContent = await file.text();
-  const rows = parseCsv(fileContent);
+  const fileBuffer = await file.arrayBuffer();
+  const rows = await parseXlsx(fileBuffer);
 
   try {
     const result = await importGiftRows(rows, { findAll: () => createListGiftsUseCase().execute() }, createUpsertGiftUseCase());

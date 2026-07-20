@@ -16,7 +16,7 @@ export default function ImportGuestsPage() {
       </div>
       <h1 className="mt-2 font-serif text-3xl text-forest">Importar convidados</h1>
       <a
-        href="/templates/convidados-modelo.csv"
+        href="/templates/convidados-modelo.xlsx"
         download
         className="mt-2 inline-block font-sans text-sm text-moss hover:text-moss/80"
       >

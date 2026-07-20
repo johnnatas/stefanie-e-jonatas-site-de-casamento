@@ -15,6 +15,7 @@ const availableGift: GiftDto = {
   id: "gift-1",
   name: "Air fryer",
   description: "Air fryer 5L",
+  imageUrl: null,
   price: 450,
   category: "cozinha",
   status: "available",

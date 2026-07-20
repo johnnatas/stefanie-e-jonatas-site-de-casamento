@@ -17,6 +17,7 @@ describe("mapGiftToDto", () => {
       id: "gift-1",
       name: "Batedeira",
       description: "Batedeira planetária",
+      imageUrl: "/placeholder.jpg",
       price: 500,
       category: "cozinha",
       status: "available",

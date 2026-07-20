@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
+import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
 import { formatCurrency } from "@/shared/utils/formatCurrency";
 import { GiftDto } from "@/components/gifts/GiftDto";
 import {
@@ -31,7 +31,7 @@ export function GiftCard({ gift }: GiftCardProps) {
 
   return (
     <div className="flex flex-col rounded-lg border border-line bg-paper p-5">
-      <PlaceholderImage label={gift.name} className="h-40 w-full rounded-md" />
+      <PhotoOrPlaceholder src={gift.imageUrl} label={gift.name} className="h-40 w-full rounded-md" />
       <h3 className="mt-4 font-serif text-xl text-forest">{gift.name}</h3>
       <p className="mt-1 flex-1 font-sans text-sm text-forest/70">{gift.description}</p>
       <p className="mt-3 font-serif text-lg text-moss">{formatCurrency(gift.price)}</p>

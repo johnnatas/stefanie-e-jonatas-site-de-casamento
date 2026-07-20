@@ -16,7 +16,7 @@ export default function ImportGiftsPage() {
       </div>
       <h1 className="mt-2 font-serif text-3xl text-forest">Importar presentes</h1>
       <a
-        href="/templates/presentes-modelo.csv"
+        href="/templates/presentes-modelo.xlsx"
         download
         className="mt-2 inline-block font-sans text-sm text-moss hover:text-moss/80"
       >

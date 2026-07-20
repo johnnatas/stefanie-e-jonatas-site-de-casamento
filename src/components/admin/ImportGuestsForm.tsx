@@ -16,13 +16,13 @@ export function ImportGuestsForm() {
       <form action={formAction} className="flex flex-col gap-4">
         <div>
           <label htmlFor="file" className="block font-sans text-sm text-forest">
-            Arquivo CSV
+            Arquivo Excel (.xlsx)
           </label>
           <input
             id="file"
             name="file"
             type="file"
-            accept=".csv"
+            accept=".xlsx"
             required
             className="mt-1 w-full font-sans text-sm text-forest"
           />

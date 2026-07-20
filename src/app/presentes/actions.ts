@@ -1,9 +1,15 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { createGiftContributionUseCase } from "@/infrastructure/composition";
+import { createGiftContributionUseCase, getSiteContentOrDefault } from "@/infrastructure/composition";
 import { GiftNotAvailableError, InvalidGiftDataError } from "@/domain/errors/DomainError";
+import {
+  canReserveForLater,
+  latestReservableDate,
+  parseExpectedPaymentDateEndOfDay,
+} from "@/shared/utils/giftReservationWindow";
 
 const contributionSchema = z.object({
   giftId: z.string().min(1, "Presente inválido."),
@@ -48,4 +54,82 @@ export async function createGiftContributionAction(
   }
 
   redirect(checkoutUrl);
+}
+
+const reserveForLaterSchema = z.object({
+  giftId: z.string().min(1, "Presente inválido."),
+  guestName: z.string().min(3, "Informe seu nome completo."),
+  guestEmail: z.string().email("Informe um e-mail válido."),
+  expectedPaymentDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Informe uma data válida."),
+});
+
+export interface ReserveGiftForLaterActionState {
+  status: "idle" | "error" | "success";
+  message?: string;
+  checkoutUrl?: string;
+  guestName?: string;
+  expectedPaymentDate?: string;
+}
+
+export async function reserveGiftForLaterAction(
+  _prevState: ReserveGiftForLaterActionState,
+  formData: FormData
+): Promise<ReserveGiftForLaterActionState> {
+  const parsed = reserveForLaterSchema.safeParse({
+    giftId: formData.get("giftId"),
+    guestName: formData.get("guestName"),
+    guestEmail: formData.get("guestEmail"),
+    expectedPaymentDate: formData.get("expectedPaymentDate"),
+  });
+
+  if (!parsed.success) {
+    return { status: "error", message: "Preencha seu nome, e-mail e a data corretamente." };
+  }
+
+  const settings = await getSiteContentOrDefault("settings");
+  const weddingDate = new Date(settings.weddingDateIso);
+  const expectedPaymentDate = parseExpectedPaymentDateEndOfDay(parsed.data.expectedPaymentDate);
+
+  if (expectedPaymentDate.getTime() < Date.now()) {
+    return { status: "error", message: "A data prevista não pode estar no passado." };
+  }
+
+  if (
+    !canReserveForLater(weddingDate) ||
+    expectedPaymentDate.getTime() > latestReservableDate(weddingDate).getTime()
+  ) {
+    return {
+      status: "error",
+      message: "A data prevista deve ser de até 30 dias antes do casamento.",
+    };
+  }
+
+  try {
+    const result = await createGiftContributionUseCase().execute({
+      giftId: parsed.data.giftId,
+      guestName: parsed.data.guestName,
+      guestEmail: parsed.data.guestEmail,
+      expectedPaymentDate,
+    });
+
+    revalidatePath("/presentes");
+
+    return {
+      status: "success",
+      checkoutUrl: result.checkoutUrl,
+      guestName: parsed.data.guestName,
+      expectedPaymentDate: parsed.data.expectedPaymentDate,
+    };
+  } catch (error) {
+    if (error instanceof GiftNotAvailableError) {
+      return { status: "error", message: "Esse presente já foi escolhido por outra pessoa." };
+    }
+    if (error instanceof InvalidGiftDataError) {
+      return { status: "error", message: "Presente não encontrado." };
+    }
+    return {
+      status: "error",
+      message: "Não foi possível reservar o presente agora. Tente novamente em instantes.",
+    };
+  }
 }

@@ -38,4 +38,23 @@ describe("GiftContribution", () => {
 
     expect(contribution.status).toBe("rejected");
   });
+
+  it("defaults expectedPaymentDate to null", () => {
+    const contribution = GiftContribution.create(validProps);
+
+    expect(contribution.expectedPaymentDate).toBeNull();
+  });
+
+  it("stores an expected payment date when provided", () => {
+    const date = new Date("2027-05-01T23:59:59-03:00");
+    const contribution = GiftContribution.create({ ...validProps, expectedPaymentDate: date });
+
+    expect(contribution.expectedPaymentDate).toBe(date);
+  });
+
+  it("expires a pending contribution", () => {
+    const contribution = GiftContribution.create(validProps).expire();
+
+    expect(contribution.status).toBe("expired");
+  });
 });

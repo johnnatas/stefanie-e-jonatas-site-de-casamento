@@ -1,6 +1,6 @@
 import { InvalidContributionDataError } from "@/domain/errors/DomainError";
 
-export type ContributionStatus = "pending" | "approved" | "rejected";
+export type ContributionStatus = "pending" | "approved" | "rejected" | "expired";
 
 export interface GiftContributionProps {
   id?: string;
@@ -11,6 +11,7 @@ export interface GiftContributionProps {
   status?: ContributionStatus;
   mercadoPagoPreferenceId?: string;
   mercadoPagoPaymentId?: string;
+  expectedPaymentDate?: Date | null;
   createdAt?: Date;
 }
 
@@ -23,6 +24,7 @@ export class GiftContribution {
   readonly status: ContributionStatus;
   readonly mercadoPagoPreferenceId?: string;
   readonly mercadoPagoPaymentId?: string;
+  readonly expectedPaymentDate: Date | null;
   readonly createdAt: Date;
 
   private constructor(props: GiftContributionProps) {
@@ -34,6 +36,7 @@ export class GiftContribution {
     this.status = props.status ?? "pending";
     this.mercadoPagoPreferenceId = props.mercadoPagoPreferenceId;
     this.mercadoPagoPaymentId = props.mercadoPagoPaymentId;
+    this.expectedPaymentDate = props.expectedPaymentDate ?? null;
     this.createdAt = props.createdAt ?? new Date();
   }
 
@@ -63,5 +66,9 @@ export class GiftContribution {
 
   reject(paymentId: string): GiftContribution {
     return new GiftContribution({ ...this, status: "rejected", mercadoPagoPaymentId: paymentId });
+  }
+
+  expire(): GiftContribution {
+    return new GiftContribution({ ...this, status: "expired" });
   }
 }

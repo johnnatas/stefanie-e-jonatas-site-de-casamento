@@ -1,7 +1,13 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createUpsertGiftUseCase, resolvePhotoField } from "@/infrastructure/composition";
+import {
+  createUpsertGiftUseCase,
+  createRefreshGiftPaymentLinkUseCase,
+  createVerifyPriceChangeSecretUseCase,
+  createListGiftsUseCase,
+  resolvePhotoField,
+} from "@/infrastructure/composition";
 import { giftFormSchema } from "@/components/admin/giftFormSchema";
 
 export interface UpsertGiftActionState {
@@ -33,10 +39,36 @@ export async function upsertGiftAction(
     return { status: "error", message: "Verifique os campos do formulário." };
   }
 
+  if (parsed.data.id) {
+    const existingGifts = await createListGiftsUseCase().execute();
+    const existingGift = existingGifts.find((gift) => gift.id === parsed.data.id);
+
+    if (existingGift && existingGift.price !== parsed.data.price) {
+      const secretKey = (formData.get("secretKey") as string) || "";
+      const isValid = await createVerifyPriceChangeSecretUseCase().execute(secretKey);
+      if (!isValid) {
+        return { status: "error", message: "Chave secreta inválida ou não informada." };
+      }
+    }
+  }
+
+  let upsertResult;
   try {
-    await createUpsertGiftUseCase().execute(parsed.data);
+    upsertResult = await createUpsertGiftUseCase().execute(parsed.data);
   } catch {
     return { status: "error", message: "Não foi possível salvar o presente agora." };
+  }
+
+  if (upsertResult.nameOrPriceChanged) {
+    try {
+      await createRefreshGiftPaymentLinkUseCase().execute(upsertResult.gift);
+    } catch {
+      return {
+        status: "error",
+        message:
+          "Presente salvo, mas não foi possível gerar o link de pagamento agora. Edite e salve novamente para tentar de novo.",
+      };
+    }
   }
 
   redirect("/admin/presentes");

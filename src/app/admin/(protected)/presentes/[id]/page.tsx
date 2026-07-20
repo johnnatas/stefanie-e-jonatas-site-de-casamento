@@ -61,6 +61,7 @@ export default async function EditGiftPage({ params }: EditGiftPageProps) {
             price: gift.price,
             category: gift.category,
           }}
+          checkoutUrl={gift.mercadoPagoCheckoutUrl}
         />
       </div>
     </div>

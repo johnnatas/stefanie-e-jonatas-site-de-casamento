@@ -10,6 +10,7 @@ import { PhotoUploadField } from "@/components/admin/PhotoUploadField";
 
 interface GiftFormProps {
   defaultValues?: GiftFormValues;
+  checkoutUrl?: string | null;
 }
 
 const inputClassName =
@@ -17,7 +18,7 @@ const inputClassName =
 
 const initialUpsertGiftActionState: UpsertGiftActionState = { status: "idle" };
 
-export function GiftForm({ defaultValues }: GiftFormProps) {
+export function GiftForm({ defaultValues, checkoutUrl }: GiftFormProps) {
   const [state, formAction, isPending] = useActionState(upsertGiftAction, initialUpsertGiftActionState);
 
   return (
@@ -81,6 +82,46 @@ export function GiftForm({ defaultValues }: GiftFormProps) {
           className={inputClassName}
         />
       </div>
+
+      {defaultValues?.id && (
+        <div>
+          <label htmlFor="secretKey" className="block font-sans text-sm text-forest">
+            Chave secreta (obrigatória se alterar o valor)
+          </label>
+          <input
+            id="secretKey"
+            name="secretKey"
+            type="password"
+            autoComplete="off"
+            className={inputClassName}
+          />
+        </div>
+      )}
+
+      {defaultValues?.id && checkoutUrl && (
+        <div>
+          <label htmlFor="checkoutUrl" className="block font-sans text-sm text-forest">
+            Link de pagamento
+          </label>
+          <div className="mt-1 flex items-center gap-2">
+            <input
+              id="checkoutUrl"
+              type="text"
+              readOnly
+              value={checkoutUrl}
+              onFocus={(event) => event.target.select()}
+              className={inputClassName}
+            />
+            <button
+              type="button"
+              onClick={() => navigator.clipboard.writeText(checkoutUrl)}
+              className="shrink-0 rounded-full border border-line px-4 py-2 font-sans text-xs uppercase tracking-widest text-forest transition-colors hover:border-moss"
+            >
+              Copiar link
+            </button>
+          </div>
+        </div>
+      )}
 
       <button
         type="submit"

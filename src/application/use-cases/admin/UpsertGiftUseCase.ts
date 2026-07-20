@@ -11,12 +11,18 @@ export interface UpsertGiftInput {
   category: string;
 }
 
+export interface UpsertGiftResult {
+  gift: Gift;
+  nameOrPriceChanged: boolean;
+}
+
 export class UpsertGiftUseCase {
   constructor(private readonly giftRepository: GiftRepository) {}
 
-  async execute(input: UpsertGiftInput): Promise<Gift> {
+  async execute(input: UpsertGiftInput): Promise<UpsertGiftResult> {
     if (!input.id) {
-      return this.giftRepository.save(Gift.create(input));
+      const created = await this.giftRepository.save(Gift.create(input));
+      return { gift: created, nameOrPriceChanged: true };
     }
 
     const existingGift = await this.giftRepository.findById(input.id);
@@ -24,7 +30,15 @@ export class UpsertGiftUseCase {
       throw new InvalidGiftDataError(`Gift with id ${input.id} was not found.`);
     }
 
-    const updatedGift = Gift.create({ ...input, status: existingGift.status });
-    return this.giftRepository.update(updatedGift);
+    const updatedGift = Gift.create({
+      ...input,
+      status: existingGift.status,
+      mercadoPagoPreferenceId: existingGift.mercadoPagoPreferenceId,
+      mercadoPagoCheckoutUrl: existingGift.mercadoPagoCheckoutUrl,
+    });
+    const saved = await this.giftRepository.update(updatedGift);
+
+    const nameOrPriceChanged = existingGift.name !== saved.name || existingGift.price !== saved.price;
+    return { gift: saved, nameOrPriceChanged };
   }
 }

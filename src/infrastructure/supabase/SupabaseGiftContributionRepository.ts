@@ -86,15 +86,18 @@ export class SupabaseGiftContributionRepository implements GiftContributionRepos
     return data ? toEntity(data as GiftContributionRow) : null;
   }
 
-  async findByPreferenceId(preferenceId: string): Promise<GiftContribution | null> {
+  async findPendingByGiftId(giftId: string): Promise<GiftContribution | null> {
     const { data, error } = await this.client
       .from("gift_contributions")
       .select()
-      .eq("mercado_pago_preference_id", preferenceId)
+      .eq("gift_id", giftId)
+      .eq("status", "pending")
+      .order("created_at", { ascending: false })
+      .limit(1)
       .maybeSingle();
 
     if (error) {
-      throw new Error(`Failed to find gift contribution by preference id: ${error.message}`);
+      throw new Error(`Failed to find pending gift contribution: ${error.message}`);
     }
 
     return data ? toEntity(data as GiftContributionRow) : null;
@@ -108,6 +111,19 @@ export class SupabaseGiftContributionRepository implements GiftContributionRepos
 
     if (error) {
       throw new Error(`Failed to list approved gift contributions: ${error.message}`);
+    }
+
+    return (data as GiftContributionRow[]).map(toEntity);
+  }
+
+  async findAll(): Promise<GiftContribution[]> {
+    const { data, error } = await this.client
+      .from("gift_contributions")
+      .select()
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      throw new Error(`Failed to list gift contributions: ${error.message}`);
     }
 
     return (data as GiftContributionRow[]).map(toEntity);

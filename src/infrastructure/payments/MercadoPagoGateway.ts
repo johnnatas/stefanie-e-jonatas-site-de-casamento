@@ -6,6 +6,7 @@ import {
   PaymentGateway,
   PaymentStatus,
 } from "@/application/ports/PaymentGateway";
+import { AdminSecuritySettingsRepository } from "@/domain/repositories/AdminSecuritySettingsRepository";
 import { getEnv } from "@/infrastructure/config/env";
 
 function mapStatus(mercadoPagoStatus: string | undefined): PaymentStatus {
@@ -15,13 +16,20 @@ function mapStatus(mercadoPagoStatus: string | undefined): PaymentStatus {
 }
 
 export class MercadoPagoGateway implements PaymentGateway {
-  private getClient(): MercadoPagoConfig {
-    return new MercadoPagoConfig({ accessToken: getEnv().MERCADOPAGO_ACCESS_TOKEN });
+  constructor(private readonly securitySettingsRepository: AdminSecuritySettingsRepository) {}
+
+  private async getClient(): Promise<MercadoPagoConfig> {
+    const settings = await this.securitySettingsRepository.getSettings();
+    if (!settings.mercadoPagoAccessToken) {
+      throw new Error("Mercado Pago não está configurado. Configure o Access Token em Integrações.");
+    }
+    return new MercadoPagoConfig({ accessToken: settings.mercadoPagoAccessToken });
   }
 
   async createPreference(input: CreatePreferenceInput): Promise<CreatePreferenceOutput> {
     const siteUrl = getEnv().NEXT_PUBLIC_SITE_URL;
-    const preference = new Preference(this.getClient());
+    const client = await this.getClient();
+    const preference = new Preference(client);
 
     const result = await preference.create({
       body: {
@@ -54,7 +62,8 @@ export class MercadoPagoGateway implements PaymentGateway {
   }
 
   async getPayment(paymentId: string): Promise<PaymentDetails> {
-    const payment = new Payment(this.getClient());
+    const client = await this.getClient();
+    const payment = new Payment(client);
     const result = await payment.get({ id: paymentId });
 
     if (!result.id || !result.external_reference) {

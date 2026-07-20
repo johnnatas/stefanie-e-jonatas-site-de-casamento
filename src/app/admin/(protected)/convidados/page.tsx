@@ -32,12 +32,20 @@ export default async function AdminGuestsPage() {
     <div>
       <div className="flex items-center justify-between">
         <h1 className="font-serif text-3xl text-forest">Convidados</h1>
-        <Link
-          href="/admin/convidados/novo"
-          className="font-sans text-sm uppercase tracking-widest text-moss hover:text-forest"
-        >
-          + Novo convidado
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/admin/convidados/importar"
+            className="font-sans text-sm uppercase tracking-widest text-moss hover:text-forest"
+          >
+            Importar CSV
+          </Link>
+          <Link
+            href="/admin/convidados/novo"
+            className="font-sans text-sm uppercase tracking-widest text-moss hover:text-forest"
+          >
+            + Novo convidado
+          </Link>
+        </div>
       </div>
 
       {!guests ? (

@@ -11,6 +11,7 @@ interface GiftContributionRow {
   status: ContributionStatus;
   mercado_pago_preference_id: string | null;
   mercado_pago_payment_id: string | null;
+  expected_payment_date: string | null;
   created_at: string;
 }
 
@@ -24,6 +25,7 @@ function toEntity(row: GiftContributionRow): GiftContribution {
     status: row.status,
     mercadoPagoPreferenceId: row.mercado_pago_preference_id ?? undefined,
     mercadoPagoPaymentId: row.mercado_pago_payment_id ?? undefined,
+    expectedPaymentDate: row.expected_payment_date ? new Date(row.expected_payment_date) : null,
     createdAt: new Date(row.created_at),
   });
 }
@@ -42,6 +44,9 @@ export class SupabaseGiftContributionRepository implements GiftContributionRepos
         status: contribution.status,
         mercado_pago_preference_id: contribution.mercadoPagoPreferenceId ?? null,
         mercado_pago_payment_id: contribution.mercadoPagoPaymentId ?? null,
+        expected_payment_date: contribution.expectedPaymentDate
+          ? contribution.expectedPaymentDate.toISOString()
+          : null,
       })
       .select()
       .single();

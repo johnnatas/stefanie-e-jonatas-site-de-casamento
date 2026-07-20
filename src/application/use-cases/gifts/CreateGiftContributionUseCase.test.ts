@@ -30,7 +30,7 @@ describe("CreateGiftContributionUseCase", () => {
     );
   });
 
-  it("reserves the gift, creates a pending contribution and returns a checkout url", async () => {
+  it("reserves the gift, creates a pending contribution, and creates a checkout url when the gift has none stored", async () => {
     const result = await useCase.execute({
       giftId: "gift-1",
       guestName: "Carla Nunes",
@@ -44,6 +44,27 @@ describe("CreateGiftContributionUseCase", () => {
 
     const gift = await giftRepository.findById("gift-1");
     expect(gift?.status).toBe("reserved");
+    expect(gift?.mercadoPagoCheckoutUrl).toBe(result.checkoutUrl);
+  });
+
+  it("reuses the gift's stored checkout url instead of creating a new preference", async () => {
+    const gift = await giftRepository.findById("gift-1");
+    await giftRepository.update(
+      Gift.create({
+        ...gift!,
+        mercadoPagoPreferenceId: "preference-fixed",
+        mercadoPagoCheckoutUrl: "https://mercadopago.test/fixed-link",
+      })
+    );
+
+    const result = await useCase.execute({
+      giftId: "gift-1",
+      guestName: "Carla Nunes",
+      guestEmail: "carla@example.com",
+    });
+
+    expect(result.checkoutUrl).toBe("https://mercadopago.test/fixed-link");
+    expect(result.contribution.mercadoPagoPreferenceId).toBe("preference-fixed");
   });
 
   it("throws when the gift does not exist", async () => {

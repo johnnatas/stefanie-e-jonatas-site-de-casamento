@@ -23,6 +23,7 @@ import { DeleteGiftUseCase } from "@/application/use-cases/admin/DeleteGiftUseCa
 import { GetDashboardSummaryUseCase } from "@/application/use-cases/admin/GetDashboardSummaryUseCase";
 import { UpsertGiftUseCase } from "@/application/use-cases/admin/UpsertGiftUseCase";
 import { RefreshGiftPaymentLinkUseCase } from "@/application/use-cases/gifts/RefreshGiftPaymentLinkUseCase";
+import { ListGiftContributionsUseCase } from "@/application/use-cases/gifts/ListGiftContributionsUseCase";
 import { VerifyPriceChangeSecretUseCase } from "@/application/use-cases/security/VerifyPriceChangeSecretUseCase";
 import { UpdateSecretKeyUseCase } from "@/application/use-cases/security/UpdateSecretKeyUseCase";
 import { UpdateMercadoPagoAccessTokenUseCase } from "@/application/use-cases/security/UpdateMercadoPagoAccessTokenUseCase";
@@ -83,6 +84,10 @@ export function createUpsertGiftUseCase(): UpsertGiftUseCase {
 export function createRefreshGiftPaymentLinkUseCase(): RefreshGiftPaymentLinkUseCase {
   const { giftRepository, paymentGateway } = repositories();
   return new RefreshGiftPaymentLinkUseCase(giftRepository, paymentGateway);
+}
+
+export function createListGiftContributionsUseCase(): ListGiftContributionsUseCase {
+  return new ListGiftContributionsUseCase(repositories().giftContributionRepository);
 }
 
 export function createVerifyPriceChangeSecretUseCase(): VerifyPriceChangeSecretUseCase {

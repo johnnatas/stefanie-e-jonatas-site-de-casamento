@@ -4,12 +4,16 @@ import { CreateGiftContributionUseCase } from "@/application/use-cases/gifts/Cre
 import { InMemoryGiftRepository } from "@/application/testing/InMemoryGiftRepository";
 import { InMemoryGiftContributionRepository } from "@/application/testing/InMemoryGiftContributionRepository";
 import { FakePaymentGateway } from "@/application/testing/FakePaymentGateway";
+import { FakeEmailGateway } from "@/application/testing/FakeEmailGateway";
+import { InMemoryNotificationLogRepository } from "@/application/testing/InMemoryNotificationLogRepository";
 import { Gift } from "@/domain/entities/Gift";
 
 describe("ConfirmGiftPaymentUseCase", () => {
   let giftRepository: InMemoryGiftRepository;
   let contributionRepository: InMemoryGiftContributionRepository;
   let paymentGateway: FakePaymentGateway;
+  let emailGateway: FakeEmailGateway;
+  let notificationLogRepository: InMemoryNotificationLogRepository;
   let createContribution: CreateGiftContributionUseCase;
   let confirmPayment: ConfirmGiftPaymentUseCase;
 
@@ -17,8 +21,16 @@ describe("ConfirmGiftPaymentUseCase", () => {
     giftRepository = new InMemoryGiftRepository();
     contributionRepository = new InMemoryGiftContributionRepository();
     paymentGateway = new FakePaymentGateway();
+    emailGateway = new FakeEmailGateway();
+    notificationLogRepository = new InMemoryNotificationLogRepository();
     createContribution = new CreateGiftContributionUseCase(giftRepository, contributionRepository, paymentGateway);
-    confirmPayment = new ConfirmGiftPaymentUseCase(giftRepository, contributionRepository, paymentGateway);
+    confirmPayment = new ConfirmGiftPaymentUseCase(
+      giftRepository,
+      contributionRepository,
+      paymentGateway,
+      emailGateway,
+      notificationLogRepository
+    );
 
     await giftRepository.save(
       Gift.create({
@@ -46,6 +58,51 @@ describe("ConfirmGiftPaymentUseCase", () => {
     expect(updated?.status).toBe("approved");
     const gift = await giftRepository.findById("gift-1");
     expect(gift?.status).toBe("paid");
+  });
+
+  it("sends a thank-you email to the guest when payment is approved", async () => {
+    await createContribution.execute({
+      giftId: "gift-1",
+      guestName: "Bruna Lima",
+      guestEmail: "bruna@example.com",
+    });
+
+    paymentGateway.simulatePayment("payment-1", "approved", "gift-1");
+    await confirmPayment.execute({ paymentId: "payment-1" });
+
+    expect(emailGateway.sentEmails).toHaveLength(1);
+    expect(emailGateway.sentEmails[0].to).toBe("bruna@example.com");
+    expect(emailGateway.sentEmails[0].subject).toContain("obrigado");
+    expect(emailGateway.sentEmails[0].html).toContain("Liquidificador");
+  });
+
+  it("does not send a thank-you email when payment is rejected", async () => {
+    await createContribution.execute({
+      giftId: "gift-1",
+      guestName: "Bruna Lima",
+      guestEmail: "bruna@example.com",
+    });
+
+    paymentGateway.simulatePayment("payment-2", "rejected", "gift-1");
+    await confirmPayment.execute({ paymentId: "payment-2" });
+
+    expect(emailGateway.sentEmails).toHaveLength(0);
+  });
+
+  it("does not send a duplicate thank-you email on a repeated approved notification", async () => {
+    await createContribution.execute({
+      giftId: "gift-1",
+      guestName: "Bruna Lima",
+      guestEmail: "bruna@example.com",
+    });
+
+    paymentGateway.simulatePayment("payment-1", "approved", "gift-1");
+    await confirmPayment.execute({ paymentId: "payment-1" });
+
+    paymentGateway.simulatePayment("payment-1-retry", "approved", "gift-1");
+    await confirmPayment.execute({ paymentId: "payment-1-retry" });
+
+    expect(emailGateway.sentEmails).toHaveLength(1);
   });
 
   it("rejects the contribution and releases the gift when payment is rejected", async () => {

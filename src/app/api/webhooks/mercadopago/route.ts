@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
   revalidatePath("/presentes");
   revalidatePath("/admin/presentes");
   revalidatePath("/admin/pagamentos");
+  revalidatePath("/admin/dashboard");
 
   return NextResponse.json({ received: true });
 }

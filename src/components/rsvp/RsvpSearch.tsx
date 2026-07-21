@@ -12,17 +12,6 @@ interface RsvpSearchProps {
 
 type Step = "searching" | "confirming" | "done";
 
-function shuffleWord(word: string, seed: number): string {
-  const letters = word.split("");
-  let state = seed;
-  for (let i = letters.length - 1; i > 0; i--) {
-    state = (state * 9301 + 49297) % 233280;
-    const j = Math.floor((state / 233280) * (i + 1));
-    [letters[i], letters[j]] = [letters[j], letters[i]];
-  }
-  return letters.join("");
-}
-
 export function RsvpSearch({ guests }: RsvpSearchProps) {
   const [query, setQuery] = useState("");
   const [step, setStep] = useState<Step>("searching");
@@ -30,19 +19,6 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
-
-  const decorativeText = useMemo(
-    () =>
-      guests
-        .map((guest, index) =>
-          guest.fullName
-            .split(" ")
-            .map((word) => shuffleWord(word, index + word.length + 1))
-            .join(" ")
-        )
-        .join("   "),
-    [guests]
-  );
 
   const trimmedQuery = query.trim();
   const match = useMemo(() => findBestGuestMatch(trimmedQuery, guests), [trimmedQuery, guests]);
@@ -73,13 +49,6 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
 
   return (
     <section className="relative flex min-h-[70vh] flex-col items-center justify-center overflow-hidden px-6 py-20 text-center">
-      <p
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 flex select-none items-center justify-center overflow-hidden px-6 font-serif text-3xl leading-loose text-line"
-      >
-        {decorativeText}
-      </p>
-
       <div className="relative flex w-full max-w-lg flex-col items-center gap-6">
         {step === "done" ? (
           <div className="flex flex-col items-center gap-6">

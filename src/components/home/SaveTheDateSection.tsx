@@ -20,11 +20,7 @@ interface SaveTheDateSectionProps {
 
 export function SaveTheDateSection({ milestonePhotos }: SaveTheDateSectionProps) {
   return (
-    <section
-      className="relative overflow-hidden bg-mist px-6 py-32 before:pointer-events-none before:absolute
-        before:inset-x-0 before:top-0 before:h-24 before:w-full before:bg-[url('/images/torn-paper.png')]
-        before:bg-cover before:bg-top before:bg-no-repeat before:content-[''] sm:before:h-32 md:before:h-40"
-    >
+    <section className="bg-mist px-6 py-32">
       <div className="mx-auto flex max-w-5xl flex-col gap-16 md:flex-row md:items-center md:gap-24">
         <h2 className="flex flex-col items-center gap-1 text-center md:items-start md:text-left">
           {HEADING_LINES.map((line) => (

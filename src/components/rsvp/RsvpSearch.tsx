@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { PillButton } from "@/components/ui/PillButton";
 import { findBestGuestMatch, GuestNameCandidate } from "@/shared/utils/matchGuestName";
 import { confirmRsvpAction } from "@/app/confirmar-presenca/actions";
@@ -81,9 +82,15 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
 
       <div className="relative flex w-full max-w-lg flex-col items-center gap-6">
         {step === "done" ? (
-          <p role="status" className="font-serif text-2xl text-forest">
-            {feedback}
-          </p>
+          <div className="flex flex-col items-center gap-6">
+            <p role="status" className="font-serif text-2xl text-forest">
+              {feedback}
+            </p>
+            <PillButton href="/presentes">Ver lista de presentes</PillButton>
+            <Link href="/" className="font-sans text-sm uppercase tracking-widest text-forest/70 hover:text-moss">
+              Voltar ao início
+            </Link>
+          </div>
         ) : (
           <>
             <div className="w-full">
@@ -121,7 +128,7 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
 
             {trimmedQuery.length >= 2 && !match && (
               <p className="font-sans text-sm text-forest/70">
-                Não encontramos esse nome — confira a grafia ou fale com a gente.
+                Não encontramos esse nome — tente digitar como está no convite, com nome e sobrenome.
               </p>
             )}
 

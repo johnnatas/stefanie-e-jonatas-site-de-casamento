@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { UpsertGiftUseCase } from "@/application/use-cases/admin/UpsertGiftUseCase";
 import { InMemoryGiftRepository } from "@/application/testing/InMemoryGiftRepository";
 import { InvalidGiftDataError } from "@/domain/errors/DomainError";
+import { Gift } from "@/domain/entities/Gift";
 
 const baseInput = {
   name: "Jogo de facas",
@@ -46,6 +47,71 @@ describe("UpsertGiftUseCase", () => {
     });
 
     expect(result.nameOrPriceChanged).toBe(false);
+  });
+
+  it("clears the stored Mercado Pago preference/checkout link when the price changes, so a stale link can never be reused at a different price", async () => {
+    const repository = new InMemoryGiftRepository();
+    const created = (
+      await new UpsertGiftUseCase(repository).execute(baseInput)
+    ).gift;
+    await repository.update(
+      Gift.create({
+        ...created,
+        mercadoPagoPreferenceId: "stale-preference-id",
+        mercadoPagoCheckoutUrl: "https://mercadopago.test/stale-checkout",
+      })
+    );
+
+    const result = await new UpsertGiftUseCase(repository).execute({ ...baseInput, id: created.id, price: 220 });
+
+    expect(result.gift.mercadoPagoPreferenceId).toBeUndefined();
+    expect(result.gift.mercadoPagoCheckoutUrl).toBeNull();
+  });
+
+  it("clears the stored Mercado Pago preference/checkout link when the name changes", async () => {
+    const repository = new InMemoryGiftRepository();
+    const created = (
+      await new UpsertGiftUseCase(repository).execute(baseInput)
+    ).gift;
+    await repository.update(
+      Gift.create({
+        ...created,
+        mercadoPagoPreferenceId: "stale-preference-id",
+        mercadoPagoCheckoutUrl: "https://mercadopago.test/stale-checkout",
+      })
+    );
+
+    const result = await new UpsertGiftUseCase(repository).execute({
+      ...baseInput,
+      id: created.id,
+      name: "Jogo de facas profissional",
+    });
+
+    expect(result.gift.mercadoPagoPreferenceId).toBeUndefined();
+    expect(result.gift.mercadoPagoCheckoutUrl).toBeNull();
+  });
+
+  it("preserves the stored Mercado Pago preference/checkout link when name and price are unchanged", async () => {
+    const repository = new InMemoryGiftRepository();
+    const created = (
+      await new UpsertGiftUseCase(repository).execute(baseInput)
+    ).gift;
+    await repository.update(
+      Gift.create({
+        ...created,
+        mercadoPagoPreferenceId: "current-preference-id",
+        mercadoPagoCheckoutUrl: "https://mercadopago.test/current-checkout",
+      })
+    );
+
+    const result = await new UpsertGiftUseCase(repository).execute({
+      ...baseInput,
+      id: created.id,
+      description: "Nova descrição",
+    });
+
+    expect(result.gift.mercadoPagoPreferenceId).toBe("current-preference-id");
+    expect(result.gift.mercadoPagoCheckoutUrl).toBe("https://mercadopago.test/current-checkout");
   });
 
   it("throws when updating a gift that does not exist", async () => {

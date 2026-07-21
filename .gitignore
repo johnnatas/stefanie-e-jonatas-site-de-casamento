@@ -42,6 +42,7 @@ yarn-error.log*
 
 # personal Claude Code overrides
 /.claude/settings.local.json
+/.playwright-mcp/
 
 # typescript
 *.tsbuildinfo

@@ -28,6 +28,7 @@ import { RefreshGiftPaymentLinkUseCase } from "@/application/use-cases/gifts/Ref
 import { ListGiftContributionsUseCase } from "@/application/use-cases/gifts/ListGiftContributionsUseCase";
 import { SendReservationConfirmationUseCase } from "@/application/use-cases/notifications/SendReservationConfirmationUseCase";
 import { SendReservationRemindersUseCase } from "@/application/use-cases/notifications/SendReservationRemindersUseCase";
+import { SendGiftSuggestionRemindersUseCase } from "@/application/use-cases/notifications/SendGiftSuggestionRemindersUseCase";
 import { VerifyPriceChangeSecretUseCase } from "@/application/use-cases/security/VerifyPriceChangeSecretUseCase";
 import { UpdateSecretKeyUseCase } from "@/application/use-cases/security/UpdateSecretKeyUseCase";
 import { UpdateMercadoPagoAccessTokenUseCase } from "@/application/use-cases/security/UpdateMercadoPagoAccessTokenUseCase";
@@ -112,6 +113,16 @@ export function createSendReservationRemindersUseCase(): SendReservationReminder
   return new SendReservationRemindersUseCase(
     giftContributionRepository,
     giftRepository,
+    emailGateway,
+    notificationLogRepository
+  );
+}
+
+export function createSendGiftSuggestionRemindersUseCase(): SendGiftSuggestionRemindersUseCase {
+  const { guestRepository, giftContributionRepository, emailGateway, notificationLogRepository } = repositories();
+  return new SendGiftSuggestionRemindersUseCase(
+    guestRepository,
+    giftContributionRepository,
     emailGateway,
     notificationLogRepository
   );

@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, type RefObject } from "react";
-import Link from "next/link";
 import useEmblaCarousel from "embla-carousel-react";
 import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
+import { PillButton } from "@/components/ui/PillButton";
 import type { HomeTopicsContent } from "@/application/content/schemas";
 
 interface Topic {
@@ -34,18 +34,20 @@ function buildTopics(content: HomeTopicsContent): Topic[] {
 
 function TopicPanel({ topic, className }: { topic: Topic; className?: string }) {
   return (
-    <Link href={topic.href} className={`group relative block h-full overflow-hidden ${className ?? ""}`}>
+    <div className={`group relative block h-full overflow-hidden ${className ?? ""}`}>
       <PhotoOrPlaceholder
         src={topic.photo}
         label={`Foto — ${topic.title}`}
         className="absolute inset-0 h-full w-full"
       />
       <div className="absolute inset-0 bg-forest/40 transition-colors group-hover:bg-forest/55" />
-      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-8 text-paper">
-        <h3 className="font-serif text-3xl">{topic.title}</h3>
-        <p className="font-sans text-sm text-paper/80">{topic.description}</p>
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 p-8 text-center text-paper">
+        <h3 className="font-serif text-4xl uppercase tracking-wide sm:text-5xl">{topic.title}</h3>
+        <PillButton href={topic.href} className="border-paper text-paper hover:bg-paper hover:text-forest">
+          {topic.description}
+        </PillButton>
       </div>
-    </Link>
+    </div>
   );
 }
 

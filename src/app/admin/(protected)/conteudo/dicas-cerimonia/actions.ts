@@ -6,6 +6,8 @@ import { createUpdateSiteContentUseCase, resolvePhotoField } from "@/infrastruct
 import { tipsCerimoniaContentSchema } from "@/application/content/schemas";
 import type { SiteContentActionState } from "@/application/content/actionState";
 
+const MAX_ROUTES = 10;
+
 export async function updateTipsCerimoniaAction(
   _prevState: SiteContentActionState,
   formData: FormData
@@ -13,11 +15,27 @@ export async function updateTipsCerimoniaAction(
   const currentUrl = (formData.get("photoCurrentUrl") as string) || null;
   const photo = await resolvePhotoField("tips-cerimonia", "photo", formData, currentUrl, "photoFile", "photoRemove");
 
+  const routes: { originLabel: string; instructions: string; mapUrl: string | null }[] = [];
+  for (let index = 0; index < MAX_ROUTES; index++) {
+    const field = `route${index}`;
+    if (!formData.has(`${field}Marker`)) continue;
+
+    routes.push({
+      originLabel: (formData.get(`${field}OriginLabel`) as string) ?? "",
+      instructions: (formData.get(`${field}Instructions`) as string) ?? "",
+      mapUrl: (formData.get(`${field}MapUrl`) as string) || null,
+    });
+  }
+
   const parsed = tipsCerimoniaContentSchema.safeParse({
     eyebrow: formData.get("eyebrow") || null,
     title: formData.get("title"),
     body: formData.get("body"),
     photo,
+    eventDateLabel: formData.get("eventDateLabel") || null,
+    eventTimeLabel: formData.get("eventTimeLabel") || null,
+    eventAddress: formData.get("eventAddress") || null,
+    routes,
   });
 
   if (!parsed.success) {

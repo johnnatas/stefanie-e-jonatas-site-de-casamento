@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
 import { PillButton } from "@/components/ui/PillButton";
@@ -34,9 +34,17 @@ function buildTopics(content: HomeTopicsContent): Topic[] {
   }));
 }
 
-function TopicPanel({ topic, className }: { topic: Topic; className?: string }) {
+function TopicPanel({
+  topic,
+  className,
+  style,
+}: {
+  topic: Topic;
+  className?: string;
+  style?: CSSProperties;
+}) {
   return (
-    <div className={`group relative block h-full overflow-hidden ${className ?? ""}`}>
+    <div className={`group relative block h-full overflow-hidden ${className ?? ""}`} style={style}>
       <PhotoOrPlaceholder
         src={topic.photo}
         label={`Foto — ${topic.title}`}
@@ -111,9 +119,9 @@ function usePrefersReducedMotion() {
   return prefersReduced;
 }
 
-function DesktopScrollCarousel({ topics }: { topics: Topic[] }) {
+function ScrollCarousel({ topics, panelWidthVw }: { topics: Topic[]; panelWidthVw: number }) {
   const sectionRef = useRef<HTMLElement>(null);
-  const rowWidthVw = topics.length * 50;
+  const rowWidthVw = topics.length * panelWidthVw;
   const maxTranslateVw = Math.max(rowWidthVw - 100, 0);
   const translateVw = useScrollDrivenTranslate(sectionRef, maxTranslateVw);
 
@@ -125,7 +133,7 @@ function DesktopScrollCarousel({ topics }: { topics: Topic[] }) {
           style={{ transform: `translateX(-${translateVw}vw)`, width: `${rowWidthVw}vw` }}
         >
           {topics.map((topic) => (
-            <TopicPanel key={topic.href} topic={topic} className="w-[50vw] flex-shrink-0" />
+            <TopicPanel key={topic.href} topic={topic} className="flex-shrink-0" style={{ width: `${panelWidthVw}vw` }} />
           ))}
         </div>
       </div>
@@ -152,10 +160,12 @@ function SwipeCarousel({ topics }: { topics: Topic[] }) {
 }
 
 /**
- * Last section of the Home page. Desktop: scroll-jacked horizontal
- * carousel (vertical scroll drives horizontal panel movement). Mobile
- * and prefers-reduced-motion: a standard swipe/drag carousel instead —
- * see references/images/carrossel-de-scroll-horizontal.png for the
+ * Last section of the Home page: scroll-jacked horizontal carousel
+ * (vertical scroll drives horizontal panel movement) on both desktop
+ * and mobile, with narrower panels on mobile (85vw vs. 50vw) so pacing
+ * matches the smaller viewport. prefers-reduced-motion gets a standard
+ * swipe/drag carousel instead, on every breakpoint — see
+ * references/images/carrossel-de-scroll-horizontal.png for the
  * full-height photo treatment this mirrors (local design reference, not
  * in the repo).
  */
@@ -167,13 +177,17 @@ export function TopicsCarousel({ content }: TopicsCarouselProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
   const topics = buildTopics(content);
 
+  if (prefersReducedMotion) {
+    return <SwipeCarousel topics={topics} />;
+  }
+
   return (
     <>
       <div className="hidden md:block">
-        {prefersReducedMotion ? <SwipeCarousel topics={topics} /> : <DesktopScrollCarousel topics={topics} />}
+        <ScrollCarousel topics={topics} panelWidthVw={50} />
       </div>
       <div className="md:hidden">
-        <SwipeCarousel topics={topics} />
+        <ScrollCarousel topics={topics} panelWidthVw={85} />
       </div>
     </>
   );

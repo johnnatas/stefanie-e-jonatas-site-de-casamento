@@ -26,6 +26,7 @@ import { GetDashboardSummaryUseCase } from "@/application/use-cases/admin/GetDas
 import { UpsertGiftUseCase } from "@/application/use-cases/admin/UpsertGiftUseCase";
 import { RefreshGiftPaymentLinkUseCase } from "@/application/use-cases/gifts/RefreshGiftPaymentLinkUseCase";
 import { ListGiftContributionsUseCase } from "@/application/use-cases/gifts/ListGiftContributionsUseCase";
+import { SendReservationConfirmationUseCase } from "@/application/use-cases/notifications/SendReservationConfirmationUseCase";
 import { VerifyPriceChangeSecretUseCase } from "@/application/use-cases/security/VerifyPriceChangeSecretUseCase";
 import { UpdateSecretKeyUseCase } from "@/application/use-cases/security/UpdateSecretKeyUseCase";
 import { UpdateMercadoPagoAccessTokenUseCase } from "@/application/use-cases/security/UpdateMercadoPagoAccessTokenUseCase";
@@ -98,6 +99,11 @@ export function createListGiftContributionsUseCase(): ListGiftContributionsUseCa
 
 export function createUpdateResendApiKeyUseCase(): UpdateResendApiKeyUseCase {
   return new UpdateResendApiKeyUseCase(repositories().securitySettingsRepository);
+}
+
+export function createSendReservationConfirmationUseCase(): SendReservationConfirmationUseCase {
+  const { emailGateway, notificationLogRepository } = repositories();
+  return new SendReservationConfirmationUseCase(emailGateway, notificationLogRepository);
 }
 
 export function createVerifyPriceChangeSecretUseCase(): VerifyPriceChangeSecretUseCase {

@@ -3,7 +3,12 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { createGiftContributionUseCase, getSiteContentOrDefault } from "@/infrastructure/composition";
+import {
+  createGiftContributionUseCase,
+  createListGiftsUseCase,
+  createSendReservationConfirmationUseCase,
+  getSiteContentOrDefault,
+} from "@/infrastructure/composition";
 import { GiftNotAvailableError, InvalidGiftDataError } from "@/domain/errors/DomainError";
 import {
   canReserveForLater,
@@ -113,6 +118,23 @@ export async function reserveGiftForLaterAction(
     });
 
     revalidatePath("/presentes");
+
+    try {
+      const gifts = await createListGiftsUseCase().execute();
+      const gift = gifts.find((candidate) => candidate.id === parsed.data.giftId);
+      if (gift) {
+        await createSendReservationConfirmationUseCase().execute({
+          contributionId: result.contribution.id!,
+          guestName: parsed.data.guestName,
+          guestEmail: parsed.data.guestEmail,
+          giftName: gift.name,
+          expectedPaymentDate,
+          checkoutUrl: result.checkoutUrl,
+        });
+      }
+    } catch (emailError) {
+      console.error("Failed to send reservation confirmation email", emailError);
+    }
 
     return {
       status: "success",

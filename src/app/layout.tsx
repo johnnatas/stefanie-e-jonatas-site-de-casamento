@@ -23,10 +23,25 @@ const alexBrush = Alex_Brush({
   weight: ["400"],
 });
 
+const TITLE = "Stéfanie & Jonatas | Nosso Casamento";
+const DESCRIPTION =
+  "Acompanhe os detalhes do casamento de Stéfanie e Jonatas: confirme presença, veja a lista de presentes e saiba tudo sobre o grande dia.";
+
 export const metadata: Metadata = {
-  title: "Stéfanie & Jonatas | Nosso Casamento",
-  description:
-    "Acompanhe os detalhes do casamento de Stéfanie e Jonatas: confirme presença, veja a lista de presentes e saiba tudo sobre o grande dia.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://sjcasamento.site"),
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    type: "website",
+    locale: "pt_BR",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({

@@ -3,6 +3,7 @@ import { createGetAdminSecuritySettingsUseCase } from "@/infrastructure/composit
 import { isBackendConfigured } from "@/infrastructure/config/env";
 import { ConfigurationNotice } from "@/components/ui/ConfigurationNotice";
 import { MercadoPagoTokenForm } from "@/components/admin/MercadoPagoTokenForm";
+import { ResendApiKeyForm } from "@/components/admin/ResendApiKeyForm";
 import { SecretKeyForm } from "@/components/admin/SecretKeyForm";
 
 export const metadata: Metadata = {
@@ -46,6 +47,7 @@ export default async function IntegracoesPage() {
           currentTokenLast4={summary.mercadoPagoAccessTokenLast4}
           hasSecretKey={summary.hasSecretKey}
         />
+        <ResendApiKeyForm currentApiKeyLast4={summary.resendApiKeyLast4} hasSecretKey={summary.hasSecretKey} />
         <SecretKeyForm hasSecretKey={summary.hasSecretKey} />
       </div>
     </div>

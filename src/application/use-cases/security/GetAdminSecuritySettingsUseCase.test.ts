@@ -9,7 +9,11 @@ describe("GetAdminSecuritySettingsUseCase", () => {
 
     const summary = await new GetAdminSecuritySettingsUseCase(repository).execute();
 
-    expect(summary).toEqual({ mercadoPagoAccessTokenLast4: null, hasSecretKey: false });
+    expect(summary).toEqual({
+      mercadoPagoAccessTokenLast4: null,
+      resendApiKeyLast4: null,
+      hasSecretKey: false,
+    });
   });
 
   it("returns the last 4 characters of the token and hasSecretKey true when both are set", async () => {
@@ -20,6 +24,19 @@ describe("GetAdminSecuritySettingsUseCase", () => {
 
     const summary = await new GetAdminSecuritySettingsUseCase(repository).execute();
 
-    expect(summary).toEqual({ mercadoPagoAccessTokenLast4: "0beb", hasSecretKey: true });
+    expect(summary).toEqual({
+      mercadoPagoAccessTokenLast4: "0beb",
+      resendApiKeyLast4: null,
+      hasSecretKey: true,
+    });
+  });
+
+  it("returns the last 4 characters of the Resend API key when set", async () => {
+    const repository = new InMemoryAdminSecuritySettingsRepository();
+    await repository.updateResendApiKey("re_123456789_abcd");
+
+    const summary = await new GetAdminSecuritySettingsUseCase(repository).execute();
+
+    expect(summary.resendApiKeyLast4).toBe("abcd");
   });
 });

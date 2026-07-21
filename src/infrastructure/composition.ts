@@ -29,6 +29,7 @@ import { ListGiftContributionsUseCase } from "@/application/use-cases/gifts/List
 import { VerifyPriceChangeSecretUseCase } from "@/application/use-cases/security/VerifyPriceChangeSecretUseCase";
 import { UpdateSecretKeyUseCase } from "@/application/use-cases/security/UpdateSecretKeyUseCase";
 import { UpdateMercadoPagoAccessTokenUseCase } from "@/application/use-cases/security/UpdateMercadoPagoAccessTokenUseCase";
+import { UpdateResendApiKeyUseCase } from "@/application/use-cases/security/UpdateResendApiKeyUseCase";
 import { GetAdminSecuritySettingsUseCase } from "@/application/use-cases/security/GetAdminSecuritySettingsUseCase";
 
 export { uploadSiteContentPhoto, InvalidPhotoUploadError } from "@/infrastructure/supabase/uploadSiteContentPhoto";
@@ -93,6 +94,10 @@ export function createRefreshGiftPaymentLinkUseCase(): RefreshGiftPaymentLinkUse
 
 export function createListGiftContributionsUseCase(): ListGiftContributionsUseCase {
   return new ListGiftContributionsUseCase(repositories().giftContributionRepository);
+}
+
+export function createUpdateResendApiKeyUseCase(): UpdateResendApiKeyUseCase {
+  return new UpdateResendApiKeyUseCase(repositories().securitySettingsRepository);
 }
 
 export function createVerifyPriceChangeSecretUseCase(): VerifyPriceChangeSecretUseCase {

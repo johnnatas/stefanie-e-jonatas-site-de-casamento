@@ -2,6 +2,7 @@
 
 import {
   createUpdateMercadoPagoAccessTokenUseCase,
+  createUpdateResendApiKeyUseCase,
   createUpdateSecretKeyUseCase,
 } from "@/infrastructure/composition";
 import { InvalidSecurityCredentialError } from "@/domain/errors/DomainError";
@@ -57,4 +58,28 @@ export async function updateSecretKeyAction(
   }
 
   return { status: "success", message: "Chave secreta atualizada com sucesso." };
+}
+
+export interface UpdateResendApiKeyActionState {
+  status: "idle" | "success" | "error";
+  message?: string;
+}
+
+export async function updateResendApiKeyAction(
+  _prevState: UpdateResendApiKeyActionState,
+  formData: FormData
+): Promise<UpdateResendApiKeyActionState> {
+  const apiKey = (formData.get("apiKey") as string) || "";
+  const secretKey = (formData.get("secretKey") as string) || "";
+
+  try {
+    await createUpdateResendApiKeyUseCase().execute({ apiKey, secretKey });
+  } catch (error) {
+    if (error instanceof InvalidSecurityCredentialError) {
+      return { status: "error", message: error.message };
+    }
+    return { status: "error", message: "Não foi possível salvar a API Key agora." };
+  }
+
+  return { status: "success", message: "API Key atualizada com sucesso." };
 }

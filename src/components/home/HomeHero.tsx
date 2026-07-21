@@ -17,7 +17,7 @@ export function HomeHero({ heroContent, settings }: HomeHeroProps) {
     <section className="relative -mt-[115px] min-h-dvh overflow-hidden">
       <HeroCarousel photos={heroContent.photos} />
 
-      <div className="relative flex min-h-dvh flex-col items-center justify-center gap-20 px-6 pt-[136px] pb-28 text-center text-paper">
+      <div className="relative flex min-h-dvh flex-col items-center justify-center gap-28 px-6 pt-[136px] pb-28 text-center text-paper">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -27,9 +27,10 @@ export function HomeHero({ heroContent, settings }: HomeHeroProps) {
           <h1 className="font-serif text-5xl sm:text-7xl">{COUPLE_NAMES}</h1>
           <span aria-hidden="true" className="h-px w-16 bg-paper" />
           <p className="font-script text-2xl text-paper/90">{heroContent.tagline}</p>
-          <p className="font-serif text-sm uppercase tracking-widest text-paper/90">
-            {formatWeddingDateLabel(settings.weddingDateIso)} · {settings.weddingLocationLabel}
-          </p>
+          <div className="flex flex-col items-center gap-1 font-serif text-sm uppercase tracking-widest text-paper/90">
+            <span>{formatWeddingDateLabel(settings.weddingDateIso)}</span>
+            <span>{settings.weddingLocationLabel}</span>
+          </div>
         </motion.div>
 
         <motion.div

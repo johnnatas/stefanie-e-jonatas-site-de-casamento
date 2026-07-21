@@ -40,6 +40,24 @@ describe("GiftCard", () => {
     expect(screen.getByPlaceholderText("Seu e-mail")).toBeInTheDocument();
   });
 
+  it("associates a label with the name and email fields in the immediate-checkout form", async () => {
+    const user = userEvent.setup();
+    render(<GiftCard gift={availableGift} canReserveForLater />);
+
+    await user.click(screen.getByRole("button", { name: /presentear agora/i }));
+    expect(screen.getByLabelText("Seu nome")).toBeInTheDocument();
+    expect(screen.getByLabelText("Seu e-mail")).toBeInTheDocument();
+  });
+
+  it("associates a label with the name and email fields in the reserve-for-later form", async () => {
+    const user = userEvent.setup();
+    render(<GiftCard gift={availableGift} canReserveForLater />);
+
+    await user.click(screen.getByRole("button", { name: /reservar para depois/i }));
+    expect(screen.getByLabelText("Seu nome")).toBeInTheDocument();
+    expect(screen.getByLabelText("Seu e-mail")).toBeInTheDocument();
+  });
+
   it("shows the error message returned by the action when the immediate contribution fails", async () => {
     createGiftContributionActionMock.mockResolvedValue({
       status: "error",
@@ -87,6 +105,29 @@ describe("GiftCard", () => {
     );
 
     await user.click(screen.getByRole("button", { name: /voltar/i }));
+
+    expect(screen.queryByText("Presente reservado!")).not.toBeInTheDocument();
+  });
+
+  it("exposes the reservation confirmation as a dialog and closes it on Escape", async () => {
+    reserveGiftForLaterActionMock.mockResolvedValue({
+      status: "success",
+      checkoutUrl: "https://mercadopago.test/checkout",
+      guestName: "Carla Nunes",
+      expectedPaymentDate: "2027-05-01",
+    });
+    const user = userEvent.setup();
+    render(<GiftCard gift={availableGift} canReserveForLater />);
+
+    await user.click(screen.getByRole("button", { name: /reservar para depois/i }));
+    await user.type(screen.getByLabelText("Seu nome"), "Carla Nunes");
+    await user.type(screen.getByLabelText("Seu e-mail"), "carla@example.com");
+    fireEvent.change(screen.getByLabelText("Quando pretende pagar?"), { target: { value: "2027-05-01" } });
+    await user.click(screen.getByRole("button", { name: /reservar presente/i }));
+
+    expect(await screen.findByRole("dialog", { name: /presente reservado/i })).toBeInTheDocument();
+
+    await user.keyboard("{Escape}");
 
     expect(screen.queryByText("Presente reservado!")).not.toBeInTheDocument();
   });

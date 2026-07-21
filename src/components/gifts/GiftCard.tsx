@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
 import { formatCurrency } from "@/shared/utils/formatCurrency";
 import { GiftDto } from "@/components/gifts/GiftDto";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 import {
   createGiftContributionAction,
   reserveGiftForLaterAction,
@@ -39,6 +40,13 @@ export function GiftCard({ gift, canReserveForLater }: GiftCardProps) {
 
   const showConfirmationModal = laterState.status === "success" && !modalDismissed;
   const isAvailable = gift.status === "available";
+
+  const modalRef = useRef<HTMLDivElement>(null);
+  function closeConfirmationModal() {
+    setModalDismissed(true);
+    setActiveForm("none");
+  }
+  useFocusTrap(modalRef, showConfirmationModal, closeConfirmationModal);
 
   return (
     <div className="flex flex-col rounded-lg border border-line bg-paper p-5">
@@ -77,14 +85,22 @@ export function GiftCard({ gift, canReserveForLater }: GiftCardProps) {
       {isAvailable && activeForm === "now" && (
         <form action={nowFormAction} className="mt-4 flex flex-col gap-2">
           <input type="hidden" name="giftId" value={gift.id} />
+          <label htmlFor={`guestName-now-${gift.id}`} className="sr-only">
+            Seu nome
+          </label>
           <input
+            id={`guestName-now-${gift.id}`}
             name="guestName"
             placeholder="Seu nome"
             required
             minLength={3}
             className="rounded-md border border-line bg-paper px-3 py-2 font-sans text-sm text-forest focus:border-moss focus:outline-none"
           />
+          <label htmlFor={`guestEmail-now-${gift.id}`} className="sr-only">
+            Seu e-mail
+          </label>
           <input
+            id={`guestEmail-now-${gift.id}`}
             name="guestEmail"
             type="email"
             placeholder="Seu e-mail"
@@ -109,14 +125,22 @@ export function GiftCard({ gift, canReserveForLater }: GiftCardProps) {
       {isAvailable && activeForm === "later" && (
         <form action={laterFormAction} className="mt-4 flex flex-col gap-2">
           <input type="hidden" name="giftId" value={gift.id} />
+          <label htmlFor={`guestName-later-${gift.id}`} className="sr-only">
+            Seu nome
+          </label>
           <input
+            id={`guestName-later-${gift.id}`}
             name="guestName"
             placeholder="Seu nome"
             required
             minLength={3}
             className="rounded-md border border-line bg-paper px-3 py-2 font-sans text-sm text-forest focus:border-moss focus:outline-none"
           />
+          <label htmlFor={`guestEmail-later-${gift.id}`} className="sr-only">
+            Seu e-mail
+          </label>
           <input
+            id={`guestEmail-later-${gift.id}`}
             name="guestEmail"
             type="email"
             placeholder="Seu e-mail"
@@ -150,8 +174,16 @@ export function GiftCard({ gift, canReserveForLater }: GiftCardProps) {
 
       {showConfirmationModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-forest/40 px-4">
-          <div className="w-full max-w-sm rounded-lg bg-paper p-6">
-            <h4 className="font-serif text-lg text-forest">Presente reservado!</h4>
+          <div
+            ref={modalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={`reserved-modal-title-${gift.id}`}
+            className="w-full max-w-sm rounded-lg bg-paper p-6"
+          >
+            <h4 id={`reserved-modal-title-${gift.id}`} className="font-serif text-lg text-forest">
+              Presente reservado!
+            </h4>
             <p className="mt-2 font-sans text-sm text-forest/70">
               Reservamos <strong>{gift.name}</strong> para {laterState.guestName}, com pagamento previsto
               para {laterState.expectedPaymentDate?.split("-").reverse().join("/")}.
@@ -168,10 +200,7 @@ export function GiftCard({ gift, canReserveForLater }: GiftCardProps) {
               </a>
               <button
                 type="button"
-                onClick={() => {
-                  setModalDismissed(true);
-                  setActiveForm("none");
-                }}
+                onClick={closeConfirmationModal}
                 className="rounded-full border border-line px-4 py-2 font-sans text-xs uppercase tracking-widest text-forest transition-colors hover:border-moss"
               >
                 Voltar

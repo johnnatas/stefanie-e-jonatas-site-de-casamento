@@ -1,10 +1,12 @@
 "use client";
 
+import { useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { NAV_ITEMS } from "@/shared/navigation";
 import { Monogram } from "@/components/ui/Monogram";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -13,11 +15,17 @@ interface MobileMenuProps {
 
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const pathname = usePathname();
+  const containerRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(containerRef, isOpen, onClose);
 
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
+          ref={containerRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Menu"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

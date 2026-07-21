@@ -64,23 +64,35 @@ function TopicPanel({
   );
 }
 
-function useScrollDrivenTranslate(sectionRef: RefObject<HTMLElement | null>, maxTranslateVw: number) {
-  const [translateVw, setTranslateVw] = useState(0);
-
+/**
+ * Drives the track's real scrollLeft from vertical page scroll, so the
+ * panels advance as the user scrolls down — but since it's a genuine
+ * horizontally-scrollable element (not a transform), the user can also
+ * swipe/drag it left-right directly at any point. The two inputs don't
+ * conflict: a horizontal touch gesture on the track scrolls only the
+ * track (no window 'scroll' event fires), while vertical page scroll
+ * keeps syncing scrollLeft to the formula whenever it does fire.
+ */
+function useScrollSyncedHorizontalScroll(
+  sectionRef: RefObject<HTMLElement | null>,
+  trackRef: RefObject<HTMLDivElement | null>
+) {
   useEffect(() => {
     let rafId: number | null = null;
 
     function measure() {
       rafId = null;
       const section = sectionRef.current;
-      if (!section) return;
+      const track = trackRef.current;
+      if (!section || !track) return;
 
       const scrollableDistance = section.offsetHeight - window.innerHeight;
       if (scrollableDistance <= 0) return;
 
       const rect = section.getBoundingClientRect();
       const scrolled = Math.min(Math.max(-rect.top, 0), scrollableDistance);
-      setTranslateVw((scrolled / scrollableDistance) * maxTranslateVw);
+      const maxScrollLeft = track.scrollWidth - track.clientWidth;
+      track.scrollLeft = (scrolled / scrollableDistance) * maxScrollLeft;
     }
 
     function handleScroll() {
@@ -94,9 +106,7 @@ function useScrollDrivenTranslate(sectionRef: RefObject<HTMLElement | null>, max
       window.removeEventListener("scroll", handleScroll);
       if (rafId !== null) cancelAnimationFrame(rafId);
     };
-  }, [sectionRef, maxTranslateVw]);
-
-  return translateVw;
+  }, [sectionRef, trackRef]);
 }
 
 function getPrefersReducedMotion() {
@@ -121,20 +131,27 @@ function usePrefersReducedMotion() {
 
 function ScrollCarousel({ topics, panelWidthVw }: { topics: Topic[]; panelWidthVw: number }) {
   const sectionRef = useRef<HTMLElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const rowWidthVw = topics.length * panelWidthVw;
-  const maxTranslateVw = Math.max(rowWidthVw - 100, 0);
-  const translateVw = useScrollDrivenTranslate(sectionRef, maxTranslateVw);
+  useScrollSyncedHorizontalScroll(sectionRef, trackRef);
 
   return (
     <section ref={sectionRef} className="relative" style={{ height: "300vh" }}>
       <div className="sticky top-0 h-screen overflow-hidden">
         <div
-          className="flex h-full"
-          style={{ transform: `translateX(-${translateVw}vw)`, width: `${rowWidthVw}vw` }}
+          ref={trackRef}
+          className="h-full overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          {topics.map((topic) => (
-            <TopicPanel key={topic.href} topic={topic} className="flex-shrink-0" style={{ width: `${panelWidthVw}vw` }} />
-          ))}
+          <div className="flex h-full" style={{ width: `${rowWidthVw}vw` }}>
+            {topics.map((topic) => (
+              <TopicPanel
+                key={topic.href}
+                topic={topic}
+                className="flex-shrink-0"
+                style={{ width: `${panelWidthVw}vw` }}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -163,8 +180,10 @@ function SwipeCarousel({ topics }: { topics: Topic[] }) {
  * Last section of the Home page: scroll-jacked horizontal carousel
  * (vertical scroll drives horizontal panel movement) on both desktop
  * and mobile, with narrower panels on mobile (85vw vs. 50vw) so pacing
- * matches the smaller viewport. prefers-reduced-motion gets a standard
- * swipe/drag carousel instead, on every breakpoint — see
+ * matches the smaller viewport. The track is a real horizontally
+ * scrollable element, so users can also swipe/drag it directly at any
+ * point, not just via vertical scroll. prefers-reduced-motion gets a
+ * standard swipe/drag carousel instead, on every breakpoint — see
  * references/images/carrossel-de-scroll-horizontal.png for the
  * full-height photo treatment this mirrors (local design reference, not
  * in the repo).

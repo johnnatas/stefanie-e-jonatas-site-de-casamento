@@ -49,27 +49,34 @@ describe("Header", () => {
     expect(screen.getByRole("banner")).toHaveClass("bg-transparent", "text-paper");
   });
 
-  it("switches to a solid background once the page scrolls past the hero", () => {
+  it("switches to a solid background and shrinks once the page scrolls past the hero", () => {
     render(<Header />);
 
     Object.defineProperty(window, "scrollY", { value: 200, configurable: true });
     fireEvent.scroll(window);
 
-    expect(screen.getByRole("banner")).toHaveClass("bg-paper", "text-forest");
+    expect(screen.getByRole("banner")).toHaveClass("bg-mist", "text-forest", "py-4");
+    expect(screen.getByAltText("Stéfanie & Jonatas")).toHaveClass("h-10");
+  });
+
+  it("renders the larger logo only while transparent at the top of the home page", () => {
+    render(<Header />);
+
+    expect(screen.getByAltText("Stéfanie & Jonatas")).toHaveClass("h-[65px]");
   });
 
   it("renders solid immediately when the page loads already scrolled past the hero", () => {
     Object.defineProperty(window, "scrollY", { value: 200, configurable: true });
     render(<Header />);
 
-    expect(screen.getByRole("banner")).toHaveClass("bg-paper", "text-forest");
+    expect(screen.getByRole("banner")).toHaveClass("bg-mist", "text-forest");
   });
 
   it("renders solid on non-home pages regardless of scroll position", () => {
     vi.mocked(usePathname).mockReturnValue("/presentes");
     render(<Header />);
 
-    expect(screen.getByRole("banner")).toHaveClass("bg-paper", "text-forest");
+    expect(screen.getByRole("banner")).toHaveClass("bg-mist", "text-forest");
   });
 
   it("only changes color on hover for an inactive nav item, not font or casing", () => {

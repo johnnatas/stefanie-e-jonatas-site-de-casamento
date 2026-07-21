@@ -32,13 +32,13 @@ export function Header() {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-40 flex items-center py-[25px] transition-colors",
-        isTransparent ? "bg-transparent text-paper" : "border-b border-line bg-paper text-forest"
+        "fixed inset-x-0 top-0 z-40 flex items-center transition-colors",
+        isTransparent ? "py-[25px] bg-transparent text-paper" : "py-4 border-b border-line bg-mist text-forest"
       )}
     >
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6">
         <Link href="/" aria-label="Início" className="text-current">
-          <Monogram light={isTransparent} className="h-[65px] w-auto" />
+          <Monogram light={isTransparent} className={isTransparent ? "h-[65px] w-auto" : "h-10 w-auto"} />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">

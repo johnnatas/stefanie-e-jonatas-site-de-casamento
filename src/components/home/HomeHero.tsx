@@ -14,8 +14,9 @@ interface HomeHeroProps {
 
 export function HomeHero({ heroContent, settings }: HomeHeroProps) {
   return (
-    <section className="relative -mt-[115px] min-h-dvh overflow-hidden">
+    <section className="relative -mt-[72px] min-h-dvh overflow-hidden">
       <HeroCarousel photos={heroContent.photos} />
+      <div aria-hidden="true" className="absolute inset-0 bg-forest/25" />
 
       <div className="relative flex min-h-dvh flex-col items-center justify-center gap-28 px-6 pt-[136px] pb-28 text-center text-paper">
         <motion.div

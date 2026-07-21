@@ -51,7 +51,7 @@ export function AdminMobileNav({ groups, isOpen, onClose }: AdminMobileNavProps)
               type="button"
               onClick={onClose}
               aria-label="Fechar menu"
-              className="text-3xl leading-none text-forest"
+              className="flex min-h-11 min-w-11 items-center justify-center text-3xl leading-none text-forest"
             >
               &times;
             </button>
@@ -71,7 +71,7 @@ export function AdminMobileNav({ groups, isOpen, onClose }: AdminMobileNavProps)
                         onClick={onClose}
                         aria-current={isActive ? "page" : undefined}
                         className={cn(
-                          "font-sans text-base uppercase tracking-widest transition-colors",
+                          "flex min-h-11 items-center font-sans text-base uppercase tracking-widest transition-colors",
                           isActive ? "font-medium text-moss" : "text-forest/70 hover:text-moss"
                         )}
                       >
@@ -87,7 +87,7 @@ export function AdminMobileNav({ groups, isOpen, onClose }: AdminMobileNavProps)
           <form action={logoutAction} className="mt-8">
             <button
               type="submit"
-              className="font-sans text-sm uppercase tracking-widest text-forest/70 hover:text-moss"
+              className="flex min-h-11 items-center font-sans text-sm uppercase tracking-widest text-forest/70 hover:text-moss"
             >
               Sair
             </button>

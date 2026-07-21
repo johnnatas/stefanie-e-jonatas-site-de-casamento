@@ -53,7 +53,7 @@ export default function AdminProtectedLayout({ children }: { children: React.Rea
           type="button"
           onClick={() => setIsMobileNavOpen(true)}
           aria-label="Abrir menu"
-          className="flex flex-col gap-1.5"
+          className="flex min-h-11 min-w-11 flex-col items-center justify-center gap-1.5"
         >
           <span className="block h-px w-6 bg-forest" />
           <span className="block h-px w-6 bg-forest" />

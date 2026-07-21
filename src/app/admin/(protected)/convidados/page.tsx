@@ -30,7 +30,7 @@ export default async function AdminGuestsPage() {
         <div className="flex items-center gap-4">
           <Link
             href="/admin/convidados/importar"
-            className="font-sans text-sm uppercase tracking-widest text-moss hover:text-forest"
+            className="flex min-h-11 items-center font-sans text-sm uppercase tracking-widest text-moss hover:text-forest"
           >
             Importar
           </Link>

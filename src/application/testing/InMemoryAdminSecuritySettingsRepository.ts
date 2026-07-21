@@ -8,6 +8,7 @@ export class InMemoryAdminSecuritySettingsRepository implements AdminSecuritySet
     mercadoPagoAccessToken: null,
     priceChangeSecretHash: null,
     priceChangeSecretSalt: null,
+    resendApiKey: null,
   };
 
   async getSettings(): Promise<AdminSecuritySettings> {
@@ -21,5 +22,9 @@ export class InMemoryAdminSecuritySettingsRepository implements AdminSecuritySet
   async updateSecretKeyHash(hash: string, salt: string): Promise<void> {
     this.settings.priceChangeSecretHash = hash;
     this.settings.priceChangeSecretSalt = salt;
+  }
+
+  async updateResendApiKey(key: string): Promise<void> {
+    this.settings.resendApiKey = key;
   }
 }

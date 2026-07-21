@@ -4,6 +4,8 @@ import { SupabaseGiftRepository } from "@/infrastructure/supabase/SupabaseGiftRe
 import { SupabaseGiftContributionRepository } from "@/infrastructure/supabase/SupabaseGiftContributionRepository";
 import { SupabaseSiteContentRepository } from "@/infrastructure/supabase/SupabaseSiteContentRepository";
 import { SupabaseAdminSecuritySettingsRepository } from "@/infrastructure/supabase/SupabaseAdminSecuritySettingsRepository";
+import { SupabaseNotificationLogRepository } from "@/infrastructure/supabase/SupabaseNotificationLogRepository";
+import { ResendEmailGateway } from "@/infrastructure/email/ResendEmailGateway";
 import { GetSiteContentUseCase } from "@/application/use-cases/content/GetSiteContentUseCase";
 import { UpdateSiteContentUseCase } from "@/application/use-cases/content/UpdateSiteContentUseCase";
 import { isBackendConfigured } from "@/infrastructure/config/env";
@@ -47,6 +49,8 @@ function repositories() {
     siteContentRepository: new SupabaseSiteContentRepository(client),
     securitySettingsRepository,
     paymentGateway: new MercadoPagoGateway(securitySettingsRepository),
+    notificationLogRepository: new SupabaseNotificationLogRepository(client),
+    emailGateway: new ResendEmailGateway(securitySettingsRepository),
   };
 }
 

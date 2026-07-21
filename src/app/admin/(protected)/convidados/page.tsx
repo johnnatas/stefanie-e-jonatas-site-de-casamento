@@ -36,7 +36,7 @@ export default async function AdminGuestsPage() {
           </Link>
           <Link
             href="/admin/convidados/novo"
-            className="font-sans text-sm uppercase tracking-widest text-moss hover:text-forest"
+            className="rounded-full bg-moss px-5 py-2 font-sans text-xs uppercase tracking-widest text-paper transition-colors hover:bg-moss/80"
           >
             + Novo convidado
           </Link>

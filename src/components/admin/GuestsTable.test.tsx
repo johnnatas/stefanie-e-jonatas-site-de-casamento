@@ -56,4 +56,15 @@ describe("GuestsTable", () => {
     expect(screen.queryByText("Bruno Costa")).not.toBeInTheDocument();
     expect(screen.queryByText("Carla Nunes")).not.toBeInTheDocument();
   });
+
+  it("shows how many guests match the current filters out of the total", async () => {
+    const user = userEvent.setup();
+    render(<GuestsTable guests={guests} />);
+
+    expect(screen.getByText("3 de 3 convidados")).toBeInTheDocument();
+
+    await user.selectOptions(screen.getByLabelText("Status"), "confirmed");
+
+    expect(screen.getByText("1 de 3 convidados")).toBeInTheDocument();
+  });
 });

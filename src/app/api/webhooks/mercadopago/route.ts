@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createConfirmGiftPaymentUseCase } from "@/infrastructure/composition";
 
 interface MercadoPagoWebhookBody {
@@ -20,7 +21,14 @@ export async function POST(request: NextRequest) {
     await createConfirmGiftPaymentUseCase().execute({ paymentId: String(paymentId) });
   } catch (error) {
     console.error("Failed to process Mercado Pago webhook notification", error);
+    // Return a non-2xx status so Mercado Pago's automatic redelivery retries
+    // this notification instead of considering it permanently handled.
+    return NextResponse.json({ received: false }, { status: 500 });
   }
+
+  revalidatePath("/presentes");
+  revalidatePath("/admin/presentes");
+  revalidatePath("/admin/pagamentos");
 
   return NextResponse.json({ received: true });
 }

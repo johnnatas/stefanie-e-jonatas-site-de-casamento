@@ -45,6 +45,9 @@ export async function createGiftContributionAction(
   try {
     const result = await createGiftContributionUseCase().execute(parsed.data);
     checkoutUrl = result.checkoutUrl;
+    revalidatePath("/presentes");
+    revalidatePath("/admin/presentes");
+    revalidatePath("/admin/pagamentos");
   } catch (error) {
     if (error instanceof GiftNotAvailableError) {
       return { status: "error", message: "Esse presente já foi escolhido por outra pessoa." };
@@ -118,6 +121,8 @@ export async function reserveGiftForLaterAction(
     });
 
     revalidatePath("/presentes");
+    revalidatePath("/admin/presentes");
+    revalidatePath("/admin/pagamentos");
 
     try {
       const gifts = await createListGiftsUseCase().execute();

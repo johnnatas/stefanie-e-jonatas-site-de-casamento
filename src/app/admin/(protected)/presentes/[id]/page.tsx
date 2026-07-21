@@ -48,6 +48,8 @@ export default async function EditGiftPage({ params }: EditGiftPageProps) {
     notFound();
   }
 
+  const existingCategories = Array.from(new Set(gifts.map((candidate) => candidate.category))).sort();
+
   return (
     <div>
       <h1 className="font-serif text-3xl text-forest">Editar presente</h1>
@@ -62,6 +64,7 @@ export default async function EditGiftPage({ params }: EditGiftPageProps) {
             category: gift.category,
           }}
           checkoutUrl={gift.mercadoPagoCheckoutUrl}
+          existingCategories={existingCategories}
         />
       </div>
     </div>

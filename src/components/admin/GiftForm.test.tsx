@@ -69,4 +69,30 @@ describe("GiftForm", () => {
     });
     expect(screen.getByText(/Preencha valor, imagem manualmente\./)).toBeInTheDocument();
   });
+
+  it("shows a category select with existing categories when there are any", () => {
+    render(<GiftForm existingCategories={["cozinha", "casa"]} />);
+
+    const select = screen.getByLabelText("Categoria");
+    expect(select.tagName).toBe("SELECT");
+    expect(screen.getByRole("option", { name: "cozinha" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "casa" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "+ Nova categoria" })).toBeInTheDocument();
+  });
+
+  it("switches to a free-text category input when '+ Nova categoria' is chosen", async () => {
+    const user = userEvent.setup();
+    render(<GiftForm existingCategories={["cozinha"]} />);
+
+    await user.selectOptions(screen.getByLabelText("Categoria"), "+ Nova categoria");
+
+    expect(screen.getByLabelText("Categoria").tagName).toBe("INPUT");
+    expect(screen.getByRole("button", { name: "Escolher existente" })).toBeInTheDocument();
+  });
+
+  it("falls back to a free-text category input when there are no existing categories yet", () => {
+    render(<GiftForm />);
+
+    expect(screen.getByLabelText("Categoria").tagName).toBe("INPUT");
+  });
 });

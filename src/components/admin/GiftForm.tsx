@@ -12,10 +12,13 @@ import { PhotoUploadField } from "@/components/admin/PhotoUploadField";
 interface GiftFormProps {
   defaultValues?: GiftFormValues;
   checkoutUrl?: string | null;
+  existingCategories?: string[];
 }
 
 const inputClassName =
   "mt-1 w-full rounded-md border border-line bg-paper px-4 py-2 font-sans text-forest focus:border-moss focus:outline-none";
+
+const NEW_CATEGORY_OPTION = "__new__";
 
 const initialUpsertGiftActionState: UpsertGiftActionState = { status: "idle" };
 
@@ -26,10 +29,12 @@ interface LinkFetchState {
 
 const initialLinkFetchState: LinkFetchState = { status: "idle" };
 
-export function GiftForm({ defaultValues, checkoutUrl }: GiftFormProps) {
+export function GiftForm({ defaultValues, checkoutUrl, existingCategories = [] }: GiftFormProps) {
   const [state, formAction, isPending] = useActionState(upsertGiftAction, initialUpsertGiftActionState);
   const [imageUrl, setImageUrl] = useState<string | null>(defaultValues?.imageUrl ?? null);
   const [linkFetchState, setLinkFetchState] = useState<LinkFetchState>(initialLinkFetchState);
+  const categoryIsKnown = !!defaultValues?.category && existingCategories.includes(defaultValues.category);
+  const [isNewCategory, setIsNewCategory] = useState(existingCategories.length === 0 || (!!defaultValues?.category && !categoryIsKnown));
 
   const productLinkRef = useRef<HTMLInputElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -162,13 +167,47 @@ export function GiftForm({ defaultValues, checkoutUrl }: GiftFormProps) {
         <label htmlFor="category" className="block font-sans text-sm text-forest">
           Categoria
         </label>
-        <input
-          id="category"
-          name="category"
-          defaultValue={defaultValues?.category}
-          required
-          className={inputClassName}
-        />
+        {isNewCategory ? (
+          <div className="mt-1 flex items-center gap-2">
+            <input
+              id="category"
+              name="category"
+              defaultValue={!categoryIsKnown ? defaultValues?.category : undefined}
+              required
+              className={inputClassName}
+            />
+            {existingCategories.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setIsNewCategory(false)}
+                className="shrink-0 font-sans text-xs uppercase tracking-widest text-moss hover:text-forest"
+              >
+                Escolher existente
+              </button>
+            )}
+          </div>
+        ) : (
+          <select
+            id="category"
+            name="category"
+            defaultValue={defaultValues?.category}
+            required
+            className={inputClassName}
+            onChange={(event) => {
+              if (event.target.value === NEW_CATEGORY_OPTION) {
+                setIsNewCategory(true);
+              }
+            }}
+          >
+            {!defaultValues?.category && <option value="">Selecione...</option>}
+            {existingCategories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+            <option value={NEW_CATEGORY_OPTION}>+ Nova categoria</option>
+          </select>
+        )}
       </div>
 
       {defaultValues?.id && (

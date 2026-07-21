@@ -6,12 +6,38 @@ interface DashboardStatsProps {
   summary: DashboardSummary;
 }
 
+interface StatItem {
+  label: string;
+  value: string | number;
+  href: string;
+}
+
+function StatGrid({ items }: { items: StatItem[] }) {
+  return (
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+      {items.map((item) => (
+        <Link
+          key={item.label}
+          href={item.href}
+          className="rounded-lg border border-line bg-paper p-5 text-center transition-colors hover:border-moss"
+        >
+          <p className="font-serif text-3xl text-forest">{item.value}</p>
+          <p className="mt-1 font-sans text-xs uppercase tracking-widest text-forest/70">{item.label}</p>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
 export function DashboardStats({ summary }: DashboardStatsProps) {
-  const items = [
+  const guestItems: StatItem[] = [
     { label: "Confirmados", value: summary.confirmedGuestsCount, href: "/admin/convidados?status=confirmed" },
     { label: "Pendentes", value: summary.pendingGuestsCount, href: "/admin/convidados?status=pending" },
     { label: "Não vão", value: summary.declinedGuestsCount, href: "/admin/convidados?status=declined" },
     { label: "Total de pessoas", value: summary.totalAttendeesCount, href: "/admin/convidados" },
+  ];
+
+  const giftItems: StatItem[] = [
     { label: "Presentes cadastrados", value: summary.totalGiftsCount, href: "/admin/presentes" },
     { label: "Presentes recebidos", value: summary.paidGiftsCount, href: "/admin/presentes?status=paid" },
     {
@@ -22,19 +48,15 @@ export function DashboardStats({ summary }: DashboardStatsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-      {items.map((item) => (
-        <Link
-          key={item.label}
-          href={item.href}
-          className="rounded-lg border border-line bg-paper p-5 text-center transition-colors hover:border-moss"
-        >
-          <p className="font-serif text-3xl text-forest">{item.value}</p>
-          <p className="mt-1 font-sans text-xs uppercase tracking-widest text-forest/70">
-            {item.label}
-          </p>
-        </Link>
-      ))}
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-3">
+        <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/40">Convidados</span>
+        <StatGrid items={guestItems} />
+      </div>
+      <div className="flex flex-col gap-3">
+        <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/40">Presentes</span>
+        <StatGrid items={giftItems} />
+      </div>
     </div>
   );
 }

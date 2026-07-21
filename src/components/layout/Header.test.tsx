@@ -37,10 +37,10 @@ describe("Header", () => {
     });
   });
 
-  it("is fixed out of flow with a 72px height so it can overlay page content", () => {
+  it("is fixed out of flow so it can overlay page content", () => {
     render(<Header />);
 
-    expect(screen.getByRole("banner")).toHaveClass("fixed", "inset-x-0", "top-0", "h-[72px]");
+    expect(screen.getByRole("banner")).toHaveClass("fixed", "inset-x-0", "top-0", "py-[25px]");
   });
 
   it("renders transparent over the hero on the home page before scrolling", () => {

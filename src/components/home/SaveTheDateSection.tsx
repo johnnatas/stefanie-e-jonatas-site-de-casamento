@@ -2,7 +2,9 @@
 
 import { motion } from "framer-motion";
 import { ArchFlipCard } from "@/components/ui/ArchFlipCard";
+import { Monogram } from "@/components/ui/Monogram";
 import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
+import { PillButton } from "@/components/ui/PillButton";
 import { MILESTONES } from "@/shared/milestones";
 import type { HomeMilestonePhotosContent } from "@/application/content/schemas";
 
@@ -22,17 +24,24 @@ export function SaveTheDateSection({ milestonePhotos }: SaveTheDateSectionProps)
   return (
     <section className="bg-mist px-6 py-32">
       <div className="mx-auto flex max-w-5xl flex-col gap-16 md:flex-row md:items-center md:gap-24">
-        <h2 className="flex flex-col items-center gap-1 text-center md:items-start md:text-left">
-          {HEADING_LINES.map((line) => (
-            <span
-              key={line.text}
-              className="font-serif text-6xl uppercase leading-none sm:text-7xl"
-              style={{ color: line.color, opacity: line.opacity }}
-            >
-              {line.text}
-            </span>
-          ))}
-        </h2>
+        <div className="flex flex-col items-center gap-8 text-center md:items-start md:text-left">
+          <h2 className="flex flex-col items-center gap-1 md:items-start">
+            {HEADING_LINES.map((line) => (
+              <span
+                key={line.text}
+                className="font-serif text-6xl uppercase leading-none sm:text-7xl"
+                style={{ color: line.color, opacity: line.opacity }}
+              >
+                {line.text}
+              </span>
+            ))}
+          </h2>
+
+          <div className="flex items-center gap-4">
+            <Monogram className="h-12 w-auto" />
+            <PillButton href="/confirmar-presenca">Confirme sua presença</PillButton>
+          </div>
+        </div>
 
         <div className="grid flex-1 grid-cols-1 gap-8 md:grid-cols-3">
           {MILESTONES.map((milestone, index) => (

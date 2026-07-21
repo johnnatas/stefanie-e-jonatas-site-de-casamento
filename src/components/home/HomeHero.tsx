@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { HeroCarousel } from "@/components/home/HeroCarousel";
 import { CountdownTimer } from "@/components/home/CountdownTimer";
-import { PillButton } from "@/components/ui/PillButton";
 import { formatWeddingDateLabel } from "@/shared/utils/formatWeddingDateLabel";
 import { COUPLE_NAMES } from "@/shared/navigation";
 import type { HomeHeroContent, SettingsContent } from "@/application/content/schemas";
@@ -15,7 +14,7 @@ interface HomeHeroProps {
 
 export function HomeHero({ heroContent, settings }: HomeHeroProps) {
   return (
-    <section className="relative -mt-[72px] min-h-dvh overflow-hidden">
+    <section className="relative -mt-[115px] min-h-dvh overflow-hidden">
       <HeroCarousel photos={heroContent.photos} />
 
       <div className="relative flex min-h-dvh flex-col items-center justify-center gap-20 px-6 pt-[136px] pb-28 text-center text-paper">
@@ -31,12 +30,6 @@ export function HomeHero({ heroContent, settings }: HomeHeroProps) {
           <p className="font-serif text-sm uppercase tracking-widest text-paper/90">
             {formatWeddingDateLabel(settings.weddingDateIso)} · {settings.weddingLocationLabel}
           </p>
-          <PillButton
-            href="/confirmar-presenca"
-            className="border-paper text-paper hover:bg-paper hover:text-forest"
-          >
-            Confirme sua presença
-          </PillButton>
         </motion.div>
 
         <motion.div
@@ -48,13 +41,6 @@ export function HomeHero({ heroContent, settings }: HomeHeroProps) {
           <CountdownTimer weddingDateIso={settings.weddingDateIso} />
         </motion.div>
       </div>
-
-      <img
-        src="/images/torn-paper.png"
-        alt=""
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-24 w-full object-cover object-top sm:h-32 md:h-40"
-      />
     </section>
   );
 }

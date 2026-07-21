@@ -14,6 +14,12 @@ export default async function HomePage() {
   return (
     <>
       <HomeHero heroContent={heroContent} settings={settings} />
+      <img
+        src="/images/torn-paper.png"
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none -mt-24 h-24 w-full object-cover object-top sm:-mt-32 sm:h-32 md:-mt-40 md:h-40"
+      />
       <SaveTheDateSection milestonePhotos={milestonePhotos} />
       <TopicsCarousel content={topicsContent} />
     </>

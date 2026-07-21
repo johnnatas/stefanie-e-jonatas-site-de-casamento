@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useRef, useState } from "react";
+import Link from "next/link";
 import {
   upsertGiftAction,
   type UpsertGiftActionState,
@@ -77,186 +78,206 @@ export function GiftForm({ defaultValues, checkoutUrl, existingCategories = [] }
   }
 
   return (
-    <form action={formAction} className="flex max-w-md flex-col gap-4">
+    <form action={formAction} className="flex max-w-md flex-col gap-8">
       {defaultValues?.id && <input type="hidden" name="id" value={defaultValues.id} />}
 
-      <div>
-        <label htmlFor="productLink" className="block font-sans text-sm text-forest">
-          Link do produto (opcional)
-        </label>
-        <div className="mt-1 flex items-center gap-2">
-          <input
-            id="productLink"
-            ref={productLinkRef}
-            type="url"
-            placeholder="Cole o link do produto"
-            className={inputClassName}
-          />
-          <button
-            type="button"
-            onClick={handleFetchLinkMetadata}
-            disabled={linkFetchState.status === "pending"}
-            className="shrink-0 rounded-full border border-line px-4 py-2 font-sans text-xs uppercase tracking-widest text-forest transition-colors hover:border-moss disabled:opacity-60"
-          >
-            {linkFetchState.status === "pending" ? "Buscando..." : "Buscar dados do link"}
-          </button>
-        </div>
-        {linkFetchState.message && (
-          <p
-            className={`mt-1 font-sans text-xs ${linkFetchState.status === "error" ? "text-danger" : "text-moss"}`}
-          >
-            {linkFetchState.message}
-          </p>
-        )}
-      </div>
+      <div className="flex flex-col gap-4">
+        <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/40">Sobre o presente</span>
 
-      <div>
-        <label htmlFor="name" className="block font-sans text-sm text-forest">
-          Nome
-        </label>
-        <input
-          id="name"
-          name="name"
-          ref={nameInputRef}
-          defaultValue={defaultValues?.name}
-          required
-          className={inputClassName}
-        />
-      </div>
-
-      <div>
-        <label htmlFor="description" className="block font-sans text-sm text-forest">
-          Descrição
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          defaultValue={defaultValues?.description}
-          required
-          rows={3}
-          className={inputClassName}
-        />
-      </div>
-
-      <PhotoUploadField
-        name="image"
-        currentUrl={imageUrl}
-        label="Foto do presente"
-        className="h-40 w-full rounded-md"
-        showRemoveCheckbox={false}
-      />
-
-      <div>
-        <label htmlFor="price" className="block font-sans text-sm text-forest">
-          Valor (R$)
-        </label>
-        <input
-          id="price"
-          name="price"
-          ref={priceInputRef}
-          type="number"
-          min={0}
-          step="0.01"
-          defaultValue={defaultValues?.price}
-          required
-          className={inputClassName}
-        />
-      </div>
-
-      <div>
-        <label htmlFor="category" className="block font-sans text-sm text-forest">
-          Categoria
-        </label>
-        {isNewCategory ? (
-          <div className="mt-1 flex items-center gap-2">
-            <input
-              id="category"
-              name="category"
-              defaultValue={!categoryIsKnown ? defaultValues?.category : undefined}
-              required
-              className={inputClassName}
-            />
-            {existingCategories.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setIsNewCategory(false)}
-                className="shrink-0 font-sans text-xs uppercase tracking-widest text-moss hover:text-forest"
-              >
-                Escolher existente
-              </button>
-            )}
-          </div>
-        ) : (
-          <select
-            id="category"
-            name="category"
-            defaultValue={defaultValues?.category}
-            required
-            className={inputClassName}
-            onChange={(event) => {
-              if (event.target.value === NEW_CATEGORY_OPTION) {
-                setIsNewCategory(true);
-              }
-            }}
-          >
-            {!defaultValues?.category && <option value="">Selecione...</option>}
-            {existingCategories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-            <option value={NEW_CATEGORY_OPTION}>+ Nova categoria</option>
-          </select>
-        )}
-      </div>
-
-      {defaultValues?.id && (
         <div>
-          <label htmlFor="secretKey" className="block font-sans text-sm text-forest">
-            Chave secreta (obrigatória se alterar o valor)
-          </label>
-          <input
-            id="secretKey"
-            name="secretKey"
-            type="password"
-            autoComplete="off"
-            className={inputClassName}
-          />
-        </div>
-      )}
-
-      {defaultValues?.id && checkoutUrl && (
-        <div>
-          <label htmlFor="checkoutUrl" className="block font-sans text-sm text-forest">
-            Link de pagamento
+          <label htmlFor="productLink" className="block font-sans text-sm text-forest">
+            Link do produto (opcional)
           </label>
           <div className="mt-1 flex items-center gap-2">
             <input
-              id="checkoutUrl"
-              type="text"
-              readOnly
-              value={checkoutUrl}
-              onFocus={(event) => event.target.select()}
+              id="productLink"
+              ref={productLinkRef}
+              type="url"
+              placeholder="Cole o link do produto"
               className={inputClassName}
             />
             <button
               type="button"
-              onClick={() => navigator.clipboard.writeText(checkoutUrl)}
-              className="shrink-0 rounded-full border border-line px-4 py-2 font-sans text-xs uppercase tracking-widest text-forest transition-colors hover:border-moss"
+              onClick={handleFetchLinkMetadata}
+              disabled={linkFetchState.status === "pending"}
+              className="shrink-0 rounded-full border border-line px-4 py-2 font-sans text-xs uppercase tracking-widest text-forest transition-colors hover:border-moss disabled:opacity-60"
             >
-              Copiar link
+              {linkFetchState.status === "pending" ? "Buscando..." : "Buscar dados do link"}
             </button>
           </div>
+          {linkFetchState.message && (
+            <p
+              className={`mt-1 font-sans text-xs ${linkFetchState.status === "error" ? "text-danger" : "text-moss"}`}
+            >
+              {linkFetchState.message}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label htmlFor="name" className="block font-sans text-sm text-forest">
+            Nome
+          </label>
+          <input
+            id="name"
+            name="name"
+            ref={nameInputRef}
+            defaultValue={defaultValues?.name}
+            required
+            className={inputClassName}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="description" className="block font-sans text-sm text-forest">
+            Descrição
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            defaultValue={defaultValues?.description}
+            required
+            rows={3}
+            className={inputClassName}
+          />
+        </div>
+
+        <PhotoUploadField
+          name="image"
+          currentUrl={imageUrl}
+          label="Foto do presente"
+          className="h-40 w-full rounded-md"
+          showRemoveCheckbox={false}
+        />
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/40">Valor e categoria</span>
+
+        <div>
+          <label htmlFor="price" className="block font-sans text-sm text-forest">
+            Valor (R$)
+          </label>
+          <input
+            id="price"
+            name="price"
+            ref={priceInputRef}
+            type="number"
+            min={0}
+            step="0.01"
+            defaultValue={defaultValues?.price}
+            required
+            className={inputClassName}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="category" className="block font-sans text-sm text-forest">
+            Categoria
+          </label>
+          {isNewCategory ? (
+            <div className="mt-1 flex items-center gap-2">
+              <input
+                id="category"
+                name="category"
+                defaultValue={!categoryIsKnown ? defaultValues?.category : undefined}
+                required
+                className={inputClassName}
+              />
+              {existingCategories.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setIsNewCategory(false)}
+                  className="shrink-0 font-sans text-xs uppercase tracking-widest text-moss hover:text-forest"
+                >
+                  Escolher existente
+                </button>
+              )}
+            </div>
+          ) : (
+            <select
+              id="category"
+              name="category"
+              defaultValue={defaultValues?.category}
+              required
+              className={inputClassName}
+              onChange={(event) => {
+                if (event.target.value === NEW_CATEGORY_OPTION) {
+                  setIsNewCategory(true);
+                }
+              }}
+            >
+              {!defaultValues?.category && <option value="">Selecione...</option>}
+              {existingCategories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+              <option value={NEW_CATEGORY_OPTION}>+ Nova categoria</option>
+            </select>
+          )}
+        </div>
+      </div>
+
+      {defaultValues?.id && (
+        <div className="flex flex-col gap-4">
+          <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/40">Administrativo</span>
+
+          <div>
+            <label htmlFor="secretKey" className="block font-sans text-sm text-forest">
+              Chave secreta (obrigatória se alterar o valor)
+            </label>
+            <input
+              id="secretKey"
+              name="secretKey"
+              type="password"
+              autoComplete="off"
+              className={inputClassName}
+            />
+          </div>
+
+          {checkoutUrl && (
+            <div>
+              <label htmlFor="checkoutUrl" className="block font-sans text-sm text-forest">
+                Link de pagamento
+              </label>
+              <div className="mt-1 flex items-center gap-2">
+                <input
+                  id="checkoutUrl"
+                  type="text"
+                  readOnly
+                  value={checkoutUrl}
+                  onFocus={(event) => event.target.select()}
+                  className={inputClassName}
+                />
+                <button
+                  type="button"
+                  onClick={() => navigator.clipboard.writeText(checkoutUrl)}
+                  className="shrink-0 rounded-full border border-line px-4 py-2 font-sans text-xs uppercase tracking-widest text-forest transition-colors hover:border-moss"
+                >
+                  Copiar link
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={isPending}
-        className="rounded-full bg-moss px-8 py-3 font-sans text-sm uppercase tracking-widest text-paper transition-colors hover:bg-moss/80 disabled:opacity-60"
-      >
-        {isPending ? "Salvando..." : "Salvar presente"}
-      </button>
+      <div className="flex items-center gap-4">
+        <button
+          type="submit"
+          disabled={isPending}
+          className="rounded-full bg-moss px-8 py-3 font-sans text-sm uppercase tracking-widest text-paper transition-colors hover:bg-moss/80 disabled:opacity-60"
+        >
+          {isPending ? "Salvando..." : "Salvar presente"}
+        </button>
+        <Link
+          href="/admin/presentes"
+          className="font-sans text-sm uppercase tracking-widest text-forest/70 hover:text-moss"
+        >
+          Cancelar
+        </Link>
+      </div>
 
       {state.status === "error" && (
         <p role="alert" className="text-xs text-danger">

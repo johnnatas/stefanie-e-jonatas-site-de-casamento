@@ -95,4 +95,10 @@ describe("GiftForm", () => {
 
     expect(screen.getByLabelText("Categoria").tagName).toBe("INPUT");
   });
+
+  it("links Cancelar back to the gifts list", () => {
+    render(<GiftForm />);
+
+    expect(screen.getByRole("link", { name: "Cancelar" })).toHaveAttribute("href", "/admin/presentes");
+  });
 });

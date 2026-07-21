@@ -20,8 +20,8 @@ interface SaveTheDateSectionProps {
 
 export function SaveTheDateSection({ milestonePhotos }: SaveTheDateSectionProps) {
   return (
-    <section className="bg-mist px-6 py-24">
-      <div className="mx-auto flex max-w-5xl flex-col gap-12 md:flex-row md:items-center md:gap-16">
+    <section className="bg-mist px-6 py-32">
+      <div className="mx-auto flex max-w-5xl flex-col gap-16 md:flex-row md:items-center md:gap-24">
         <h2 className="flex flex-col items-center gap-1 text-center md:items-start md:text-left">
           {HEADING_LINES.map((line) => (
             <span
@@ -34,7 +34,7 @@ export function SaveTheDateSection({ milestonePhotos }: SaveTheDateSectionProps)
           ))}
         </h2>
 
-        <div className="grid flex-1 grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="grid flex-1 grid-cols-1 gap-8 md:grid-cols-3">
           {MILESTONES.map((milestone, index) => (
             <motion.div
               key={milestone.title}

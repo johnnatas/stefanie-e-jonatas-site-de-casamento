@@ -22,12 +22,12 @@ export function HomeHero({ heroContent, settings }: HomeHeroProps) {
     >
       <HeroCarousel photos={heroContent.photos} />
 
-      <div className="relative flex min-h-dvh flex-col items-center justify-center gap-12 px-6 pt-[136px] pb-28 text-center text-paper">
+      <div className="relative flex min-h-dvh flex-col items-center justify-center gap-20 px-6 pt-[136px] pb-28 text-center text-paper">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="flex flex-col items-center gap-6"
+          className="flex flex-col items-center gap-8"
         >
           <h1 className="font-serif text-5xl sm:text-7xl">{COUPLE_NAMES}</h1>
           <span aria-hidden="true" className="h-px w-16 bg-paper" />

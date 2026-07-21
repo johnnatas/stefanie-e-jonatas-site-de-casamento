@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type { GiftStatus } from "@/domain/entities/Gift";
@@ -44,13 +44,17 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
     isValidStatus(searchParams.get("status")) ? (searchParams.get("status") as GiftStatus) : "all"
   );
 
-  function syncUrl(nextSearch: string, nextCategory: string, nextStatus: GiftStatus | "all") {
-    const params = new URLSearchParams();
-    if (nextSearch) params.set("search", nextSearch);
-    if (nextCategory !== "all") params.set("category", nextCategory);
-    if (nextStatus !== "all") params.set("status", nextStatus);
-    router.replace(params.toString() ? `/admin/presentes?${params.toString()}` : "/admin/presentes");
-  }
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      const params = new URLSearchParams();
+      if (search) params.set("search", search);
+      if (category !== "all") params.set("category", category);
+      if (status !== "all") params.set("status", status);
+      router.replace(params.toString() ? `/admin/presentes?${params.toString()}` : "/admin/presentes");
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [search, category, status, router]);
 
   const filteredGifts = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -72,10 +76,7 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
           <input
             id="gift-search"
             value={search}
-            onChange={(event) => {
-              setSearch(event.target.value);
-              syncUrl(event.target.value, category, status);
-            }}
+            onChange={(event) => setSearch(event.target.value)}
             className={inputClassName}
           />
         </div>
@@ -86,10 +87,7 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
           <select
             id="gift-category"
             value={category}
-            onChange={(event) => {
-              setCategory(event.target.value);
-              syncUrl(search, event.target.value, status);
-            }}
+            onChange={(event) => setCategory(event.target.value)}
             className={inputClassName}
           >
             <option value="all">Todas</option>
@@ -107,11 +105,7 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
           <select
             id="gift-status"
             value={status}
-            onChange={(event) => {
-              const nextStatus = event.target.value as GiftStatus | "all";
-              setStatus(nextStatus);
-              syncUrl(search, category, nextStatus);
-            }}
+            onChange={(event) => setStatus(event.target.value as GiftStatus | "all")}
             className={inputClassName}
           >
             <option value="all">Todos</option>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type { AttendanceStatus } from "@/domain/entities/Guest";
@@ -42,12 +42,16 @@ export function GuestsTable({ guests }: GuestsTableProps) {
     isValidStatus(searchParams.get("status")) ? (searchParams.get("status") as AttendanceStatus) : "all"
   );
 
-  function syncUrl(nextSearch: string, nextStatus: AttendanceStatus | "all") {
-    const params = new URLSearchParams();
-    if (nextSearch) params.set("search", nextSearch);
-    if (nextStatus !== "all") params.set("status", nextStatus);
-    router.replace(params.toString() ? `/admin/convidados?${params.toString()}` : "/admin/convidados");
-  }
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      const params = new URLSearchParams();
+      if (search) params.set("search", search);
+      if (status !== "all") params.set("status", status);
+      router.replace(params.toString() ? `/admin/convidados?${params.toString()}` : "/admin/convidados");
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [search, status, router]);
 
   const filteredGuests = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -71,10 +75,7 @@ export function GuestsTable({ guests }: GuestsTableProps) {
           <input
             id="guest-search"
             value={search}
-            onChange={(event) => {
-              setSearch(event.target.value);
-              syncUrl(event.target.value, status);
-            }}
+            onChange={(event) => setSearch(event.target.value)}
             className={inputClassName}
           />
         </div>
@@ -85,11 +86,7 @@ export function GuestsTable({ guests }: GuestsTableProps) {
           <select
             id="guest-status"
             value={status}
-            onChange={(event) => {
-              const nextStatus = event.target.value as AttendanceStatus | "all";
-              setStatus(nextStatus);
-              syncUrl(search, nextStatus);
-            }}
+            onChange={(event) => setStatus(event.target.value as AttendanceStatus | "all")}
             className={inputClassName}
           >
             <option value="all">Todos</option>

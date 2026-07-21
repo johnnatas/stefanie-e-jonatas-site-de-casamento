@@ -10,7 +10,8 @@ export type NotificationKind =
   | "gift_suggestion_t30"
   | "gift_suggestion_t15"
   | "gift_suggestion_t3"
-  | "wedding_day";
+  | "wedding_day"
+  | "payment_thank_you";
 
 export type NotificationEntityType = "gift_contribution" | "guest";
 

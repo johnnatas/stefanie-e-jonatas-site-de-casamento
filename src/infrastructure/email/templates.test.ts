@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   giftSuggestionEmail,
+  paymentThankYouEmail,
   reservationConfirmationEmail,
   reservationReminderEmail,
   weddingDayEmail,
@@ -53,5 +54,13 @@ describe("email templates", () => {
 
     expect(result.subject).toBe("Hoje é o grande dia! 💍");
     expect(result.html).toContain("Carla");
+  });
+
+  it("builds the payment thank-you email", () => {
+    const result = paymentThankYouEmail({ guestName: "Carla", giftName: "Liquidificador" });
+
+    expect(result.subject).toBe("Muito obrigado pelo carinho! 💛");
+    expect(result.html).toContain("Carla");
+    expect(result.html).toContain("Liquidificador");
   });
 });

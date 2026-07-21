@@ -53,6 +53,22 @@ describe("RsvpSearch", () => {
     });
   });
 
+  it("offers a way forward instead of a dead end once the response is submitted", async () => {
+    confirmRsvpActionMock.mockResolvedValue({
+      success: true,
+      message: "Tudo bem, sentiremos sua falta! Obrigado por avisar.",
+    });
+    const user = userEvent.setup();
+    render(<RsvpSearch guests={GUESTS} />);
+
+    await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
+    await user.click(await screen.findByRole("button", { name: /não poderei ir/i }));
+
+    await screen.findByText(/sentiremos sua falta/i);
+    expect(screen.getByRole("link", { name: /ver lista de presentes/i })).toHaveAttribute("href", "/presentes");
+    expect(screen.getByRole("link", { name: /voltar ao início/i })).toHaveAttribute("href", "/");
+  });
+
   it("reveals the companions/message form and submits with the confirmed status", async () => {
     confirmRsvpActionMock.mockResolvedValue({
       success: true,

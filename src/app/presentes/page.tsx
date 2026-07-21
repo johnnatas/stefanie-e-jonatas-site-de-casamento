@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { createListGiftsUseCase } from "@/infrastructure/composition";
+import { createListGiftsUseCase, getSiteContentOrDefault } from "@/infrastructure/composition";
 import { isBackendConfigured } from "@/infrastructure/config/env";
 import { mapGiftToDto, GiftDto } from "@/components/gifts/GiftDto";
 import { GiftGrid } from "@/components/gifts/GiftGrid";
 import { ConfigurationNotice } from "@/components/ui/ConfigurationNotice";
 import { SplitPanel } from "@/components/ui/SplitPanel";
 import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
+import { canReserveForLater } from "@/shared/utils/giftReservationWindow";
 
 export const metadata: Metadata = {
   title: "Lista de Presentes | Stéfanie & Jonatas",
@@ -26,11 +27,16 @@ export default async function GiftsPage({ searchParams }: GiftsPageProps) {
 
   let gifts: GiftDto[] = [];
   let loadError = false;
+  let allowReserveForLater = false;
 
   if (isBackendConfigured()) {
     try {
-      const result = await createListGiftsUseCase().execute();
+      const [result, settings] = await Promise.all([
+        createListGiftsUseCase().execute(),
+        getSiteContentOrDefault("settings"),
+      ]);
       gifts = result.map(mapGiftToDto);
+      allowReserveForLater = canReserveForLater(new Date(settings.weddingDateIso));
     } catch {
       loadError = true;
     }
@@ -41,7 +47,6 @@ export default async function GiftsPage({ searchParams }: GiftsPageProps) {
       <h1 className="sr-only">Lista de Presentes</h1>
 
       <SplitPanel
-        eyebrow="Com carinho"
         title="Lista de Presentes"
         tone="dark"
         image={<PlaceholderImage label="Lista de presentes" className="absolute inset-0 h-full w-full" />}
@@ -64,7 +69,7 @@ export default async function GiftsPage({ searchParams }: GiftsPageProps) {
         {!isBackendConfigured() || loadError ? (
           <ConfigurationNotice message="A lista de presentes será exibida assim que o backend (Supabase) estiver configurado." />
         ) : (
-          <GiftGrid gifts={gifts} />
+          <GiftGrid gifts={gifts} canReserveForLater={allowReserveForLater} />
         )}
       </div>
     </div>

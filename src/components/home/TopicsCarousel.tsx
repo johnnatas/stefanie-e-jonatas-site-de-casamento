@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState, type RefObject } from "react";
-import Link from "next/link";
 import useEmblaCarousel from "embla-carousel-react";
 import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
+import { PillButton } from "@/components/ui/PillButton";
 import type { HomeTopicsContent } from "@/application/content/schemas";
 
 interface Topic {
   title: string;
   description: string;
   photo: string | null;
+  address: string | null;
   href: string;
 }
 
@@ -28,24 +29,30 @@ function buildTopics(content: HomeTopicsContent): Topic[] {
     title: content[key].title,
     description: content[key].description,
     photo: content[key].photo,
+    address: content[key].address,
     href: TOPIC_HREFS[key],
   }));
 }
 
 function TopicPanel({ topic, className }: { topic: Topic; className?: string }) {
   return (
-    <Link href={topic.href} className={`group relative block h-full overflow-hidden ${className ?? ""}`}>
+    <div className={`group relative block h-full overflow-hidden ${className ?? ""}`}>
       <PhotoOrPlaceholder
         src={topic.photo}
         label={`Foto — ${topic.title}`}
         className="absolute inset-0 h-full w-full"
       />
       <div className="absolute inset-0 bg-forest/40 transition-colors group-hover:bg-forest/55" />
-      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-8 text-paper">
-        <h3 className="font-serif text-3xl">{topic.title}</h3>
-        <p className="font-sans text-sm text-paper/80">{topic.description}</p>
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 p-8 text-center text-paper">
+        {topic.address && (
+          <p className="whitespace-pre-line font-serif text-sm text-paper/80">{topic.address}</p>
+        )}
+        <h3 className="font-serif text-4xl uppercase tracking-wide sm:text-5xl">{topic.title}</h3>
+        <PillButton href={topic.href} className="border-paper text-paper hover:bg-paper hover:text-forest">
+          {topic.description}
+        </PillButton>
       </div>
-    </Link>
+    </div>
   );
 }
 
@@ -53,7 +60,10 @@ function useScrollDrivenTranslate(sectionRef: RefObject<HTMLElement | null>, max
   const [translateVw, setTranslateVw] = useState(0);
 
   useEffect(() => {
-    function handleScroll() {
+    let rafId: number | null = null;
+
+    function measure() {
+      rafId = null;
       const section = sectionRef.current;
       if (!section) return;
 
@@ -65,9 +75,17 @@ function useScrollDrivenTranslate(sectionRef: RefObject<HTMLElement | null>, max
       setTranslateVw((scrolled / scrollableDistance) * maxTranslateVw);
     }
 
-    handleScroll();
+    function handleScroll() {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(measure);
+    }
+
+    measure();
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
   }, [sectionRef, maxTranslateVw]);
 
   return translateVw;

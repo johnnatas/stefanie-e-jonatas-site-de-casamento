@@ -12,6 +12,23 @@ export class InMemoryGuestRepository implements GuestRepository {
     return persisted;
   }
 
+  async update(guest: Guest): Promise<Guest> {
+    const index = this.guests.findIndex((existing) => existing.id === guest.id);
+    if (index === -1) {
+      throw new GuestNotFoundError("Guest not found.");
+    }
+    this.guests[index] = guest;
+    return guest;
+  }
+
+  async delete(id: string): Promise<void> {
+    const index = this.guests.findIndex((existing) => existing.id === id);
+    if (index === -1) {
+      throw new GuestNotFoundError("Guest not found.");
+    }
+    this.guests.splice(index, 1);
+  }
+
   async findAll(): Promise<Guest[]> {
     return [...this.guests];
   }

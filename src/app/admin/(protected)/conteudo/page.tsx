@@ -5,32 +5,94 @@ export const metadata: Metadata = {
   title: "Conteúdo do Site | Painel Administrativo",
 };
 
-const CONTENT_SECTIONS = [
-  { label: "Configurações (data do casamento)", href: "/admin/conteudo/configuracoes" },
-  { label: "Hero da Home", href: "/admin/conteudo/hero" },
-  { label: "Fotos dos Marcos (Save the Date)", href: "/admin/conteudo/marcos" },
-  { label: "Carrossel da Home", href: "/admin/conteudo/carrossel" },
-  { label: "Dicas — Cerimônia", href: "/admin/conteudo/dicas-cerimonia" },
-  { label: "Dicas — Traje", href: "/admin/conteudo/dicas-traje" },
-  { label: "Dicas — Hospedagem", href: "/admin/conteudo/dicas-hospedagem" },
+interface ContentSection {
+  label: string;
+  description: string;
+  href: string;
+}
+
+interface ContentGroup {
+  label: string;
+  sections: ContentSection[];
+}
+
+const CONTENT_GROUPS: ContentGroup[] = [
+  {
+    label: "Configurações gerais",
+    sections: [
+      {
+        label: "Data do casamento",
+        description: "Data e horário exibidos no contador da Home.",
+        href: "/admin/conteudo/configuracoes",
+      },
+    ],
+  },
+  {
+    label: "Home",
+    sections: [
+      {
+        label: "Hero da Home",
+        description: "Texto e fotos do topo da página inicial.",
+        href: "/admin/conteudo/hero",
+      },
+      {
+        label: "Fotos dos Marcos",
+        description: "Fotos do Save the Date / linha do tempo.",
+        href: "/admin/conteudo/marcos",
+      },
+      {
+        label: "Carrossel da Home",
+        description: "Tópicos em destaque na página inicial.",
+        href: "/admin/conteudo/carrossel",
+      },
+    ],
+  },
+  {
+    label: "Dicas e Instruções",
+    sections: [
+      {
+        label: "Cerimônia",
+        description: "Informações sobre local e horário da cerimônia.",
+        href: "/admin/conteudo/dicas-cerimonia",
+      },
+      {
+        label: "Traje",
+        description: "Orientações de traje para os convidados.",
+        href: "/admin/conteudo/dicas-traje",
+      },
+      {
+        label: "Hospedagem",
+        description: "Sugestões de hospedagem para quem vem de fora.",
+        href: "/admin/conteudo/dicas-hospedagem",
+      },
+    ],
+  },
 ];
 
 export default function ContentIndexPage() {
   return (
     <div>
       <h1 className="font-serif text-3xl text-forest">Conteúdo do Site</h1>
-      <ul className="mt-6 flex flex-col gap-3">
-        {CONTENT_SECTIONS.map((section) => (
-          <li key={section.href}>
-            <Link
-              href={section.href}
-              className="font-sans text-sm uppercase tracking-widest text-moss hover:text-forest"
-            >
-              {section.label}
-            </Link>
-          </li>
+
+      <div className="mt-8 flex flex-col gap-8">
+        {CONTENT_GROUPS.map((group) => (
+          <div key={group.label} className="flex flex-col gap-3">
+            <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/70">{group.label}</span>
+            <div className="flex flex-col gap-1">
+              {group.sections.map((section) => (
+                <Link
+                  key={section.href}
+                  href={section.href}
+                  className="group flex flex-col gap-0.5 border-b border-line py-3 transition-colors"
+                >
+                  <span className="font-serif text-lg text-forest group-hover:text-moss">{section.label}</span>
+                  <span className="font-sans text-sm text-forest/60">{section.description}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

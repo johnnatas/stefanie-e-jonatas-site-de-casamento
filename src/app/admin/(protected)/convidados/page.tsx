@@ -1,18 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { createListGuestsUseCase } from "@/infrastructure/composition";
 import { isBackendConfigured } from "@/infrastructure/config/env";
 import { ConfigurationNotice } from "@/components/ui/ConfigurationNotice";
+import { GuestsTable } from "@/components/admin/GuestsTable";
 import type { Guest } from "@/domain/entities/Guest";
 
 export const metadata: Metadata = {
   title: "Convidados | Painel Administrativo",
-};
-
-const STATUS_LABELS: Record<Guest["attendanceStatus"], string> = {
-  pending: "Pendente",
-  confirmed: "Confirmado",
-  declined: "Recusado",
 };
 
 export default async function AdminGuestsPage() {
@@ -29,14 +25,22 @@ export default async function AdminGuestsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="font-serif text-3xl text-forest">Convidados</h1>
-        <Link
-          href="/admin/convidados/novo"
-          className="font-sans text-sm uppercase tracking-widest text-moss hover:text-forest"
-        >
-          + Novo convidado
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/admin/convidados/importar"
+            className="flex min-h-11 items-center font-sans text-sm uppercase tracking-widest text-moss hover:text-forest"
+          >
+            Importar
+          </Link>
+          <Link
+            href="/admin/convidados/novo"
+            className="rounded-full bg-moss px-5 py-2 font-sans text-xs uppercase tracking-widest text-paper transition-colors hover:bg-moss/80"
+          >
+            + Novo convidado
+          </Link>
+        </div>
       </div>
 
       {!guests ? (
@@ -52,33 +56,19 @@ export default async function AdminGuestsPage() {
       ) : guests.length === 0 ? (
         <p className="mt-6 font-sans text-forest/70">Nenhum convidado cadastrado ainda.</p>
       ) : (
-        <div className="mt-6 overflow-x-auto">
-          <table className="w-full min-w-[560px] border-collapse font-sans text-sm">
-            <thead>
-              <tr className="border-b border-line text-left text-forest/70">
-                <th className="py-2 pr-4">Nome</th>
-                <th className="py-2 pr-4">Contato</th>
-                <th className="py-2 pr-4">Acompanhantes</th>
-                <th className="py-2 pr-4">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {guests.map((guest) => (
-                <tr key={guest.id} className="border-b border-line">
-                  <td className="py-3 pr-4 text-forest">
-                    {guest.fullName}
-                    {guest.nickname && <span className="text-forest/70"> ({guest.nickname})</span>}
-                  </td>
-                  <td className="py-3 pr-4 text-forest/70">
-                    {[guest.email, guest.phone].filter(Boolean).join(" · ") || "—"}
-                  </td>
-                  <td className="py-3 pr-4 text-forest/70">{guest.companionsCount}</td>
-                  <td className="py-3 pr-4 text-forest/70">{STATUS_LABELS[guest.attendanceStatus]}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Suspense fallback={<p className="mt-6 font-sans text-forest/70">Carregando...</p>}>
+          <GuestsTable
+            guests={guests.map((guest) => ({
+              id: guest.id!,
+              fullName: guest.fullName,
+              nickname: guest.nickname,
+              email: guest.email,
+              phone: guest.phone,
+              companionsCount: guest.companionsCount,
+              attendanceStatus: guest.attendanceStatus,
+            }))}
+          />
+        </Suspense>
       )}
     </div>
   );

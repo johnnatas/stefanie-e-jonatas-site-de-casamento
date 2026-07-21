@@ -12,28 +12,40 @@ const baseInput = {
 };
 
 describe("UpsertGiftUseCase", () => {
-  it("creates a new gift when no id is provided", async () => {
+  it("creates a new gift when no id is provided, flagged as name/price changed", async () => {
     const repository = new InMemoryGiftRepository();
 
-    const gift = await new UpsertGiftUseCase(repository).execute(baseInput);
+    const result = await new UpsertGiftUseCase(repository).execute(baseInput);
 
-    expect(gift.id).toBeDefined();
-    expect(gift.status).toBe("available");
+    expect(result.gift.id).toBeDefined();
+    expect(result.gift.status).toBe("available");
+    expect(result.nameOrPriceChanged).toBe(true);
   });
 
-  it("updates an existing gift preserving its current status", async () => {
+  it("updates an existing gift preserving its current status, flagging a price change", async () => {
     const repository = new InMemoryGiftRepository();
-    const created = await new UpsertGiftUseCase(repository).execute(baseInput);
-    const reserved = await repository.update(created.reserve());
+    const created = (await new UpsertGiftUseCase(repository).execute(baseInput)).gift;
+    const reserved = await repository.update(created.reserve(new Date(Date.now() + 60 * 60 * 1000)));
 
-    const updated = await new UpsertGiftUseCase(repository).execute({
+    const result = await new UpsertGiftUseCase(repository).execute({ ...baseInput, id: reserved.id, price: 220 });
+
+    expect(result.gift.price).toBe(220);
+    expect(result.gift.status).toBe("reserved");
+    expect(result.nameOrPriceChanged).toBe(true);
+  });
+
+  it("does not flag a change when only description/category are edited", async () => {
+    const repository = new InMemoryGiftRepository();
+    const created = (await new UpsertGiftUseCase(repository).execute(baseInput)).gift;
+
+    const result = await new UpsertGiftUseCase(repository).execute({
       ...baseInput,
-      id: reserved.id,
-      price: 220,
+      id: created.id,
+      description: "Nova descrição",
+      category: "casa",
     });
 
-    expect(updated.price).toBe(220);
-    expect(updated.status).toBe("reserved");
+    expect(result.nameOrPriceChanged).toBe(false);
   });
 
   it("throws when updating a gift that does not exist", async () => {

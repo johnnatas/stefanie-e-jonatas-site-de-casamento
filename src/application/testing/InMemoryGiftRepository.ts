@@ -20,6 +20,14 @@ export class InMemoryGiftRepository implements GiftRepository {
     return gift;
   }
 
+  async delete(id: string): Promise<void> {
+    const index = this.gifts.findIndex((g) => g.id === id);
+    if (index === -1) {
+      throw new Error(`Gift with id ${id} not found.`);
+    }
+    this.gifts.splice(index, 1);
+  }
+
   async findAll(): Promise<Gift[]> {
     return [...this.gifts];
   }

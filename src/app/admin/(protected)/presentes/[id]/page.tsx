@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createListGiftsUseCase } from "@/infrastructure/composition";
+import { isBackendConfigured } from "@/infrastructure/config/env";
+import { ConfigurationNotice } from "@/components/ui/ConfigurationNotice";
 import { GiftForm } from "@/components/admin/GiftForm";
 
 export const metadata: Metadata = {
@@ -13,26 +16,61 @@ interface EditGiftPageProps {
 
 export default async function EditGiftPage({ params }: EditGiftPageProps) {
   const { id } = await params;
-  const gifts = await createListGiftsUseCase().execute();
+  const backendConfigured = isBackendConfigured();
+
+  if (!backendConfigured) {
+    return (
+      <div>
+        <h1 className="font-serif text-3xl text-forest">Editar presente</h1>
+        <div className="mt-6">
+          <ConfigurationNotice message="Configure o Supabase (.env.local) para editar presentes." />
+        </div>
+      </div>
+    );
+  }
+
+  let gifts;
+  try {
+    gifts = await createListGiftsUseCase().execute();
+  } catch {
+    return (
+      <div>
+        <h1 className="font-serif text-3xl text-forest">Editar presente</h1>
+        <div className="mt-6">
+          <ConfigurationNotice message="Não foi possível carregar este presente agora." />
+        </div>
+      </div>
+    );
+  }
+
   const gift = gifts.find((candidate) => candidate.id === id);
 
   if (!gift) {
     notFound();
   }
 
+  const existingCategories = Array.from(new Set(gifts.map((candidate) => candidate.category))).sort();
+
   return (
     <div>
-      <h1 className="font-serif text-3xl text-forest">Editar presente</h1>
+      <div className="flex items-center gap-4">
+        <Link href="/admin/presentes" className="font-sans text-sm text-forest/70 hover:text-forest">
+          ← Voltar
+        </Link>
+      </div>
+      <h1 className="mt-2 font-serif text-3xl text-forest">Editar presente</h1>
       <div className="mt-6">
         <GiftForm
           defaultValues={{
             id: gift.id,
             name: gift.name,
             description: gift.description,
-            imageUrl: gift.imageUrl,
+            imageUrl: gift.imageUrl ?? "",
             price: gift.price,
             category: gift.category,
           }}
+          checkoutUrl={gift.mercadoPagoCheckoutUrl}
+          existingCategories={existingCategories}
         />
       </div>
     </div>

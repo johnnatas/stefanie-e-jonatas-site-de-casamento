@@ -17,10 +17,13 @@ export async function updateHomeTopicsAction(
     const currentUrl = (formData.get(`${key}CurrentUrl`) as string) || null;
     const photo = await resolvePhotoField("home-topics", key, formData, currentUrl, `${key}File`, `${key}Remove`);
 
+    const address = (formData.get(`${key}Address`) as string | null)?.trim() || null;
+
     content[key] = {
       title: formData.get(`${key}Title`),
       description: formData.get(`${key}Description`),
       photo,
+      address,
     };
   }
 

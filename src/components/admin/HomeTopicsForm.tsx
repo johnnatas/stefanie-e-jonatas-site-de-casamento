@@ -61,6 +61,22 @@ export function HomeTopicsForm({ defaultValues }: HomeTopicsFormProps) {
               />
             </div>
 
+            {key === "cerimonia" && (
+              <div>
+                <label htmlFor={`${key}Address`} className="block font-sans text-sm text-forest">
+                  Endereço (opcional)
+                </label>
+                <textarea
+                  id={`${key}Address`}
+                  name={`${key}Address`}
+                  defaultValue={entry.address ?? undefined}
+                  rows={2}
+                  placeholder="Ex: Estrada Municipal do Bairro Caioçara, 1100 — Jarinu, SP"
+                  className={inputClassName}
+                />
+              </div>
+            )}
+
             <PhotoUploadField name={key} currentUrl={entry.photo} label={`Foto — ${TOPIC_LABELS[key]}`} />
           </fieldset>
         );

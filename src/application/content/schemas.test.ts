@@ -59,6 +59,7 @@ describe("homeTopicsContentSchema", () => {
       title: "Cerimônia",
       description: "Horário, local e tudo sobre a celebração.",
       photo: null,
+      address: null,
     });
     expect(result.presentes.title).toBe("Lista de presentes");
     expect(result.traje.title).toBe("Traje");

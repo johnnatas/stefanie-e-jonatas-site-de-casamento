@@ -24,6 +24,7 @@ const topicEntrySchema = z.object({
   title: z.string().min(1),
   description: z.string().min(1),
   photo: z.string().min(1).nullable().default(null),
+  address: z.string().min(1).nullable().default(null),
 });
 export type TopicEntry = z.output<typeof topicEntrySchema>;
 
@@ -32,26 +33,31 @@ export const homeTopicsContentSchema = z.object({
     title: "Cerimônia",
     description: "Horário, local e tudo sobre a celebração.",
     photo: null,
+    address: null,
   }),
   presentes: topicEntrySchema.default({
     title: "Lista de presentes",
     description: "Ajude a construir o começo da nossa nova casa.",
     photo: null,
+    address: null,
   }),
   traje: topicEntrySchema.default({
     title: "Traje",
     description: "Código de vestimenta para o grande dia.",
     photo: null,
+    address: null,
   }),
   hospedagem: topicEntrySchema.default({
     title: "Hospedagem",
     description: "Sugestões de hotéis e pousadas próximas.",
     photo: null,
+    address: null,
   }),
   nossaHistoria: topicEntrySchema.default({
     title: "Nossa história",
     description: "Como tudo começou até chegarmos aqui.",
     photo: null,
+    address: null,
   }),
 });
 export type HomeTopicsContent = z.output<typeof homeTopicsContentSchema>;

@@ -14,6 +14,8 @@ export interface GuestAttendanceUpdate {
 
 export interface GuestRepository {
   save(guest: Guest): Promise<Guest>;
+  update(guest: Guest): Promise<Guest>;
+  delete(id: string): Promise<void>;
   findAll(): Promise<Guest[]>;
   /** Name/nickname/id only — never email, phone, or message. */
   findAllPublicNames(): Promise<GuestPublicSummary[]>;

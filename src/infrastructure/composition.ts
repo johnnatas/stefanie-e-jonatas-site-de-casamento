@@ -3,6 +3,9 @@ import { SupabaseGuestRepository } from "@/infrastructure/supabase/SupabaseGuest
 import { SupabaseGiftRepository } from "@/infrastructure/supabase/SupabaseGiftRepository";
 import { SupabaseGiftContributionRepository } from "@/infrastructure/supabase/SupabaseGiftContributionRepository";
 import { SupabaseSiteContentRepository } from "@/infrastructure/supabase/SupabaseSiteContentRepository";
+import { SupabaseAdminSecuritySettingsRepository } from "@/infrastructure/supabase/SupabaseAdminSecuritySettingsRepository";
+import { SupabaseNotificationLogRepository } from "@/infrastructure/supabase/SupabaseNotificationLogRepository";
+import { ResendEmailGateway } from "@/infrastructure/email/ResendEmailGateway";
 import { GetSiteContentUseCase } from "@/application/use-cases/content/GetSiteContentUseCase";
 import { UpdateSiteContentUseCase } from "@/application/use-cases/content/UpdateSiteContentUseCase";
 import { isBackendConfigured } from "@/infrastructure/config/env";
@@ -16,8 +19,22 @@ import { ConfirmGiftPaymentUseCase } from "@/application/use-cases/gifts/Confirm
 import { ListGuestsUseCase } from "@/application/use-cases/admin/ListGuestsUseCase";
 import { SearchGuestsUseCase } from "@/application/use-cases/rsvp/SearchGuestsUseCase";
 import { CreateGuestUseCase } from "@/application/use-cases/admin/CreateGuestUseCase";
+import { UpdateGuestUseCase } from "@/application/use-cases/admin/UpdateGuestUseCase";
+import { DeleteGuestUseCase } from "@/application/use-cases/admin/DeleteGuestUseCase";
+import { DeleteGiftUseCase } from "@/application/use-cases/admin/DeleteGiftUseCase";
 import { GetDashboardSummaryUseCase } from "@/application/use-cases/admin/GetDashboardSummaryUseCase";
 import { UpsertGiftUseCase } from "@/application/use-cases/admin/UpsertGiftUseCase";
+import { RefreshGiftPaymentLinkUseCase } from "@/application/use-cases/gifts/RefreshGiftPaymentLinkUseCase";
+import { ListGiftContributionsUseCase } from "@/application/use-cases/gifts/ListGiftContributionsUseCase";
+import { SendReservationConfirmationUseCase } from "@/application/use-cases/notifications/SendReservationConfirmationUseCase";
+import { SendReservationRemindersUseCase } from "@/application/use-cases/notifications/SendReservationRemindersUseCase";
+import { SendGiftSuggestionRemindersUseCase } from "@/application/use-cases/notifications/SendGiftSuggestionRemindersUseCase";
+import { SendWeddingDayNotificationUseCase } from "@/application/use-cases/notifications/SendWeddingDayNotificationUseCase";
+import { VerifyPriceChangeSecretUseCase } from "@/application/use-cases/security/VerifyPriceChangeSecretUseCase";
+import { UpdateSecretKeyUseCase } from "@/application/use-cases/security/UpdateSecretKeyUseCase";
+import { UpdateMercadoPagoAccessTokenUseCase } from "@/application/use-cases/security/UpdateMercadoPagoAccessTokenUseCase";
+import { UpdateResendApiKeyUseCase } from "@/application/use-cases/security/UpdateResendApiKeyUseCase";
+import { GetAdminSecuritySettingsUseCase } from "@/application/use-cases/security/GetAdminSecuritySettingsUseCase";
 
 export { uploadSiteContentPhoto, InvalidPhotoUploadError } from "@/infrastructure/supabase/uploadSiteContentPhoto";
 export { resolvePhotoField } from "@/infrastructure/supabase/resolvePhotoField";
@@ -29,12 +46,16 @@ export { resolvePhotoField } from "@/infrastructure/supabase/resolvePhotoField";
  */
 function repositories() {
   const client = getSupabaseServiceRoleClient();
+  const securitySettingsRepository = new SupabaseAdminSecuritySettingsRepository(client);
   return {
     guestRepository: new SupabaseGuestRepository(client),
     giftRepository: new SupabaseGiftRepository(client),
     giftContributionRepository: new SupabaseGiftContributionRepository(client),
     siteContentRepository: new SupabaseSiteContentRepository(client),
-    paymentGateway: new MercadoPagoGateway(),
+    securitySettingsRepository,
+    paymentGateway: new MercadoPagoGateway(securitySettingsRepository),
+    notificationLogRepository: new SupabaseNotificationLogRepository(client),
+    emailGateway: new ResendEmailGateway(securitySettingsRepository),
   };
 }
 
@@ -43,7 +64,8 @@ export function createConfirmRsvpUseCase(): ConfirmRsvpUseCase {
 }
 
 export function createListGiftsUseCase(): ListGiftsUseCase {
-  return new ListGiftsUseCase(repositories().giftRepository);
+  const { giftRepository, giftContributionRepository } = repositories();
+  return new ListGiftsUseCase(giftRepository, giftContributionRepository);
 }
 
 export function createGiftContributionUseCase(): CreateGiftContributionUseCase {
@@ -69,12 +91,83 @@ export function createUpsertGiftUseCase(): UpsertGiftUseCase {
   return new UpsertGiftUseCase(repositories().giftRepository);
 }
 
+export function createRefreshGiftPaymentLinkUseCase(): RefreshGiftPaymentLinkUseCase {
+  const { giftRepository, paymentGateway } = repositories();
+  return new RefreshGiftPaymentLinkUseCase(giftRepository, paymentGateway);
+}
+
+export function createListGiftContributionsUseCase(): ListGiftContributionsUseCase {
+  return new ListGiftContributionsUseCase(repositories().giftContributionRepository);
+}
+
+export function createUpdateResendApiKeyUseCase(): UpdateResendApiKeyUseCase {
+  return new UpdateResendApiKeyUseCase(repositories().securitySettingsRepository);
+}
+
+export function createSendReservationConfirmationUseCase(): SendReservationConfirmationUseCase {
+  const { emailGateway, notificationLogRepository } = repositories();
+  return new SendReservationConfirmationUseCase(emailGateway, notificationLogRepository);
+}
+
+export function createSendReservationRemindersUseCase(): SendReservationRemindersUseCase {
+  const { giftContributionRepository, giftRepository, emailGateway, notificationLogRepository } = repositories();
+  return new SendReservationRemindersUseCase(
+    giftContributionRepository,
+    giftRepository,
+    emailGateway,
+    notificationLogRepository
+  );
+}
+
+export function createSendGiftSuggestionRemindersUseCase(): SendGiftSuggestionRemindersUseCase {
+  const { guestRepository, giftContributionRepository, emailGateway, notificationLogRepository } = repositories();
+  return new SendGiftSuggestionRemindersUseCase(
+    guestRepository,
+    giftContributionRepository,
+    emailGateway,
+    notificationLogRepository
+  );
+}
+
+export function createSendWeddingDayNotificationUseCase(): SendWeddingDayNotificationUseCase {
+  const { guestRepository, emailGateway, notificationLogRepository } = repositories();
+  return new SendWeddingDayNotificationUseCase(guestRepository, emailGateway, notificationLogRepository);
+}
+
+export function createVerifyPriceChangeSecretUseCase(): VerifyPriceChangeSecretUseCase {
+  return new VerifyPriceChangeSecretUseCase(repositories().securitySettingsRepository);
+}
+
+export function createUpdateSecretKeyUseCase(): UpdateSecretKeyUseCase {
+  return new UpdateSecretKeyUseCase(repositories().securitySettingsRepository);
+}
+
+export function createUpdateMercadoPagoAccessTokenUseCase(): UpdateMercadoPagoAccessTokenUseCase {
+  return new UpdateMercadoPagoAccessTokenUseCase(repositories().securitySettingsRepository);
+}
+
+export function createGetAdminSecuritySettingsUseCase(): GetAdminSecuritySettingsUseCase {
+  return new GetAdminSecuritySettingsUseCase(repositories().securitySettingsRepository);
+}
+
 export function createSearchGuestsUseCase(): SearchGuestsUseCase {
   return new SearchGuestsUseCase(repositories().guestRepository);
 }
 
 export function createCreateGuestUseCase(): CreateGuestUseCase {
   return new CreateGuestUseCase(repositories().guestRepository);
+}
+
+export function createUpdateGuestUseCase(): UpdateGuestUseCase {
+  return new UpdateGuestUseCase(repositories().guestRepository);
+}
+
+export function createDeleteGuestUseCase(): DeleteGuestUseCase {
+  return new DeleteGuestUseCase(repositories().guestRepository);
+}
+
+export function createDeleteGiftUseCase(): DeleteGiftUseCase {
+  return new DeleteGiftUseCase(repositories().giftRepository);
 }
 
 export function createGetSiteContentUseCase(): GetSiteContentUseCase {

@@ -27,11 +27,18 @@ export class InMemoryGiftContributionRepository implements GiftContributionRepos
     return this.contributions.find((c) => c.id === id) ?? null;
   }
 
-  async findByPreferenceId(preferenceId: string): Promise<GiftContribution | null> {
-    return this.contributions.find((c) => c.mercadoPagoPreferenceId === preferenceId) ?? null;
+  async findPendingByGiftId(giftId: string): Promise<GiftContribution | null> {
+    const pending = this.contributions
+      .filter((c) => c.giftId === giftId && c.status === "pending")
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    return pending[0] ?? null;
   }
 
   async findApproved(): Promise<GiftContribution[]> {
     return this.contributions.filter((c) => c.status === "approved");
+  }
+
+  async findAll(): Promise<GiftContribution[]> {
+    return [...this.contributions];
   }
 }

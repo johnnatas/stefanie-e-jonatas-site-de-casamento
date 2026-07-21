@@ -21,4 +21,20 @@ describe("CreateGuestUseCase", () => {
 
     await expect(useCase.execute({ fullName: "Al" })).rejects.toThrow(InvalidGuestDataError);
   });
+
+  it("honors companionsCount, attendanceStatus, and message when provided", async () => {
+    const repository = new InMemoryGuestRepository();
+    const useCase = new CreateGuestUseCase(repository);
+
+    const guest = await useCase.execute({
+      fullName: "Diana Reis",
+      companionsCount: 3,
+      attendanceStatus: "confirmed",
+      message: "Adoraria ir!",
+    });
+
+    expect(guest.companionsCount).toBe(3);
+    expect(guest.attendanceStatus).toBe("confirmed");
+    expect(guest.message).toBe("Adoraria ir!");
+  });
 });

@@ -2,7 +2,6 @@ import { GiftContribution } from "@/domain/entities/GiftContribution";
 import { GiftContributionRepository } from "@/domain/repositories/GiftContributionRepository";
 import { GiftRepository } from "@/domain/repositories/GiftRepository";
 import { PaymentGateway } from "@/application/ports/PaymentGateway";
-import { InvalidContributionDataError } from "@/domain/errors/DomainError";
 
 export interface ConfirmGiftPaymentInput {
   paymentId: string;
@@ -15,14 +14,12 @@ export class ConfirmGiftPaymentUseCase {
     private readonly paymentGateway: PaymentGateway
   ) {}
 
-  async execute(input: ConfirmGiftPaymentInput): Promise<GiftContribution> {
+  async execute(input: ConfirmGiftPaymentInput): Promise<GiftContribution | null> {
     const payment = await this.paymentGateway.getPayment(input.paymentId);
 
-    const contribution = await this.giftContributionRepository.findById(payment.externalReference);
+    const contribution = await this.giftContributionRepository.findPendingByGiftId(payment.externalReference);
     if (!contribution) {
-      throw new InvalidContributionDataError(
-        `Gift contribution referenced by payment ${input.paymentId} was not found.`
-      );
+      return null;
     }
 
     if (payment.status === "pending") {

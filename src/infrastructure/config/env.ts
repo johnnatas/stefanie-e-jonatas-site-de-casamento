@@ -4,7 +4,6 @@ const envSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
-  MERCADOPAGO_ACCESS_TOKEN: z.string().min(1),
   NEXT_PUBLIC_SITE_URL: z.string().url(),
 });
 
@@ -14,7 +13,7 @@ let cachedEnv: Env | undefined;
 
 /**
  * Parsed lazily (not at module load) so `next build` and unit tests can run
- * before real Supabase/Mercado Pago credentials exist in `.env.local`.
+ * before real Supabase credentials exist in `.env.local`.
  */
 export function getEnv(): Env {
   if (cachedEnv) {
@@ -25,7 +24,6 @@ export function getEnv(): Env {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
-    MERCADOPAGO_ACCESS_TOKEN: process.env.MERCADOPAGO_ACCESS_TOKEN,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   });
 
@@ -44,7 +42,6 @@ export function isBackendConfigured(): boolean {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
-    MERCADOPAGO_ACCESS_TOKEN: process.env.MERCADOPAGO_ACCESS_TOKEN,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   });
   return parsed.success;

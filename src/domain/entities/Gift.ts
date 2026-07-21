@@ -6,10 +6,13 @@ export interface GiftProps {
   id?: string;
   name: string;
   description: string;
-  imageUrl: string;
+  imageUrl: string | null;
   price: number;
   category: string;
   status?: GiftStatus;
+  reservedUntil?: Date | null;
+  mercadoPagoPreferenceId?: string;
+  mercadoPagoCheckoutUrl?: string | null;
   createdAt?: Date;
 }
 
@@ -17,10 +20,13 @@ export class Gift {
   readonly id?: string;
   readonly name: string;
   readonly description: string;
-  readonly imageUrl: string;
+  readonly imageUrl: string | null;
   readonly price: number;
   readonly category: string;
   readonly status: GiftStatus;
+  readonly reservedUntil: Date | null;
+  readonly mercadoPagoPreferenceId?: string;
+  readonly mercadoPagoCheckoutUrl: string | null;
   readonly createdAt: Date;
 
   private constructor(props: GiftProps) {
@@ -31,6 +37,9 @@ export class Gift {
     this.price = props.price;
     this.category = props.category.trim();
     this.status = props.status ?? "available";
+    this.reservedUntil = props.reservedUntil ?? null;
+    this.mercadoPagoPreferenceId = props.mercadoPagoPreferenceId;
+    this.mercadoPagoCheckoutUrl = props.mercadoPagoCheckoutUrl ?? null;
     this.createdAt = props.createdAt ?? new Date();
   }
 
@@ -54,16 +63,16 @@ export class Gift {
     return this.status === "available";
   }
 
-  reserve(): Gift {
+  reserve(reservedUntil: Date): Gift {
     if (!this.isAvailable()) {
       throw new GiftNotAvailableError(`Gift "${this.name}" is not available.`);
     }
 
-    return new Gift({ ...this, status: "reserved" });
+    return new Gift({ ...this, status: "reserved", reservedUntil });
   }
 
   markAsPaid(): Gift {
-    return new Gift({ ...this, status: "paid" });
+    return new Gift({ ...this, status: "paid", reservedUntil: null });
   }
 
   releaseToAvailable(): Gift {
@@ -71,6 +80,6 @@ export class Gift {
       throw new GiftNotAvailableError(`Gift "${this.name}" is already paid and cannot be released.`);
     }
 
-    return new Gift({ ...this, status: "available" });
+    return new Gift({ ...this, status: "available", reservedUntil: null });
   }
 }

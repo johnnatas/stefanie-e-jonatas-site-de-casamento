@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-21T00:00:00.000Z",
+  "title": "Design System: Stéfanie & Jonatas — Site de Casamento",
+  "extensions": {
+    "colorMeta": {
+      "moss": {
+        "role": "primary",
+        "displayName": "Moss",
+        "canonical": "#4a5335",
+        "tonalRamp": ["#161a10", "#242a19", "#333c24", "#4a5335", "#657146", "#83905e", "#a6b280", "#cdd6b3"]
+      },
+      "forest": {
+        "role": "secondary",
+        "displayName": "Forest",
+        "canonical": "#242a16",
+        "tonalRamp": ["#0c0e07", "#161a0d", "#1d2211", "#242a16", "#3a4423", "#565f38", "#7a8459", "#a7ad88"]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Papel",
+        "canonical": "#feffed",
+        "tonalRamp": ["#4a4a2f", "#7d7d4e", "#b0b06e", "#d8d894", "#eeeec0", "#f7f7d9", "#fcfcea", "#feffed"]
+      },
+      "paper-soft": {
+        "role": "neutral",
+        "displayName": "Papel Suave",
+        "canonical": "#e3e8c8",
+        "tonalRamp": ["#3c4327", "#5f6940", "#838f5c", "#a8b47c", "#c5cfa2", "#dbe3c1", "#e3e8c8", "#eef2dd"]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Linha",
+        "canonical": "#d0d7aa",
+        "tonalRamp": ["#33391f", "#535d32", "#748049", "#98a468", "#b5bf87", "#d0d7aa", "#dee3c1", "#ecefdc"]
+      },
+      "danger": {
+        "role": "state",
+        "displayName": "Vermelho Terracota",
+        "canonical": "#b3413a",
+        "tonalRamp": ["#3a1512", "#5c211d", "#832f28", "#b3413a", "#c46a63", "#d3928c", "#e1b6b1", "#efdad8"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Hero/título principal, uma vez por página (ex: nome do casal na Home)." },
+      "headline": { "displayName": "Headline", "purpose": "Títulos de seção (h2/h3) em todas as páginas." },
+      "script": { "displayName": "Script/Assinatura", "purpose": "Uso pontual: link de navegação ativo, citações assinadas 'Com carinho, Stéfanie & Jonatas'. Nunca corpo de texto." },
+      "body": { "displayName": "Body", "purpose": "Parágrafos e descrições, limite de leitura ~65-75ch." },
+      "label": { "displayName": "Label", "purpose": "Navegação inativa, eyebrows, tags de status — uppercase, tracking largo." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "flip-card-transition", "value": "transform 0.6s", "purpose": "Rotação 3D do ArchFlipCard ao revelar o verso." },
+      { "name": "color-transition", "value": "color/background-color 150ms ease", "purpose": "Hover/focus em botões e links — nunca transform ou sombra." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button (PillButton)",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Botão de ação principal — contorno em Moss, preenche no hover.",
+      "html": "<button class=\"ds-btn-primary\">Confirmar presença</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; border: 1px solid #4a5335; color: #4a5335; background: transparent; padding: 12px 32px; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 1rem; transition: background-color 150ms ease, color 150ms ease; } .ds-btn-primary:hover, .ds-btn-primary:focus-visible { background: #4a5335; color: #feffed; }"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Campo de formulário padrão — borda Linha, foco Moss.",
+      "html": "<input class=\"ds-input\" placeholder=\"Seu nome\" />",
+      "css": ".ds-input { width: 100%; border-radius: 6px; border: 1px solid #d0d7aa; background: #feffed; color: #242a16; padding: 8px 16px; font-family: Inter, system-ui, sans-serif; font-size: 0.875rem; } .ds-input:focus-visible { outline: none; border-color: #4a5335; }"
+    },
+    {
+      "name": "Arch Flip Card",
+      "kind": "custom",
+      "refersTo": "arch-flip-card",
+      "description": "Card assinatura em formato de arco/portal de jardim, vira em 3D no hover revelando detalhes em fundo Forest.",
+      "html": "<div class=\"ds-arch-card\"><div class=\"ds-arch-inner\"><div class=\"ds-arch-front\">01</div><div class=\"ds-arch-back\">Save the date</div></div></div>",
+      "css": ".ds-arch-card { perspective: 1200px; height: 320px; width: 100%; } .ds-arch-inner { position: relative; height: 100%; width: 100%; transform-style: preserve-3d; transition: transform 0.6s; } .ds-arch-card:hover .ds-arch-inner, .ds-arch-card:focus-within .ds-arch-inner { transform: rotateY(180deg); } .ds-arch-front, .ds-arch-back { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 999px 999px 8px 8px; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', Georgia, serif; } .ds-arch-front { background: #e3e8c8; color: #242a16; } .ds-arch-back { background: #242a16; color: #feffed; transform: rotateY(180deg); }"
+    },
+    {
+      "name": "Active Nav Link",
+      "kind": "nav",
+      "refersTo": "nav-active",
+      "description": "Item de navegação ativo troca para o registro script — a assinatura da navegação.",
+      "html": "<a class=\"ds-nav-active\" href=\"#\">presentes</a>",
+      "css": ".ds-nav-active { font-family: 'Alex Brush', cursive; font-style: italic; font-size: 1.125rem; color: #4a5335; text-transform: lowercase; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "A Casa do Jardim ao Mar",
+    "overview": "O casamento acontece numa casa com jardim, com uma muretinha que dá acesso direto à praia — decoração essencialmente verde e branco, terno bege bem clarinho, madrinhas em verde e rosa pastel. O site existe para colocar o convidado dentro dessa cena antes mesmo de chegar lá: verdes orgânicos (moss/forest) como base, papel quente ao invés de branco frio, uma caligrafia manuscrita (Alex Brush) que aparece nos momentos certos como se fosse assinada à mão, e cards em formato de arco (ArchFlipCard) que remetem a janelas/portais de jardim, não a caixas de app. Nada aqui pode parecer SaaS: sem sombras, sem gradientes, sem glassmorphism, sem cards genéricos empilhados — o site é chapado como uma folha de papel bem cuidada, e a profundidade vem de cor e contraste, não de efeito.",
+    "keyCharacteristics": [
+      "Base verde-moss/forest profunda, papel quente (não branco puro) como fundo",
+      "Serifada elegante (Playfair Display) para hierarquia + script manuscrito (Alex Brush) como assinatura, não decoração",
+      "Totalmente chapado — zero box-shadow em qualquer componente",
+      "Cards em arco (topo arredondado a 999px, base reta) como forma assinatura, não retângulos genéricos",
+      "Botões-pílula (rounded-full) com contorno fino, preenchendo de cor só no hover"
+    ],
+    "rules": [
+      { "name": "A Regra do Papel Quente", "body": "Nenhum branco puro (#ffffff) como fundo de página — sempre Papel (#feffed) ou mais quente.", "section": "colors" },
+      { "name": "A Regra da Cor com Propósito", "body": "Moss só aparece onde algo é clicável ou ativo. Se não é interativo, é Forest, Papel ou Linha.", "section": "colors" },
+      { "name": "A Regra da Assinatura", "body": "Alex Brush aparece no máximo uma vez por tela como elemento ativo — nunca como estilo de múltiplos elementos na mesma vista.", "section": "typography" },
+      { "name": "A Regra do Chapado", "body": "Zero box-shadow em qualquer estado. Se um elemento precisa se destacar, mude a cor de fundo ou o peso da borda — nunca adicione sombra.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do usar Papel (#feffed) como fundo padrão, nunca branco puro em seções de conteúdo.",
+      "Do reservar Moss exclusivamente para elementos interativos/ativos.",
+      "Do usar Alex Brush como assinatura pontual, nunca como fonte de corpo ou em múltiplos elementos por tela.",
+      "Do manter todo componente chapado — mudar cor de fundo/borda para dar destaque, nunca adicionar box-shadow.",
+      "Do usar rounded-full em todo botão de ação e o arco assinatura em cards de destaque temporal."
+    ],
+    "donts": [
+      "Don't usar rosa pastel genérico, cursiva em todo elemento, ou clip-art de flores.",
+      "Don't adicionar box-shadow, backdrop-filter ou glassmorphism em nenhum componente.",
+      "Don't usar gradiente em texto (background-clip: text).",
+      "Don't empilhar cards genéricos com ícone + título + texto repetidos.",
+      "Don't reintroduzir o token --color-gold em componentes novos — é vestigial."
+    ]
+  }
+}

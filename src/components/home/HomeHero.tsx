@@ -22,7 +22,7 @@ export function HomeHero({ heroContent, settings }: HomeHeroProps) {
     >
       <HeroCarousel photos={heroContent.photos} />
 
-      <div className="relative flex flex-col items-center gap-12 px-6 pb-28 pt-[136px] text-center text-paper">
+      <div className="relative flex min-h-dvh flex-col items-center justify-center gap-12 px-6 pt-[136px] pb-28 text-center text-paper">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}

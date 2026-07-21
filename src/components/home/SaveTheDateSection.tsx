@@ -34,7 +34,7 @@ export function SaveTheDateSection({ milestonePhotos }: SaveTheDateSectionProps)
           ))}
         </h2>
 
-        <div className="grid flex-1 grid-cols-1 gap-6 sm:grid-cols-3">
+        <div className="grid flex-1 grid-cols-1 gap-6 md:grid-cols-3">
           {MILESTONES.map((milestone, index) => (
             <motion.div
               key={milestone.title}

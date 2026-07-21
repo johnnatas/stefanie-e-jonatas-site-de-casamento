@@ -36,8 +36,8 @@ const CONTENT_GROUPS: ContentGroup[] = [
         href: "/admin/conteudo/hero",
       },
       {
-        label: "Fotos dos Marcos",
-        description: "Fotos do Save the Date / linha do tempo.",
+        label: "Fotos e Vídeos",
+        description: "Galeria de polaroids do Save the Date e da Nossa História.",
         href: "/admin/conteudo/marcos",
       },
       {

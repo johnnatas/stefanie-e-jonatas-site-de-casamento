@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   settingsContentSchema,
   homeHeroContentSchema,
-  homeMilestonePhotosContentSchema,
+  homeGalleryContentSchema,
   homeTopicsContentSchema,
   tipsCerimoniaContentSchema,
+  tipsTrajeContentSchema,
+  tipsHospedagemContentSchema,
   SITE_CONTENT_SLUGS,
   SITE_CONTENT_SCHEMAS,
 } from "@/application/content/schemas";
@@ -44,10 +46,33 @@ describe("homeHeroContentSchema", () => {
   });
 });
 
-describe("homeMilestonePhotosContentSchema", () => {
-  it("defaults all three milestone photos to null", () => {
-    const result = homeMilestonePhotosContentSchema.parse({});
-    expect(result).toEqual({ beginning: null, proposal: null, wedding: null });
+describe("homeGalleryContentSchema", () => {
+  it("defaults to an empty gallery", () => {
+    const result = homeGalleryContentSchema.parse({});
+    expect(result).toEqual({ items: [] });
+  });
+
+  it("accepts a mix of photo and video items", () => {
+    const result = homeGalleryContentSchema.safeParse({
+      items: [
+        { url: "https://example.com/a.jpg", type: "photo" },
+        { url: "https://example.com/b.mp4", type: "video" },
+      ],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects an item with an invalid type", () => {
+    const result = homeGalleryContentSchema.safeParse({
+      items: [{ url: "https://example.com/a.jpg", type: "gif" }],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects more than 20 items", () => {
+    const items = Array.from({ length: 21 }, (_, i) => ({ url: `https://example.com/${i}.jpg`, type: "photo" }));
+    const result = homeGalleryContentSchema.safeParse({ items });
+    expect(result.success).toBe(false);
   });
 });
 
@@ -76,13 +101,112 @@ describe("homeTopicsContentSchema", () => {
 });
 
 describe("tipsCerimoniaContentSchema", () => {
-  it("defaults to today's hardcoded copy", () => {
+  it("defaults to today's hardcoded copy with no event details or routes", () => {
     const result = tipsCerimoniaContentSchema.parse({});
 
     expect(result.eyebrow).toBe("O grande dia");
     expect(result.title).toBe("Local e horário");
     expect(result.body).toContain("**16h**");
     expect(result.photo).toBeNull();
+    expect(result.eventDateLabel).toBeNull();
+    expect(result.eventTimeLabel).toBeNull();
+    expect(result.eventAddress).toBeNull();
+    expect(result.routes).toEqual([]);
+  });
+
+  it("accepts event details and a list of routes", () => {
+    const result = tipsCerimoniaContentSchema.safeParse({
+      eventDateLabel: "29 de junho de 2027",
+      eventTimeLabel: "A realizar-se às 16h",
+      eventAddress: "Fazenda Santa Rita, Minas Gerais",
+      routes: [
+        { originLabel: "Vindo de Belo Horizonte", instructions: "Siga pela **BR-040**.", mapUrl: "https://maps.google.com/x" },
+      ],
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects a route missing required fields", () => {
+    const result = tipsCerimoniaContentSchema.safeParse({
+      routes: [{ originLabel: "Vindo de BH" }],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects more than 10 routes", () => {
+    const routes = Array.from({ length: 11 }, (_, i) => ({
+      originLabel: `Origem ${i}`,
+      instructions: "Siga em frente.",
+      mapUrl: null,
+    }));
+    const result = tipsCerimoniaContentSchema.safeParse({ routes });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("tipsTrajeContentSchema", () => {
+  it("defaults to today's hardcoded copy with no gender sections or Pinterest board", () => {
+    const result = tipsTrajeContentSchema.parse({});
+
+    expect(result.eyebrow).toBe("Como se vestir");
+    expect(result.title).toBe("Traje esporte fino");
+    expect(result.forHim).toBeNull();
+    expect(result.forHer).toBeNull();
+    expect(result.pinterestBoardUrl).toBeNull();
+  });
+
+  it("accepts forHim, forHer, and a Pinterest board URL", () => {
+    const result = tipsTrajeContentSchema.safeParse({
+      forHim: "Terno em tons terrosos.",
+      forHer: "Vestido midi ou longo.",
+      pinterestBoardUrl: "https://www.pinterest.com/stefanie/casamento",
+    });
+    expect(result.success).toBe(true);
+  });
+});
+
+describe("tipsHospedagemContentSchema", () => {
+  it("defaults to today's hardcoded copy with empty lists and the boilerplate disclaimer", () => {
+    const result = tipsHospedagemContentSchema.parse({});
+
+    expect(result.eyebrow).toBe("Fique por perto");
+    expect(result.distances).toEqual([]);
+    expect(result.hotels).toEqual([]);
+    expect(result.airports).toEqual([]);
+    expect(result.disclaimer).toBe("Não temos vínculo, parceria ou comissão com as indicações acima.");
+  });
+
+  it("accepts distances, hotels, and airports", () => {
+    const result = tipsHospedagemContentSchema.safeParse({
+      distances: [{ label: "Belo Horizonte", km: "120 km" }],
+      hotels: [{ name: "Pousada Serra Verde", distanceLabel: "500m", url: "https://example.com" }],
+      airports: [{ name: "Aeroporto de Confins", distanceLabel: "90 km", driveTimeLabel: "1h20" }],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects a hotel entry missing its required name", () => {
+    const result = tipsHospedagemContentSchema.safeParse({
+      hotels: [{ distanceLabel: "500m" }],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects more than 15 hotels", () => {
+    const hotels = Array.from({ length: 16 }, (_, i) => ({ name: `Hotel ${i}`, distanceLabel: null, url: null }));
+    const result = tipsHospedagemContentSchema.safeParse({ hotels });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects more than 6 airports", () => {
+    const airports = Array.from({ length: 7 }, (_, i) => ({
+      name: `Aeroporto ${i}`,
+      distanceLabel: null,
+      driveTimeLabel: null,
+    }));
+    const result = tipsHospedagemContentSchema.safeParse({ airports });
+    expect(result.success).toBe(false);
   });
 });
 

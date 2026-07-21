@@ -1,12 +1,7 @@
-"use client";
-
-import { motion } from "framer-motion";
-import { ArchFlipCard } from "@/components/ui/ArchFlipCard";
 import { Monogram } from "@/components/ui/Monogram";
-import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
 import { PillButton } from "@/components/ui/PillButton";
-import { MILESTONES } from "@/shared/milestones";
-import type { HomeMilestonePhotosContent } from "@/application/content/schemas";
+import { PolaroidGallery } from "@/components/ui/PolaroidGallery";
+import type { HomeGalleryContent } from "@/application/content/schemas";
 
 const HEADING_LINES = [
   { text: "Save", color: "var(--color-forest)", opacity: 1 },
@@ -14,13 +9,11 @@ const HEADING_LINES = [
   { text: "date!", color: "var(--color-moss)", opacity: 1 },
 ];
 
-const MILESTONE_KEYS = ["beginning", "proposal", "wedding"] as const;
-
 interface SaveTheDateSectionProps {
-  milestonePhotos: HomeMilestonePhotosContent;
+  gallery: HomeGalleryContent;
 }
 
-export function SaveTheDateSection({ milestonePhotos }: SaveTheDateSectionProps) {
+export function SaveTheDateSection({ gallery }: SaveTheDateSectionProps) {
   return (
     <section className="bg-mist px-6 py-32">
       <div className="mx-auto flex max-w-5xl flex-col gap-16 md:flex-row md:items-center md:gap-24">
@@ -43,30 +36,8 @@ export function SaveTheDateSection({ milestonePhotos }: SaveTheDateSectionProps)
           </div>
         </div>
 
-        <div className="grid flex-1 grid-cols-1 gap-8 md:grid-cols-3">
-          {MILESTONES.map((milestone, index) => (
-            <motion.div
-              key={milestone.title}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-            >
-              <ArchFlipCard
-                number={`0${index + 1}.`}
-                image={
-                  <PhotoOrPlaceholder
-                    src={milestonePhotos[MILESTONE_KEYS[index]]}
-                    label={`Foto — ${milestone.title}`}
-                    className="absolute inset-0 h-full w-full"
-                  />
-                }
-                title={milestone.title}
-                date={milestone.date}
-                description={milestone.description}
-              />
-            </motion.div>
-          ))}
+        <div className="flex-1">
+          <PolaroidGallery items={gallery.items} />
         </div>
       </div>
     </section>

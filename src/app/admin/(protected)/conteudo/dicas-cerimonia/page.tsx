@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { TipsContentForm } from "@/components/admin/TipsContentForm";
+import { TipsCerimoniaForm } from "@/components/admin/TipsCerimoniaForm";
 import { getSiteContentOrDefault } from "@/infrastructure/composition";
-import { updateTipsCerimoniaAction } from "./actions";
 
 export const metadata: Metadata = {
   title: "Dicas — Cerimônia | Painel Administrativo",
@@ -18,7 +17,7 @@ export default async function TipsCerimoniaContentPage() {
       </Link>
       <h1 className="font-serif text-3xl text-forest">Dicas — Cerimônia</h1>
       <div className="mt-6">
-        <TipsContentForm defaultValues={content} action={updateTipsCerimoniaAction} photoLabel="Local da cerimônia" />
+        <TipsCerimoniaForm defaultValues={content} />
       </div>
     </div>
   );

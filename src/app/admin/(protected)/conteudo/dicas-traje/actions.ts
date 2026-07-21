@@ -18,6 +18,9 @@ export async function updateTipsTrajeAction(
     title: formData.get("title"),
     body: formData.get("body"),
     photo,
+    forHim: formData.get("forHim") || null,
+    forHer: formData.get("forHer") || null,
+    pinterestBoardUrl: formData.get("pinterestBoardUrl") || null,
   });
 
   if (!parsed.success) {

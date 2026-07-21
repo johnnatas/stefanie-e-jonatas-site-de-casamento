@@ -64,4 +64,15 @@ describe("GiftsTable", () => {
     expect(screen.getByText("Jogo de taças")).toBeInTheDocument();
     expect(screen.queryByText("Jogo de panelas")).not.toBeInTheDocument();
   });
+
+  it("shows how many gifts match the current filters out of the total", async () => {
+    const user = userEvent.setup();
+    render(<GiftsTable gifts={gifts} />);
+
+    expect(screen.getByText("3 de 3 presentes")).toBeInTheDocument();
+
+    await user.selectOptions(screen.getByLabelText("Categoria"), "cozinha");
+
+    expect(screen.getByText("2 de 3 presentes")).toBeInTheDocument();
+  });
 });

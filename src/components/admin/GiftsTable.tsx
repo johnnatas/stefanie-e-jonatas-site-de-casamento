@@ -125,37 +125,42 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
       {filteredGifts.length === 0 ? (
         <p className="mt-6 font-sans text-forest/70">Nenhum presente encontrado.</p>
       ) : (
-        <div className="mt-6 overflow-x-auto">
-          <table className="w-full min-w-[560px] border-collapse font-sans text-sm">
-            <thead>
-              <tr className="border-b border-line text-left text-forest/70">
-                <th className="py-2 pr-4">Nome</th>
-                <th className="py-2 pr-4">Categoria</th>
-                <th className="py-2 pr-4">Valor</th>
-                <th className="py-2 pr-4">Status</th>
-                <th className="py-2 pr-4" />
-                <th className="py-2 pr-4" />
-              </tr>
-            </thead>
-            <tbody>
-              {filteredGifts.map((gift) => (
-                <tr key={gift.id} className="border-b border-line">
-                  <td className="py-3 pr-4 text-forest">{gift.name}</td>
-                  <td className="py-3 pr-4 text-forest/70">{gift.category}</td>
-                  <td className="py-3 pr-4 text-forest/70">{formatCurrency(gift.price)}</td>
-                  <td className="py-3 pr-4 text-forest/70">{STATUS_LABEL[gift.status]}</td>
-                  <td className="py-3 pr-4">
-                    <Link href={`/admin/presentes/${gift.id}`} className="text-moss hover:text-moss/80">
-                      Editar
-                    </Link>
-                  </td>
-                  <td className="py-3 pr-4">
-                    <DeleteGiftButton giftId={gift.id} giftName={gift.name} />
-                  </td>
+        <div className="mt-6">
+          <p className="font-sans text-xs text-forest/70">
+            {filteredGifts.length} de {gifts.length} presentes
+          </p>
+          <div className="mt-2 overflow-x-auto">
+            <table className="w-full min-w-[560px] border-collapse font-sans text-sm">
+              <thead>
+                <tr className="border-b border-line text-left text-forest/70">
+                  <th className="py-2 pr-4">Nome</th>
+                  <th className="py-2 pr-4">Categoria</th>
+                  <th className="py-2 pr-4">Valor</th>
+                  <th className="py-2 pr-4">Status</th>
+                  <th className="py-2 pr-4" />
+                  <th className="py-2 pr-4" />
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredGifts.map((gift) => (
+                  <tr key={gift.id} className="border-b border-line">
+                    <td className="py-3 pr-4 text-forest">{gift.name}</td>
+                    <td className="py-3 pr-4 text-forest/70">{gift.category}</td>
+                    <td className="py-3 pr-4 text-forest/70">{formatCurrency(gift.price)}</td>
+                    <td className="py-3 pr-4 text-forest/70">{STATUS_LABEL[gift.status]}</td>
+                    <td className="py-3 pr-4">
+                      <Link href={`/admin/presentes/${gift.id}`} className="text-moss hover:text-moss/80">
+                        Editar
+                      </Link>
+                    </td>
+                    <td className="py-3 pr-4">
+                      <DeleteGiftButton giftId={gift.id} giftName={gift.name} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

@@ -9,6 +9,7 @@ import {
 import { fetchGiftLinkMetadataAction } from "@/app/admin/(protected)/presentes/linkAutofillAction";
 import { GiftFormValues } from "@/components/admin/giftFormSchema";
 import { PhotoUploadField } from "@/components/admin/PhotoUploadField";
+import { cn } from "@/shared/utils/cn";
 
 interface GiftFormProps {
   defaultValues?: GiftFormValues;
@@ -107,6 +108,8 @@ export function GiftForm({ defaultValues, checkoutUrl, existingCategories = [] }
           </div>
           {linkFetchState.message && (
             <p
+              role="status"
+              aria-live="polite"
               className={`mt-1 font-sans text-xs ${linkFetchState.status === "error" ? "text-danger" : "text-moss"}`}
             >
               {linkFetchState.message}
@@ -223,16 +226,21 @@ export function GiftForm({ defaultValues, checkoutUrl, existingCategories = [] }
         <div className="flex flex-col gap-4">
           <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/40">Administrativo</span>
 
-          <div>
-            <label htmlFor="secretKey" className="block font-sans text-sm text-forest">
-              Chave secreta (obrigatória se alterar o valor)
+          <div className="rounded-md border border-line bg-paper-soft p-4">
+            <label htmlFor="secretKey" className="block font-sans text-sm font-medium text-forest">
+              Chave secreta
             </label>
+            <p id="secretKey-hint" className="mt-1 font-sans text-xs text-forest/70">
+              Necessária para confirmar mudanças de valor — protege contra alterações indevidas no preço do
+              presente.
+            </p>
             <input
               id="secretKey"
               name="secretKey"
               type="password"
               autoComplete="off"
-              className={inputClassName}
+              aria-describedby="secretKey-hint"
+              className={cn(inputClassName, "mt-2 bg-paper")}
             />
           </div>
 

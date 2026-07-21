@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import {
   createUpsertGiftUseCase,
   createRefreshGiftPaymentLinkUseCase,
@@ -71,5 +72,7 @@ export async function upsertGiftAction(
     }
   }
 
+  revalidatePath("/presentes");
+  revalidatePath("/admin/presentes");
   redirect("/admin/presentes");
 }

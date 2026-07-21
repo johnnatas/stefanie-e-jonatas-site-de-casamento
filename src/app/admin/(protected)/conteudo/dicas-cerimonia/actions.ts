@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createUpdateSiteContentUseCase, resolvePhotoField } from "@/infrastructure/composition";
 import { tipsCerimoniaContentSchema } from "@/application/content/schemas";
 import type { SiteContentActionState } from "@/application/content/actionState";
@@ -29,5 +30,6 @@ export async function updateTipsCerimoniaAction(
     return { status: "error", message: "Não foi possível salvar agora." };
   }
 
+  revalidatePath("/dicas-e-instrucoes/cerimonia");
   redirect("/admin/conteudo");
 }

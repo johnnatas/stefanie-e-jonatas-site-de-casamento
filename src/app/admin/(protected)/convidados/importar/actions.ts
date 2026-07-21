@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createCreateGuestUseCase, createListGuestsUseCase } from "@/infrastructure/composition";
 import { CreateGuestUseCase } from "@/application/use-cases/admin/CreateGuestUseCase";
 import { GuestRepository } from "@/domain/repositories/GuestRepository";
@@ -63,6 +64,8 @@ export async function importGuestsAction(
 
   try {
     const result = await importGuestRows(rows, { findAll: () => createListGuestsUseCase().execute() }, createCreateGuestUseCase());
+    revalidatePath("/admin/convidados");
+    revalidatePath("/confirmar-presenca");
     return { status: "done", result };
   } catch {
     return { status: "error", message: "Não foi possível importar os convidados agora." };

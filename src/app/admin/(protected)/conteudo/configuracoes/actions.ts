@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createUpdateSiteContentUseCase } from "@/infrastructure/composition";
 import { settingsContentSchema } from "@/application/content/schemas";
 import type { SiteContentActionState } from "@/application/content/actionState";
@@ -26,5 +27,7 @@ export async function updateSettingsAction(
     return { status: "error", message: "Não foi possível salvar agora." };
   }
 
+  revalidatePath("/");
+  revalidatePath("/presentes");
   redirect("/admin/conteudo");
 }

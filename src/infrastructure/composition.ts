@@ -36,8 +36,13 @@ import { UpdateMercadoPagoAccessTokenUseCase } from "@/application/use-cases/sec
 import { UpdateResendApiKeyUseCase } from "@/application/use-cases/security/UpdateResendApiKeyUseCase";
 import { GetAdminSecuritySettingsUseCase } from "@/application/use-cases/security/GetAdminSecuritySettingsUseCase";
 
-export { uploadSiteContentPhoto, InvalidPhotoUploadError } from "@/infrastructure/supabase/uploadSiteContentPhoto";
+export {
+  uploadSiteContentPhoto,
+  uploadSiteContentVideo,
+  InvalidPhotoUploadError,
+} from "@/infrastructure/supabase/uploadSiteContentPhoto";
 export { resolvePhotoField } from "@/infrastructure/supabase/resolvePhotoField";
+export { resolveMediaField, type MediaKind } from "@/infrastructure/supabase/resolveMediaField";
 
 /**
  * Composition root: wires domain/application use-cases to their Supabase and

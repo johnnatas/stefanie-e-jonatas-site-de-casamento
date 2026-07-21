@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
+import { useEffect, useRef, type CSSProperties, type RefObject } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
 import { PillButton } from "@/components/ui/PillButton";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import type { HomeTopicsContent } from "@/application/content/schemas";
 
 interface Topic {
@@ -107,26 +108,6 @@ function useScrollSyncedHorizontalScroll(
       if (rafId !== null) cancelAnimationFrame(rafId);
     };
   }, [sectionRef, trackRef]);
-}
-
-function getPrefersReducedMotion() {
-  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
-
-function usePrefersReducedMotion() {
-  const [prefersReduced, setPrefersReduced] = useState(getPrefersReducedMotion);
-
-  useEffect(() => {
-    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
-
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const listener = (event: MediaQueryListEvent) => setPrefersReduced(event.matches);
-    query.addEventListener("change", listener);
-    return () => query.removeEventListener("change", listener);
-  }, []);
-
-  return prefersReduced;
 }
 
 function ScrollCarousel({ topics, panelWidthVw }: { topics: Topic[]; panelWidthVw: number }) {

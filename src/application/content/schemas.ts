@@ -13,12 +13,16 @@ export const homeHeroContentSchema = z.object({
 });
 export type HomeHeroContent = z.output<typeof homeHeroContentSchema>;
 
-export const homeMilestonePhotosContentSchema = z.object({
-  beginning: z.string().min(1).nullable().default(null),
-  proposal: z.string().min(1).nullable().default(null),
-  wedding: z.string().min(1).nullable().default(null),
+export const galleryMediaItemSchema = z.object({
+  url: z.string().min(1),
+  type: z.enum(["photo", "video"]),
 });
-export type HomeMilestonePhotosContent = z.output<typeof homeMilestonePhotosContentSchema>;
+export type GalleryMediaItem = z.output<typeof galleryMediaItemSchema>;
+
+export const homeGalleryContentSchema = z.object({
+  items: z.array(galleryMediaItemSchema).max(20).default([]),
+});
+export type HomeGalleryContent = z.output<typeof homeGalleryContentSchema>;
 
 const topicEntrySchema = z.object({
   title: z.string().min(1),
@@ -102,7 +106,7 @@ export const tipsHospedagemContentSchema = z.object({
 export const SITE_CONTENT_SLUGS = [
   "settings",
   "home-hero",
-  "home-milestone-photos",
+  "home-gallery",
   "home-topics",
   "tips-cerimonia",
   "tips-traje",
@@ -113,7 +117,7 @@ export type SiteContentSlug = (typeof SITE_CONTENT_SLUGS)[number];
 export const SITE_CONTENT_SCHEMAS = {
   settings: settingsContentSchema,
   "home-hero": homeHeroContentSchema,
-  "home-milestone-photos": homeMilestonePhotosContentSchema,
+  "home-gallery": homeGalleryContentSchema,
   "home-topics": homeTopicsContentSchema,
   "tips-cerimonia": tipsCerimoniaContentSchema,
   "tips-traje": tipsTrajeContentSchema,

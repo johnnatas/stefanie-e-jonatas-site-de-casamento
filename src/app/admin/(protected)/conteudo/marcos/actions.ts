@@ -2,42 +2,58 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createUpdateSiteContentUseCase, resolvePhotoField } from "@/infrastructure/composition";
-import { homeMilestonePhotosContentSchema } from "@/application/content/schemas";
+import { createUpdateSiteContentUseCase, resolveMediaField, type MediaKind } from "@/infrastructure/composition";
+import { homeGalleryContentSchema } from "@/application/content/schemas";
 import type { SiteContentActionState } from "@/application/content/actionState";
 
-const MILESTONE_KEYS = ["beginning", "proposal", "wedding"] as const;
+const MAX_ITEMS = 20;
 
-export async function updateHomeMilestonePhotosAction(
+function isMediaKind(value: unknown): value is MediaKind {
+  return value === "photo" || value === "video";
+}
+
+export async function updateHomeGalleryAction(
   _prevState: SiteContentActionState,
   formData: FormData
 ): Promise<SiteContentActionState> {
-  const content: Record<string, string | null> = {};
+  const items: { url: string; type: MediaKind }[] = [];
 
-  for (const key of MILESTONE_KEYS) {
-    const currentUrl = (formData.get(`${key}CurrentUrl`) as string) || null;
-    content[key] = await resolvePhotoField(
-      "home-milestone-photos",
-      key,
+  for (let index = 0; index < MAX_ITEMS; index++) {
+    const field = `item${index}`;
+    if (!formData.has(`${field}CurrentUrl`)) continue;
+
+    const currentUrl = (formData.get(`${field}CurrentUrl`) as string) || null;
+    const rawType = formData.get(`${field}Type`);
+    const type: MediaKind = isMediaKind(rawType) ? rawType : "photo";
+
+    const url = await resolveMediaField(
+      "home-gallery",
+      field,
+      type,
       formData,
       currentUrl,
-      `${key}File`,
-      `${key}Remove`
+      `${field}File`,
+      `${field}Remove`
     );
+
+    if (url) {
+      items.push({ url, type });
+    }
   }
 
-  const parsed = homeMilestonePhotosContentSchema.safeParse(content);
+  const parsed = homeGalleryContentSchema.safeParse({ items });
 
   if (!parsed.success) {
-    return { status: "error", message: "Verifique os campos do formulário." };
+    return { status: "error", message: "Verifique os itens do formulário." };
   }
 
   try {
-    await createUpdateSiteContentUseCase().execute("home-milestone-photos", parsed.data);
+    await createUpdateSiteContentUseCase().execute("home-gallery", parsed.data);
   } catch {
     return { status: "error", message: "Não foi possível salvar agora." };
   }
 
   revalidatePath("/");
+  revalidatePath("/nossa-historia");
   redirect("/admin/conteudo");
 }

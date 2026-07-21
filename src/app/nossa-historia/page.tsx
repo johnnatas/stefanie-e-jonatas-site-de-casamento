@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import { ArchFlipCard } from "@/components/ui/ArchFlipCard";
-import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
-import { MILESTONES } from "@/shared/milestones";
+import { PolaroidGallery } from "@/components/ui/PolaroidGallery";
+import { getSiteContentOrDefault } from "@/infrastructure/composition";
 
 export const metadata: Metadata = {
   title: "Nossa História | Stéfanie & Jonatas",
 };
 
-export default function OurStoryPage() {
+export default async function OurStoryPage() {
+  const gallery = await getSiteContentOrDefault("home-gallery");
+
   return (
     <div className="pb-20">
       <section className="mx-auto max-w-3xl px-6 pt-20 text-center">
@@ -20,33 +21,8 @@ export default function OurStoryPage() {
         </p>
       </section>
 
-      <div className="mx-auto mt-16 flex max-w-3xl flex-col gap-16 px-6">
-        {MILESTONES.map((milestone, index) => (
-          <div key={milestone.title} className="flex flex-col items-center gap-6 text-center">
-            <ArchFlipCard
-              className="h-72 w-full max-w-xs"
-              number={`0${index + 1}.`}
-              image={
-                <PlaceholderImage
-                  label={`Foto — ${milestone.title}`}
-                  className="absolute inset-0 h-full w-full"
-                />
-              }
-              title={milestone.title}
-              date={milestone.date}
-              description={milestone.description}
-            />
-            <div>
-              <span className="font-sans text-xs uppercase tracking-widest text-moss">
-                {milestone.date}
-              </span>
-              <h2 className="mt-2 font-serif text-3xl text-forest">{milestone.title}</h2>
-              <p className="mt-3 font-sans text-sm leading-relaxed text-forest/70">
-                {milestone.description}
-              </p>
-            </div>
-          </div>
-        ))}
+      <div className="mx-auto mt-16 max-w-3xl px-6">
+        <PolaroidGallery items={gallery.items} />
       </div>
 
       <section className="mx-auto mt-16 max-w-3xl px-6 text-center">

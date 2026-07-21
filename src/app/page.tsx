@@ -4,10 +4,10 @@ import { TopicsCarousel } from "@/components/home/TopicsCarousel";
 import { getSiteContentOrDefault } from "@/infrastructure/composition";
 
 export default async function HomePage() {
-  const [settings, heroContent, milestonePhotos, topicsContent] = await Promise.all([
+  const [settings, heroContent, gallery, topicsContent] = await Promise.all([
     getSiteContentOrDefault("settings"),
     getSiteContentOrDefault("home-hero"),
-    getSiteContentOrDefault("home-milestone-photos"),
+    getSiteContentOrDefault("home-gallery"),
     getSiteContentOrDefault("home-topics"),
   ]);
 
@@ -20,7 +20,7 @@ export default async function HomePage() {
         aria-hidden="true"
         className="pointer-events-none relative -mt-[10.573vw] aspect-[4920/963] w-full"
       />
-      <SaveTheDateSection milestonePhotos={milestonePhotos} />
+      <SaveTheDateSection gallery={gallery} />
       <TopicsCarousel content={topicsContent} />
     </>
   );

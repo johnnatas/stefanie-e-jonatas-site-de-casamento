@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   settingsContentSchema,
   homeHeroContentSchema,
-  homeMilestonePhotosContentSchema,
+  homeGalleryContentSchema,
   homeTopicsContentSchema,
   tipsCerimoniaContentSchema,
   SITE_CONTENT_SLUGS,
@@ -44,10 +44,33 @@ describe("homeHeroContentSchema", () => {
   });
 });
 
-describe("homeMilestonePhotosContentSchema", () => {
-  it("defaults all three milestone photos to null", () => {
-    const result = homeMilestonePhotosContentSchema.parse({});
-    expect(result).toEqual({ beginning: null, proposal: null, wedding: null });
+describe("homeGalleryContentSchema", () => {
+  it("defaults to an empty gallery", () => {
+    const result = homeGalleryContentSchema.parse({});
+    expect(result).toEqual({ items: [] });
+  });
+
+  it("accepts a mix of photo and video items", () => {
+    const result = homeGalleryContentSchema.safeParse({
+      items: [
+        { url: "https://example.com/a.jpg", type: "photo" },
+        { url: "https://example.com/b.mp4", type: "video" },
+      ],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects an item with an invalid type", () => {
+    const result = homeGalleryContentSchema.safeParse({
+      items: [{ url: "https://example.com/a.jpg", type: "gif" }],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects more than 20 items", () => {
+    const items = Array.from({ length: 21 }, (_, i) => ({ url: `https://example.com/${i}.jpg`, type: "photo" }));
+    const result = homeGalleryContentSchema.safeParse({ items });
+    expect(result.success).toBe(false);
   });
 });
 

@@ -53,7 +53,10 @@ function useScrollDrivenTranslate(sectionRef: RefObject<HTMLElement | null>, max
   const [translateVw, setTranslateVw] = useState(0);
 
   useEffect(() => {
-    function handleScroll() {
+    let rafId: number | null = null;
+
+    function measure() {
+      rafId = null;
       const section = sectionRef.current;
       if (!section) return;
 
@@ -65,9 +68,17 @@ function useScrollDrivenTranslate(sectionRef: RefObject<HTMLElement | null>, max
       setTranslateVw((scrolled / scrollableDistance) * maxTranslateVw);
     }
 
-    handleScroll();
+    function handleScroll() {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(measure);
+    }
+
+    measure();
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
   }, [sectionRef, maxTranslateVw]);
 
   return translateVw;

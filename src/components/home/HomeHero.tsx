@@ -29,7 +29,6 @@ export function HomeHero({ heroContent, settings }: HomeHeroProps) {
           transition={{ duration: 0.7 }}
           className="flex flex-col items-center gap-6"
         >
-          <span className="font-sans text-xs uppercase tracking-[0.3em] text-paper/90">{heroContent.eyebrow}</span>
           <h1 className="font-serif text-5xl sm:text-7xl">{COUPLE_NAMES}</h1>
           <span aria-hidden="true" className="h-px w-16 bg-paper" />
           <p className="font-script text-2xl text-paper/90">{heroContent.tagline}</p>

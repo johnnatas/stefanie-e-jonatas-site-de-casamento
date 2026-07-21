@@ -66,7 +66,7 @@ export function GiftCard({ gift, canReserveForLater }: GiftCardProps) {
           <button
             type="button"
             onClick={() => setActiveForm("now")}
-            className="rounded-full bg-moss px-4 py-2 font-sans text-xs uppercase tracking-widest text-paper transition-colors hover:bg-moss/80"
+            className="min-h-11 rounded-full bg-moss px-4 py-2 font-sans text-xs uppercase tracking-widest text-paper transition-colors hover:bg-moss/80"
           >
             Presentear agora
           </button>
@@ -74,7 +74,7 @@ export function GiftCard({ gift, canReserveForLater }: GiftCardProps) {
             <button
               type="button"
               onClick={() => setActiveForm("later")}
-              className="rounded-full border border-moss px-4 py-2 font-sans text-xs uppercase tracking-widest text-moss transition-colors hover:bg-moss/10"
+              className="min-h-11 rounded-full border border-moss px-4 py-2 font-sans text-xs uppercase tracking-widest text-moss transition-colors hover:bg-moss/10"
             >
               Reservar para depois
             </button>
@@ -110,7 +110,7 @@ export function GiftCard({ gift, canReserveForLater }: GiftCardProps) {
           <button
             type="submit"
             disabled={isNowPending}
-            className="rounded-full bg-moss px-4 py-2 font-sans text-xs uppercase tracking-widest text-paper transition-colors hover:bg-moss/80 disabled:opacity-60"
+            className="min-h-11 rounded-full bg-moss px-4 py-2 font-sans text-xs uppercase tracking-widest text-paper transition-colors hover:bg-moss/80 disabled:opacity-60"
           >
             {isNowPending ? "Redirecionando..." : "Ir para pagamento"}
           </button>
@@ -160,7 +160,7 @@ export function GiftCard({ gift, canReserveForLater }: GiftCardProps) {
           <button
             type="submit"
             disabled={isLaterPending}
-            className="rounded-full bg-moss px-4 py-2 font-sans text-xs uppercase tracking-widest text-paper transition-colors hover:bg-moss/80 disabled:opacity-60"
+            className="min-h-11 rounded-full bg-moss px-4 py-2 font-sans text-xs uppercase tracking-widest text-paper transition-colors hover:bg-moss/80 disabled:opacity-60"
           >
             {isLaterPending ? "Reservando..." : "Reservar presente"}
           </button>
@@ -194,14 +194,14 @@ export function GiftCard({ gift, canReserveForLater }: GiftCardProps) {
             <div className="mt-4 flex flex-col gap-2">
               <a
                 href={laterState.checkoutUrl}
-                className="rounded-full bg-moss px-4 py-2 text-center font-sans text-xs uppercase tracking-widest text-paper transition-colors hover:bg-moss/80"
+                className="flex min-h-11 items-center justify-center rounded-full bg-moss px-4 py-2 font-sans text-xs uppercase tracking-widest text-paper transition-colors hover:bg-moss/80"
               >
                 Ir para pagamento
               </a>
               <button
                 type="button"
                 onClick={closeConfirmationModal}
-                className="rounded-full border border-line px-4 py-2 font-sans text-xs uppercase tracking-widest text-forest transition-colors hover:border-moss"
+                className="min-h-11 rounded-full border border-line px-4 py-2 font-sans text-xs uppercase tracking-widest text-forest transition-colors hover:border-moss"
               >
                 Voltar
               </button>

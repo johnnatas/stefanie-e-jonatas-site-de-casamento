@@ -33,7 +33,7 @@ export function Header() {
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-40 flex h-[72px] items-center transition-colors",
-        isTransparent ? "bg-transparent text-paper" : "border-b border-line bg-[#ffffff] text-forest"
+        isTransparent ? "bg-transparent text-paper" : "border-b border-line bg-paper text-forest"
       )}
     >
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6">
@@ -48,6 +48,7 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "text-sm transition-colors",
                   isActive

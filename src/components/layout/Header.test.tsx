@@ -55,21 +55,21 @@ describe("Header", () => {
     Object.defineProperty(window, "scrollY", { value: 200, configurable: true });
     fireEvent.scroll(window);
 
-    expect(screen.getByRole("banner")).toHaveClass("bg-[#ffffff]", "text-forest");
+    expect(screen.getByRole("banner")).toHaveClass("bg-paper", "text-forest");
   });
 
   it("renders solid immediately when the page loads already scrolled past the hero", () => {
     Object.defineProperty(window, "scrollY", { value: 200, configurable: true });
     render(<Header />);
 
-    expect(screen.getByRole("banner")).toHaveClass("bg-[#ffffff]", "text-forest");
+    expect(screen.getByRole("banner")).toHaveClass("bg-paper", "text-forest");
   });
 
   it("renders solid on non-home pages regardless of scroll position", () => {
     vi.mocked(usePathname).mockReturnValue("/presentes");
     render(<Header />);
 
-    expect(screen.getByRole("banner")).toHaveClass("bg-[#ffffff]", "text-forest");
+    expect(screen.getByRole("banner")).toHaveClass("bg-paper", "text-forest");
   });
 
   it("only changes color on hover for an inactive nav item, not font or casing", () => {
@@ -91,5 +91,13 @@ describe("Header", () => {
 
     expect(link).toHaveClass("font-script", "italic", "text-moss");
     expect(link).not.toHaveClass("hover:text-moss");
+  });
+
+  it("marks the active nav item with aria-current for assistive tech", () => {
+    vi.mocked(usePathname).mockReturnValue("/presentes");
+    render(<Header />);
+
+    expect(screen.getByRole("link", { name: "presentes" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Nossa História" })).not.toHaveAttribute("aria-current");
   });
 });

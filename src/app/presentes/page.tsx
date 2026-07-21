@@ -47,7 +47,6 @@ export default async function GiftsPage({ searchParams }: GiftsPageProps) {
       <h1 className="sr-only">Lista de Presentes</h1>
 
       <SplitPanel
-        eyebrow="Com carinho"
         title="Lista de Presentes"
         tone="dark"
         image={<PlaceholderImage label="Lista de presentes" className="absolute inset-0 h-full w-full" />}

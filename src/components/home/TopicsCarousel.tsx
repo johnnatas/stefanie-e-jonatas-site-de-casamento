@@ -10,6 +10,7 @@ interface Topic {
   title: string;
   description: string;
   photo: string | null;
+  address: string | null;
   href: string;
 }
 
@@ -28,6 +29,7 @@ function buildTopics(content: HomeTopicsContent): Topic[] {
     title: content[key].title,
     description: content[key].description,
     photo: content[key].photo,
+    address: content[key].address,
     href: TOPIC_HREFS[key],
   }));
 }
@@ -42,6 +44,9 @@ function TopicPanel({ topic, className }: { topic: Topic; className?: string }) 
       />
       <div className="absolute inset-0 bg-forest/40 transition-colors group-hover:bg-forest/55" />
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 p-8 text-center text-paper">
+        {topic.address && (
+          <p className="whitespace-pre-line font-serif text-sm text-paper/80">{topic.address}</p>
+        )}
         <h3 className="font-serif text-4xl uppercase tracking-wide sm:text-5xl">{topic.title}</h3>
         <PillButton href={topic.href} className="border-paper text-paper hover:bg-paper hover:text-forest">
           {topic.description}

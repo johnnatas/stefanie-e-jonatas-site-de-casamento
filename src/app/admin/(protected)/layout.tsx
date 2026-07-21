@@ -31,6 +31,14 @@ const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   { label: "Configurações", items: [{ label: "Integrações", href: "/admin/integracoes" }] },
 ];
 
+function findCurrentSectionLabel(pathname: string): string {
+  for (const group of ADMIN_NAV_GROUPS) {
+    const hasMatch = group.items.some((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
+    if (hasMatch) return group.label;
+  }
+  return "Painel Administrativo";
+}
+
 export default function AdminProtectedLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
@@ -38,7 +46,9 @@ export default function AdminProtectedLayout({ children }: { children: React.Rea
   return (
     <div className="mx-auto max-w-5xl px-6 py-6 md:py-12">
       <div className="flex items-center justify-between md:hidden">
-        <span className="font-serif text-lg text-forest">Painel Administrativo</span>
+        <span data-testid="admin-mobile-section-label" className="font-serif text-lg text-forest">
+          {findCurrentSectionLabel(pathname)}
+        </span>
         <button
           type="button"
           onClick={() => setIsMobileNavOpen(true)}
@@ -51,7 +61,7 @@ export default function AdminProtectedLayout({ children }: { children: React.Rea
         </button>
       </div>
 
-      <div className="mt-6 flex flex-col gap-8 md:mt-0 md:flex-row">
+      <div className="mt-4 flex flex-col gap-8 md:mt-0 md:flex-row">
         <aside className="hidden flex-col gap-6 md:flex md:w-48">
           <nav className="flex flex-col gap-6">
             {ADMIN_NAV_GROUPS.map((group) => (

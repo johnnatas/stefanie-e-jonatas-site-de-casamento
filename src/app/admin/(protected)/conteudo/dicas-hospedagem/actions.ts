@@ -6,6 +6,10 @@ import { createUpdateSiteContentUseCase, resolvePhotoField } from "@/infrastruct
 import { tipsHospedagemContentSchema } from "@/application/content/schemas";
 import type { SiteContentActionState } from "@/application/content/actionState";
 
+const MAX_DISTANCES = 15;
+const MAX_HOTELS = 15;
+const MAX_AIRPORTS = 6;
+
 export async function updateTipsHospedagemAction(
   _prevState: SiteContentActionState,
   formData: FormData
@@ -20,11 +24,47 @@ export async function updateTipsHospedagemAction(
     "photoRemove"
   );
 
+  const distances: { label: string; km: string }[] = [];
+  for (let index = 0; index < MAX_DISTANCES; index++) {
+    const field = `dist${index}`;
+    if (!formData.has(`${field}Marker`)) continue;
+    distances.push({
+      label: (formData.get(`${field}Label`) as string) ?? "",
+      km: (formData.get(`${field}Km`) as string) ?? "",
+    });
+  }
+
+  const hotels: { name: string; distanceLabel: string | null; url: string | null }[] = [];
+  for (let index = 0; index < MAX_HOTELS; index++) {
+    const field = `hotel${index}`;
+    if (!formData.has(`${field}Marker`)) continue;
+    hotels.push({
+      name: (formData.get(`${field}Name`) as string) ?? "",
+      distanceLabel: (formData.get(`${field}DistanceLabel`) as string) || null,
+      url: (formData.get(`${field}Url`) as string) || null,
+    });
+  }
+
+  const airports: { name: string; distanceLabel: string | null; driveTimeLabel: string | null }[] = [];
+  for (let index = 0; index < MAX_AIRPORTS; index++) {
+    const field = `airport${index}`;
+    if (!formData.has(`${field}Marker`)) continue;
+    airports.push({
+      name: (formData.get(`${field}Name`) as string) ?? "",
+      distanceLabel: (formData.get(`${field}DistanceLabel`) as string) || null,
+      driveTimeLabel: (formData.get(`${field}DriveTimeLabel`) as string) || null,
+    });
+  }
+
   const parsed = tipsHospedagemContentSchema.safeParse({
     eyebrow: formData.get("eyebrow") || null,
     title: formData.get("title"),
     body: formData.get("body"),
     photo,
+    distances,
+    hotels,
+    airports,
+    disclaimer: formData.get("disclaimer"),
   });
 
   if (!parsed.success) {

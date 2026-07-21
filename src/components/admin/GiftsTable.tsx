@@ -65,7 +65,7 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
   return (
     <div>
       <div className="mt-6 flex flex-wrap gap-4">
-        <div className="flex-1 min-w-[200px]">
+        <div className="flex-1 min-w-[160px]">
           <label htmlFor="gift-search" className="block font-sans text-sm text-forest">
             Buscar por nome
           </label>

@@ -95,7 +95,7 @@ export function GiftForm({ defaultValues, checkoutUrl, existingCategories = [] }
               ref={productLinkRef}
               type="url"
               placeholder="Cole o link do produto"
-              className={inputClassName}
+              className={cn(inputClassName, "min-w-0")}
             />
             <button
               type="button"
@@ -256,7 +256,7 @@ export function GiftForm({ defaultValues, checkoutUrl, existingCategories = [] }
                   readOnly
                   value={checkoutUrl}
                   onFocus={(event) => event.target.select()}
-                  className={inputClassName}
+                  className={cn(inputClassName, "min-w-0")}
                 />
                 <button
                   type="button"

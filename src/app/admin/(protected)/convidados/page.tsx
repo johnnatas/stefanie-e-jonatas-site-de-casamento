@@ -25,7 +25,7 @@ export default async function AdminGuestsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="font-serif text-3xl text-forest">Convidados</h1>
         <div className="flex items-center gap-4">
           <Link

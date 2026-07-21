@@ -38,7 +38,7 @@ export default function AdminProtectedLayout({ children }: { children: React.Rea
         <nav className="flex flex-col gap-6">
           {ADMIN_NAV_GROUPS.map((group) => (
             <div key={group.label} className="flex flex-col gap-2">
-              <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/40">
+              <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/70">
                 {group.label}
               </span>
               <div className="flex flex-col gap-2">

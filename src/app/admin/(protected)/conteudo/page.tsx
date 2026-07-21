@@ -77,7 +77,7 @@ export default function ContentIndexPage() {
       <div className="mt-8 flex flex-col gap-8">
         {CONTENT_GROUPS.map((group) => (
           <div key={group.label} className="flex flex-col gap-3">
-            <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/40">{group.label}</span>
+            <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/70">{group.label}</span>
             <div className="flex flex-col gap-1">
               {group.sections.map((section) => (
                 <Link

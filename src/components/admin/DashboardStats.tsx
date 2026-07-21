@@ -50,11 +50,11 @@ export function DashboardStats({ summary }: DashboardStatsProps) {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-3">
-        <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/40">Convidados</span>
+        <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/70">Convidados</span>
         <StatGrid items={guestItems} />
       </div>
       <div className="flex flex-col gap-3">
-        <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/40">Presentes</span>
+        <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/70">Presentes</span>
         <StatGrid items={giftItems} />
       </div>
     </div>

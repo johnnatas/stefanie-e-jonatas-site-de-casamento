@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createListGuestsUseCase } from "@/infrastructure/composition";
 import { isBackendConfigured } from "@/infrastructure/config/env";
@@ -50,7 +51,12 @@ export default async function EditGuestPage({ params }: EditGuestPageProps) {
 
   return (
     <div>
-      <h1 className="font-serif text-3xl text-forest">Editar convidado</h1>
+      <div className="flex items-center gap-4">
+        <Link href="/admin/convidados" className="font-sans text-sm text-forest/70 hover:text-forest">
+          ← Voltar
+        </Link>
+      </div>
+      <h1 className="mt-2 font-serif text-3xl text-forest">Editar convidado</h1>
       <div className="mt-6">
         <GuestForm
           defaultValues={{

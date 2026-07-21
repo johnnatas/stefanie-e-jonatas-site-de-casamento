@@ -83,7 +83,7 @@ export function GiftForm({ defaultValues, checkoutUrl, existingCategories = [] }
       {defaultValues?.id && <input type="hidden" name="id" value={defaultValues.id} />}
 
       <div className="flex flex-col gap-4">
-        <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/40">Sobre o presente</span>
+        <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/70">Sobre o presente</span>
 
         <div>
           <label htmlFor="productLink" className="block font-sans text-sm text-forest">
@@ -155,7 +155,7 @@ export function GiftForm({ defaultValues, checkoutUrl, existingCategories = [] }
       </div>
 
       <div className="flex flex-col gap-4">
-        <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/40">Valor e categoria</span>
+        <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/70">Valor e categoria</span>
 
         <div>
           <label htmlFor="price" className="block font-sans text-sm text-forest">
@@ -224,7 +224,7 @@ export function GiftForm({ defaultValues, checkoutUrl, existingCategories = [] }
 
       {defaultValues?.id && (
         <div className="flex flex-col gap-4">
-          <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/40">Administrativo</span>
+          <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/70">Administrativo</span>
 
           <div className="rounded-md border border-line bg-paper-soft p-4">
             <label htmlFor="secretKey" className="block font-sans text-sm font-medium text-forest">

@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createUpdateSiteContentUseCase, resolvePhotoField } from "@/infrastructure/composition";
 import { tipsTrajeContentSchema } from "@/application/content/schemas";
 import type { SiteContentActionState } from "@/application/content/actionState";
@@ -29,5 +30,6 @@ export async function updateTipsTrajeAction(
     return { status: "error", message: "Não foi possível salvar agora." };
   }
 
+  revalidatePath("/dicas-e-instrucoes/codigo-de-vestimenta");
   redirect("/admin/conteudo");
 }

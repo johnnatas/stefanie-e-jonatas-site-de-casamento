@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createUpdateSiteContentUseCase, resolvePhotoField } from "@/infrastructure/composition";
 import { tipsHospedagemContentSchema } from "@/application/content/schemas";
 import type { SiteContentActionState } from "@/application/content/actionState";
@@ -36,5 +37,6 @@ export async function updateTipsHospedagemAction(
     return { status: "error", message: "Não foi possível salvar agora." };
   }
 
+  revalidatePath("/dicas-e-instrucoes/hospedagem");
   redirect("/admin/conteudo");
 }

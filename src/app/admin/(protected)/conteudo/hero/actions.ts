@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createUpdateSiteContentUseCase, resolvePhotoField } from "@/infrastructure/composition";
 import { homeHeroContentSchema } from "@/application/content/schemas";
 import type { SiteContentActionState } from "@/application/content/actionState";
@@ -48,5 +49,6 @@ export async function updateHomeHeroAction(
     return { status: "error", message: "Não foi possível salvar agora." };
   }
 
+  revalidatePath("/");
   redirect("/admin/conteudo");
 }

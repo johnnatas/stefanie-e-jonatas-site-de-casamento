@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import {
   createListGiftsUseCase,
   createUpsertGiftUseCase,
@@ -98,6 +99,8 @@ export async function importGiftsAction(
       createUpsertGiftUseCase(),
       createRefreshGiftPaymentLinkUseCase()
     );
+    revalidatePath("/presentes");
+    revalidatePath("/admin/presentes");
     return { status: "done", result };
   } catch {
     return { status: "error", message: "Não foi possível importar os presentes agora." };

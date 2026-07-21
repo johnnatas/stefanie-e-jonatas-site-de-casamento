@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createCreateGuestUseCase, createUpdateGuestUseCase } from "@/infrastructure/composition";
 import { guestFormSchema } from "@/components/admin/guestFormSchema";
 
@@ -38,5 +39,7 @@ export async function upsertGuestAction(
     return { status: "error", message: "Não foi possível salvar o convidado agora." };
   }
 
+  revalidatePath("/admin/convidados");
+  revalidatePath("/confirmar-presenca");
   redirect("/admin/convidados");
 }

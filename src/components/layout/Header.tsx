@@ -32,7 +32,7 @@ export function Header() {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-40 flex items-center transition-colors",
+        "fixed inset-x-0 top-0 z-40 flex items-center transition-[color,background-color,padding] duration-300",
         isTransparent ? "py-[25px] bg-transparent text-paper" : "py-4 border-b border-line bg-mist text-forest"
       )}
     >

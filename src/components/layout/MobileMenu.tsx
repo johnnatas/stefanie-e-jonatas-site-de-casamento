@@ -30,10 +30,10 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 bg-paper md:hidden"
+          className="fixed inset-0 z-50 bg-mist md:hidden"
         >
           <div className="flex items-center justify-between px-6 py-5">
-            <Monogram className="h-12 w-10" />
+            <Monogram className="h-12 w-auto" />
             <button
               type="button"
               onClick={onClose}
@@ -44,24 +44,30 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             </button>
           </div>
           <nav className="flex flex-col items-center gap-8 pt-12">
-            {NAV_ITEMS.map((item, index) => (
-              <motion.div
-                key={item.href}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.05 * index, duration: 0.25 }}
-              >
-                <Link
-                  href={item.href}
-                  onClick={onClose}
-                  className={`font-serif text-2xl uppercase tracking-wide ${
-                    pathname === item.href ? "text-moss" : "text-forest"
-                  }`}
+            {NAV_ITEMS.map((item, index) => {
+              const isActive = pathname === item.href;
+              return (
+                <motion.div
+                  key={item.href}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 * index, duration: 0.25 }}
                 >
-                  {item.label}
-                </Link>
-              </motion.div>
-            ))}
+                  <Link
+                    href={item.href}
+                    onClick={onClose}
+                    aria-current={isActive ? "page" : undefined}
+                    className={
+                      isActive
+                        ? "font-script text-2xl italic text-moss"
+                        : "font-serif text-xl uppercase tracking-[0.2em] text-forest/80 hover:text-moss"
+                    }
+                  >
+                    {isActive ? item.label.toLowerCase() : item.label}
+                  </Link>
+                </motion.div>
+              );
+            })}
           </nav>
         </motion.div>
       )}

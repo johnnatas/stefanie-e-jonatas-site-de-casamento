@@ -29,4 +29,13 @@ describe("MobileMenu", () => {
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
+
+  it("renders the active nav item in the script style, matching the desktop header's pattern", () => {
+    render(<MobileMenu isOpen onClose={vi.fn()} />);
+
+    const link = screen.getByRole("link", { name: "início" });
+
+    expect(link).toHaveClass("font-script", "italic", "text-moss");
+    expect(link).toHaveAttribute("aria-current", "page");
+  });
 });

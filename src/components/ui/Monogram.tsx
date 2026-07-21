@@ -19,7 +19,7 @@ export function Monogram({ className, light }: MonogramProps) {
     <img
       src={light ? "/images/logo-light.png" : "/images/logo.png"}
       alt="Stéfanie & Jonatas"
-      className={cn("h-10 w-auto object-contain", className)}
+      className={cn("h-10 w-auto object-contain transition-[height] duration-300", className)}
     />
   );
 }

@@ -18,7 +18,7 @@ export default async function HomePage() {
         src="/images/torn-paper.png"
         alt=""
         aria-hidden="true"
-        className="pointer-events-none relative -mt-[19.573vw] aspect-[4920/963] w-full"
+        className="pointer-events-none relative -mt-[10.573vw] aspect-[4920/963] w-full"
       />
       <SaveTheDateSection milestonePhotos={milestonePhotos} />
       <TopicsCarousel content={topicsContent} />

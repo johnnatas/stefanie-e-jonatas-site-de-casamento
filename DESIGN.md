@@ -6,6 +6,7 @@ colors:
   forest: "#242a16"
   paper: "#feffed"
   paper-soft: "#e3e8c8"
+  mist: "#f8f8f8"
   line: "#d0d7aa"
   danger: "#b3413a"
 typography:
@@ -97,6 +98,7 @@ Paleta enraizada na cena real da cerimônia: jardim, mar, verde-e-branco — nã
 ### Neutral
 - **Papel** (`#feffed`): fundo principal — branco quente, nunca frio, como papel de carta guardado.
 - **Papel Suave** (`#e3e8c8`): verde-sálvia bem claro, usado em seções alternadas (SplitPanel) e superfícies secundárias — o "verso da folha".
+- **Névoa** (`#f8f8f8`): cinza neutro claro, uso único na seção "Save the date" da Home — quebra deliberada do verde-sálvia para dar respiro visual entre o hero e o restante da página.
 - **Linha** (`#d0d7aa`): sálvia médio, reservado a bordas, divisores e contornos de input — nunca preenchimento.
 
 ### Estado

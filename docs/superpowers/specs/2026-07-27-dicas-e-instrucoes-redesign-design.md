@@ -36,8 +36,11 @@ design e as convenções do próprio projeto.
 ### Rota única + menu de temas
 
 - `src/app/dicas-e-instrucoes/page.tsx` (Server Component) lê `searchParams.tema`
-  (`cerimonia` | `vestimenta` | `hospedagem`, default `cerimonia`; valor inválido → `cerimonia`).
-  Busca o conteúdo do tema ativo via `getSiteContentOrDefault(...)` e renderiza o shell.
+  (`cerimonia` | `vestimenta` | `hospedagem`).
+  - **Redirect de default:** se `tema` estiver **ausente** ou for **inválido**, a página faz
+    `redirect("/dicas-e-instrucoes?tema=cerimonia")` (via `next/navigation`). Assim a URL fica
+    sempre explícita e o acesso sem parâmetro cai sempre no primeiro tema, "a cerimônia".
+  - Busca o conteúdo do tema ativo via `getSiteContentOrDefault(...)` e renderiza o shell.
 - O `layout.tsx` atual (heading grande "Dicas e Instruções" + abas) é **removido** — o menu de
   temas passa a ser o elemento de topo, como na referência. `metadata` migra para `page.tsx`.
 - **Shell** (dentro de `page.tsx`): grid responsivo
@@ -140,8 +143,15 @@ O índice `/admin/conteudo` continua com as mesmas 3 entradas de link — inalte
   - `/dicas-e-instrucoes/cerimonia` → `/dicas-e-instrucoes?tema=cerimonia`
   - `/dicas-e-instrucoes/codigo-de-vestimenta` → `/dicas-e-instrucoes?tema=vestimenta`
   - `/dicas-e-instrucoes/hospedagem` → `/dicas-e-instrucoes?tema=hospedagem`
-- **Links internos:** localizar (`grep -r "dicas-e-instrucoes/"`) referências em nav/menu/home
-  topics e apontar para `/dicas-e-instrucoes` (ou `?tema=…` quando fizer sentido).
+- **Links internos — carrossel da home:** `src/components/home/TopicsCarousel.tsx` tem
+  `TOPIC_HREFS` apontando para as 3 sub-rotas antigas. Reapontar:
+  - `cerimonia` → `/dicas-e-instrucoes?tema=cerimonia`
+  - `traje` → `/dicas-e-instrucoes?tema=vestimenta`
+  - `hospedagem` → `/dicas-e-instrucoes?tema=hospedagem`
+  Atualizar também as expectativas em `src/components/home/TopicsCarousel.test.tsx` (linhas 14–17).
+- **Outros links internos:** `grep -r "dicas-e-instrucoes/"` para garantir que não restou nenhuma
+  referência às sub-rotas removidas (nav/menu/rodapé). O `layout.tsx` removido continha o outro uso
+  conhecido.
 
 ## Constraints globais (do projeto)
 
@@ -166,6 +176,7 @@ O índice `/admin/conteudo` continua com as mesmas 3 entradas de link — inalte
 **Criar:** `src/components/tips/TipsThemeMenu.tsx`, `CeremonyTheme.tsx`, `DressCodeTheme.tsx`,
 `DressCodeInspiration.tsx` (+ teste), `LodgingTheme.tsx`; `src/components/ui/GoogleMapEmbed.tsx`.
 **Modificar:** `schemas.ts` (+ teste); `src/app/dicas-e-instrucoes/page.tsx`; os 3
-`Tips*Form.tsx`; os 3 `dicas-*/actions.ts` e `page.tsx` do admin; `next.config.ts`; links internos.
+`Tips*Form.tsx`; os 3 `dicas-*/actions.ts` e `page.tsx` do admin; `next.config.ts`;
+`src/components/home/TopicsCarousel.tsx` (+ teste).
 **Remover:** `src/app/dicas-e-instrucoes/{cerimonia,codigo-de-vestimenta,hospedagem}/`,
 `src/app/dicas-e-instrucoes/layout.tsx`.

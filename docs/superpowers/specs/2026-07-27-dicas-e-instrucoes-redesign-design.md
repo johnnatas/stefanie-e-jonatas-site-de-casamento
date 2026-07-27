@@ -51,8 +51,9 @@ design e as convenções do próprio projeto.
 ### Componentes novos (`src/components/tips/`)
 
 - **`TipsThemeMenu.tsx`** — recebe `active: "cerimonia" | "vestimenta" | "hospedagem"`. Renderiza 3
-  `next/link` para `?tema=…`. Item **ativo**: `font-serif italic text-moss` (dourado/script, como a
-  referência); **inativos**: `font-sans uppercase tracking-widest text-forest/70 hover:text-moss`.
+  `next/link` para `?tema=…`. Item **ativo**: `font-script ... italic text-moss` (dourado/script,
+  idioma já usado em `Header.tsx`/`MobileMenu.tsx`); **inativos**:
+  `font-sans uppercase tracking-widest text-forest/70 hover:text-moss`.
   Labels: `a cerimônia`, `código de vestimenta`, `hospedagem`.
 - **`CeremonyTheme.tsx`** (server) — recebe `content: TipsCerimoniaContent`. Layout: imagem
   (`PhotoOrPlaceholder` com `content.photo`) no topo → título (`font-serif`) → divisor `border-line`

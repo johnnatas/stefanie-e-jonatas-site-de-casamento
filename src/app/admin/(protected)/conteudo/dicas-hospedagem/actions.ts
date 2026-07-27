@@ -66,5 +66,6 @@ export async function updateTipsHospedagemAction(
   }
 
   revalidatePath("/dicas-e-instrucoes");
+  revalidatePath("/admin/conteudo/dicas-hospedagem");
   redirect("/admin/conteudo");
 }

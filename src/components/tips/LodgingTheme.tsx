@@ -37,8 +37,14 @@ export function LodgingTheme({ content }: { content: TipsHospedagemContent }) {
               {content.hotels.map((hotel, index) => (
                 <li key={index} className="flex flex-wrap items-baseline justify-between gap-2 border-b border-line py-2">
                   {hotel.url ? (
-                    <a href={hotel.url} target="_blank" rel="noreferrer" className="text-moss hover:text-forest">
+                    <a
+                      href={hotel.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-moss underline decoration-moss/40 underline-offset-2 transition-colors hover:text-forest hover:decoration-forest/40"
+                    >
                       {hotel.name}
+                      <span aria-hidden="true">↗</span>
                     </a>
                   ) : (
                     <span>{hotel.name}</span>

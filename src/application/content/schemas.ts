@@ -95,6 +95,8 @@ export const tipsTrajeContentSchema = z.object({
     ),
   pinterestHimUrl: z.string().min(1).nullable().default(null),
   pinterestHerUrl: z.string().min(1).nullable().default(null),
+  pinterestHimLabel: z.string().min(1).nullable().default(null),
+  pinterestHerLabel: z.string().min(1).nullable().default(null),
 });
 export type TipsTrajeContent = z.output<typeof tipsTrajeContentSchema>;
 

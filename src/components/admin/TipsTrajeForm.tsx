@@ -53,7 +53,30 @@ export function TipsTrajeForm({ defaultValues }: TipsTrajeFormProps) {
         />
       </div>
 
-      <div className="border-t border-line pt-4">
+      <div className="flex flex-col gap-2 border-t border-line pt-4">
+        <label htmlFor="pinterestHerUrl" className="block font-sans text-sm text-forest">
+          Board do Pinterest — Ela (opcional)
+        </label>
+        <input
+          id="pinterestHerUrl"
+          name="pinterestHerUrl"
+          defaultValue={defaultValues.pinterestHerUrl ?? ""}
+          placeholder="https://www.pinterest.com/usuario/board-ela/"
+          className={inputClassName}
+        />
+        <label htmlFor="pinterestHerLabel" className="block font-sans text-xs text-forest/70">
+          Texto do botão enquanto o board carrega (opcional)
+        </label>
+        <input
+          id="pinterestHerLabel"
+          name="pinterestHerLabel"
+          defaultValue={defaultValues.pinterestHerLabel ?? ""}
+          placeholder="Ver inspirações no Pinterest"
+          className={inputClassName}
+        />
+      </div>
+
+      <div className="flex flex-col gap-2">
         <label htmlFor="pinterestHimUrl" className="block font-sans text-sm text-forest">
           Board do Pinterest — Ele (opcional)
         </label>
@@ -64,17 +87,14 @@ export function TipsTrajeForm({ defaultValues }: TipsTrajeFormProps) {
           placeholder="https://www.pinterest.com/usuario/board-ele/"
           className={inputClassName}
         />
-      </div>
-
-      <div>
-        <label htmlFor="pinterestHerUrl" className="block font-sans text-sm text-forest">
-          Board do Pinterest — Ela (opcional)
+        <label htmlFor="pinterestHimLabel" className="block font-sans text-xs text-forest/70">
+          Texto do botão enquanto o board carrega (opcional)
         </label>
         <input
-          id="pinterestHerUrl"
-          name="pinterestHerUrl"
-          defaultValue={defaultValues.pinterestHerUrl ?? ""}
-          placeholder="https://www.pinterest.com/usuario/board-ela/"
+          id="pinterestHimLabel"
+          name="pinterestHimLabel"
+          defaultValue={defaultValues.pinterestHimLabel ?? ""}
+          placeholder="Ver inspirações no Pinterest"
           className={inputClassName}
         />
       </div>

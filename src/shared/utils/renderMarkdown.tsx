@@ -15,11 +15,21 @@ function renderInline(text: string, keyPrefix: string): ReactNode[] {
   });
 }
 
+function renderParagraph(paragraph: string, keyPrefix: string): ReactNode[] {
+  const lines = paragraph.split(/\r\n|\r|\n/);
+
+  return lines.flatMap((line, index) => {
+    const rendered = renderInline(line, `${keyPrefix}-l${index}`);
+    return index === 0 ? rendered : [<br key={`${keyPrefix}-br${index}`} />, ...rendered];
+  });
+}
+
 /**
  * Minimal, dependency-free Markdown renderer supporting only **bold**,
- * *italic*, and blank-line-separated paragraphs. Builds React elements
- * directly from matched tokens — never parses or injects raw HTML, so
- * admin-authored content can't execute arbitrary markup.
+ * *italic*, blank-line-separated paragraphs, and single line breaks within
+ * a paragraph (rendered as <br />, since HTML collapses raw newlines).
+ * Builds React elements directly from matched tokens — never parses or
+ * injects raw HTML, so admin-authored content can't execute arbitrary markup.
  */
 export function renderMarkdown(markdown: string): ReactNode {
   const paragraphs = markdown
@@ -31,7 +41,7 @@ export function renderMarkdown(markdown: string): ReactNode {
     <>
       {paragraphs.map((paragraph, index) => (
         <p key={index} className={index > 0 ? "mt-3" : undefined}>
-          {renderInline(paragraph, `p${index}`)}
+          {renderParagraph(paragraph, `p${index}`)}
         </p>
       ))}
     </>

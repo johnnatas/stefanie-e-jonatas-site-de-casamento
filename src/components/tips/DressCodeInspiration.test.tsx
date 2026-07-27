@@ -4,13 +4,13 @@ import userEvent from "@testing-library/user-event";
 import { DressCodeInspiration } from "@/components/tips/DressCodeInspiration";
 
 describe("DressCodeInspiration", () => {
-  it("shows both toggles and selects Ele first when both boards are provided", () => {
+  it("shows both toggles and selects Ela first when both boards are provided", () => {
     render(<DressCodeInspiration him="https://pin/ele" her="https://pin/ela" />);
 
     const ele = screen.getByRole("button", { name: "Ele" });
     const ela = screen.getByRole("button", { name: "Ela" });
-    expect(ele).toHaveAttribute("aria-pressed", "true");
-    expect(ela).toHaveAttribute("aria-pressed", "false");
+    expect(ela).toHaveAttribute("aria-pressed", "true");
+    expect(ele).toHaveAttribute("aria-pressed", "false");
   });
 
   it("switches the pressed toggle on click", async () => {

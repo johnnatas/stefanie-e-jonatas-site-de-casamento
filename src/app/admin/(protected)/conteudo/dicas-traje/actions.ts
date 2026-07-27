@@ -16,6 +16,8 @@ export async function updateTipsTrajeAction(
     body: formData.get("body"),
     pinterestHimUrl: formData.get("pinterestHimUrl") || null,
     pinterestHerUrl: formData.get("pinterestHerUrl") || null,
+    pinterestHimLabel: formData.get("pinterestHimLabel") || null,
+    pinterestHerLabel: formData.get("pinterestHerLabel") || null,
   });
 
   if (!parsed.success) {
@@ -29,5 +31,6 @@ export async function updateTipsTrajeAction(
   }
 
   revalidatePath("/dicas-e-instrucoes");
+  revalidatePath("/admin/conteudo/dicas-traje");
   redirect("/admin/conteudo");
 }

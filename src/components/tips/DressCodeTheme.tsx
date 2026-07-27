@@ -13,7 +13,12 @@ export function DressCodeTheme({ content }: { content: TipsTrajeContent }) {
         {renderMarkdown(content.body)}
       </div>
       <div className="mt-12 w-full max-w-4xl">
-        <DressCodeInspiration him={content.pinterestHimUrl} her={content.pinterestHerUrl} />
+        <DressCodeInspiration
+          him={content.pinterestHimUrl}
+          her={content.pinterestHerUrl}
+          himLabel={content.pinterestHimLabel}
+          herLabel={content.pinterestHerLabel}
+        />
       </div>
     </div>
   );

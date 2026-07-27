@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createUpdateSiteContentUseCase, resolvePhotoField } from "@/infrastructure/composition";
+import { createUpdateSiteContentUseCase } from "@/infrastructure/composition";
 import { tipsTrajeContentSchema } from "@/application/content/schemas";
 import type { SiteContentActionState } from "@/application/content/actionState";
 
@@ -10,17 +10,12 @@ export async function updateTipsTrajeAction(
   _prevState: SiteContentActionState,
   formData: FormData
 ): Promise<SiteContentActionState> {
-  const currentUrl = (formData.get("photoCurrentUrl") as string) || null;
-  const photo = await resolvePhotoField("tips-traje", "photo", formData, currentUrl, "photoFile", "photoRemove");
-
   const parsed = tipsTrajeContentSchema.safeParse({
-    eyebrow: formData.get("eyebrow") || null,
     title: formData.get("title"),
+    dressCodeName: formData.get("dressCodeName"),
     body: formData.get("body"),
-    photo,
-    forHim: formData.get("forHim") || null,
-    forHer: formData.get("forHer") || null,
-    pinterestBoardUrl: formData.get("pinterestBoardUrl") || null,
+    pinterestHimUrl: formData.get("pinterestHimUrl") || null,
+    pinterestHerUrl: formData.get("pinterestHerUrl") || null,
   });
 
   if (!parsed.success) {
@@ -33,6 +28,6 @@ export async function updateTipsTrajeAction(
     return { status: "error", message: "Não foi possível salvar agora." };
   }
 
-  revalidatePath("/dicas-e-instrucoes/codigo-de-vestimenta");
+  revalidatePath("/dicas-e-instrucoes");
   redirect("/admin/conteudo");
 }

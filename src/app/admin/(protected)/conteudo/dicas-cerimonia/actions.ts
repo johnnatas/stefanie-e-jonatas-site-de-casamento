@@ -48,5 +48,6 @@ export async function updateTipsCerimoniaAction(
   }
 
   revalidatePath("/dicas-e-instrucoes");
+  revalidatePath("/admin/conteudo/dicas-cerimonia");
   redirect("/admin/conteudo");
 }

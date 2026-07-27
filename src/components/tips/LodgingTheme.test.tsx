@@ -28,4 +28,10 @@ describe("LodgingTheme", () => {
     render(<LodgingTheme content={content} />);
     expect(screen.queryByTitle(/^Mapa:/)).not.toBeInTheDocument();
   });
+
+  it("drops the two-column grid when there is no map to justify it", () => {
+    const content = tipsHospedagemContentSchema.parse({});
+    const { container } = render(<LodgingTheme content={content} />);
+    expect(container.firstChild).not.toHaveClass("lg:grid-cols-2");
+  });
 });

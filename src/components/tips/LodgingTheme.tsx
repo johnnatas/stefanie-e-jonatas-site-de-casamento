@@ -1,16 +1,19 @@
 import { GoogleMapEmbed } from "@/components/ui/GoogleMapEmbed";
 import type { TipsHospedagemContent } from "@/application/content/schemas";
+import { cn } from "@/shared/utils/cn";
 
 export function LodgingTheme({ content }: { content: TipsHospedagemContent }) {
+  const hasMap = Boolean(content.mapAddress);
+
   return (
-    <div className="flex flex-col gap-10 lg:grid lg:grid-cols-2 lg:gap-12">
+    <div className={cn("flex flex-col gap-10", hasMap && "lg:grid lg:grid-cols-2 lg:gap-12")}>
       {content.mapAddress && (
         <div className="lg:order-1">
           <GoogleMapEmbed address={content.mapAddress} />
         </div>
       )}
 
-      <div className="lg:order-2">
+      <div className={hasMap ? "lg:order-2" : undefined}>
         <h1 className="font-script text-4xl italic text-forest sm:text-5xl">{content.title}</h1>
 
         {content.distances.length > 0 && (

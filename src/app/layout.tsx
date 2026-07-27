@@ -3,6 +3,7 @@ import { Playfair_Display, Inter, Alex_Brush } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { PageLoader } from "@/components/ui/PageLoader";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -55,6 +56,7 @@ export default function RootLayout({
       className={`${playfair.variable} ${inter.variable} ${alexBrush.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans">
+        <PageLoader />
         <Header />
         <main className="flex-1 pt-[72px]">{children}</main>
         <Footer />

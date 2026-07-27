@@ -17,10 +17,10 @@ describe("DressCodeInspiration", () => {
     const user = userEvent.setup();
     render(<DressCodeInspiration him="https://pin/ele" her="https://pin/ela" />);
 
-    await user.click(screen.getByRole("button", { name: "Ela" }));
+    await user.click(screen.getByRole("button", { name: "Ele" }));
 
-    expect(screen.getByRole("button", { name: "Ela" })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("button", { name: "Ele" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: "Ele" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Ela" })).toHaveAttribute("aria-pressed", "false");
   });
 
   it("hides the Ela toggle when only the him board is provided", () => {

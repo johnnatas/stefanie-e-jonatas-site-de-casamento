@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createUpdateSiteContentUseCase, resolvePhotoField } from "@/infrastructure/composition";
+import { createUpdateSiteContentUseCase } from "@/infrastructure/composition";
 import { tipsHospedagemContentSchema } from "@/application/content/schemas";
 import type { SiteContentActionState } from "@/application/content/actionState";
 
@@ -14,16 +14,6 @@ export async function updateTipsHospedagemAction(
   _prevState: SiteContentActionState,
   formData: FormData
 ): Promise<SiteContentActionState> {
-  const currentUrl = (formData.get("photoCurrentUrl") as string) || null;
-  const photo = await resolvePhotoField(
-    "tips-hospedagem",
-    "photo",
-    formData,
-    currentUrl,
-    "photoFile",
-    "photoRemove"
-  );
-
   const distances: { label: string; km: string }[] = [];
   for (let index = 0; index < MAX_DISTANCES; index++) {
     const field = `dist${index}`;
@@ -57,10 +47,8 @@ export async function updateTipsHospedagemAction(
   }
 
   const parsed = tipsHospedagemContentSchema.safeParse({
-    eyebrow: formData.get("eyebrow") || null,
     title: formData.get("title"),
-    body: formData.get("body"),
-    photo,
+    mapAddress: formData.get("mapAddress") || null,
     distances,
     hotels,
     airports,
@@ -77,6 +65,6 @@ export async function updateTipsHospedagemAction(
     return { status: "error", message: "Não foi possível salvar agora." };
   }
 
-  revalidatePath("/dicas-e-instrucoes/hospedagem");
+  revalidatePath("/dicas-e-instrucoes");
   redirect("/admin/conteudo");
 }

@@ -18,10 +18,10 @@ interface Topic {
 const TOPIC_KEYS = ["cerimonia", "presentes", "traje", "hospedagem", "nossaHistoria"] as const;
 
 const TOPIC_HREFS: Record<(typeof TOPIC_KEYS)[number], string> = {
-  cerimonia: "/dicas-e-instrucoes/cerimonia",
+  cerimonia: "/dicas-e-instrucoes?tema=cerimonia",
   presentes: "/presentes",
-  traje: "/dicas-e-instrucoes/codigo-de-vestimenta",
-  hospedagem: "/dicas-e-instrucoes/hospedagem",
+  traje: "/dicas-e-instrucoes?tema=vestimenta",
+  hospedagem: "/dicas-e-instrucoes?tema=hospedagem",
   nossaHistoria: "/nossa-historia",
 };
 

@@ -11,10 +11,10 @@ describe("TopicsCarousel", () => {
     render(<TopicsCarousel content={content} />);
 
     const expected: [string, string, string][] = [
-      ["Cerimônia Custom", "Veja os detalhes", "/dicas-e-instrucoes/cerimonia"],
+      ["Cerimônia Custom", "Veja os detalhes", "/dicas-e-instrucoes?tema=cerimonia"],
       ["Lista de presentes", "Ajude a construir o começo da nossa nova casa", "/presentes"],
-      ["Traje", "Código de vestimenta para o grande dia", "/dicas-e-instrucoes/codigo-de-vestimenta"],
-      ["Hospedagem", "Sugestões de hotéis e pousadas próximas", "/dicas-e-instrucoes/hospedagem"],
+      ["Traje", "Código de vestimenta para o grande dia", "/dicas-e-instrucoes?tema=vestimenta"],
+      ["Hospedagem", "Sugestões de hotéis e pousadas próximas", "/dicas-e-instrucoes?tema=hospedagem"],
       ["Nossa história", "Como tudo começou até chegarmos aqui", "/nossa-historia"],
     ];
 

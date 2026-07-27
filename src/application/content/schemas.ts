@@ -74,35 +74,27 @@ export const ceremonyRouteSchema = z.object({
 export type CeremonyRoute = z.output<typeof ceremonyRouteSchema>;
 
 export const tipsCerimoniaContentSchema = z.object({
-  eyebrow: z.string().min(1).nullable().default("O grande dia"),
-  title: z.string().min(1).default("Local e horário"),
-  body: z
-    .string()
-    .min(1)
-    .default(
-      "A cerimônia acontecerá às **16h**, seguida da recepção no mesmo local. Chegue com 30 minutos de antecedência para aproveitar cada instante.\n\n*Endereço a confirmar.*"
-    ),
+  title: z.string().min(1).default("Informações sobre o grande dia!"),
   photo: z.string().min(1).nullable().default(null),
   eventDateLabel: z.string().min(1).nullable().default(null),
   eventTimeLabel: z.string().min(1).nullable().default(null),
+  eventVenueLabel: z.string().min(1).nullable().default(null),
   eventAddress: z.string().min(1).nullable().default(null),
   routes: z.array(ceremonyRouteSchema).max(10).default([]),
 });
 export type TipsCerimoniaContent = z.output<typeof tipsCerimoniaContentSchema>;
 
 export const tipsTrajeContentSchema = z.object({
-  eyebrow: z.string().min(1).nullable().default("Como se vestir"),
-  title: z.string().min(1).default("Traje esporte fino"),
+  title: z.string().min(1).default("Convidados, preparem suas vestimentas!"),
+  dressCodeName: z.string().min(1).default("Passeio completo"),
   body: z
     .string()
     .min(1)
     .default(
-      "Pedimos que evitem branco e tons muito claros, para não competir com o vestido da noiva. Tons terrosos, pastéis e clássicos são muito bem-vindos.\n\nA festa acontece em ambiente misto (aberto e fechado) — leve um casaco leve para a noite."
+      "Lembrem-se de que nosso casamento será no inverno (frio). Indicamos investir em uma terceira peça ou em mangas longas.\n\nMulheres: a cerimônia será no gramado, opte por um salto bloco."
     ),
-  photo: z.string().min(1).nullable().default(null),
-  forHim: z.string().min(1).nullable().default(null),
-  forHer: z.string().min(1).nullable().default(null),
-  pinterestBoardUrl: z.string().min(1).nullable().default(null),
+  pinterestHimUrl: z.string().min(1).nullable().default(null),
+  pinterestHerUrl: z.string().min(1).nullable().default(null),
 });
 export type TipsTrajeContent = z.output<typeof tipsTrajeContentSchema>;
 
@@ -127,15 +119,8 @@ export const airportEntrySchema = z.object({
 export type AirportEntry = z.output<typeof airportEntrySchema>;
 
 export const tipsHospedagemContentSchema = z.object({
-  eyebrow: z.string().min(1).nullable().default("Fique por perto"),
-  title: z.string().min(1).default("Onde se hospedar"),
-  body: z
-    .string()
-    .min(1)
-    .default(
-      "Separamos algumas sugestões de hotéis e pousadas próximas ao local da cerimônia, com conforto para todos os orçamentos.\n\n*Lista de hospedagens a confirmar.*"
-    ),
-  photo: z.string().min(1).nullable().default(null),
+  title: z.string().min(1).default("Dicas de hospedagem e locomoção"),
+  mapAddress: z.string().min(1).nullable().default(null),
   distances: z.array(distanceEntrySchema).max(15).default([]),
   hotels: z.array(hotelEntrySchema).max(15).default([]),
   airports: z.array(airportEntrySchema).max(6).default([]),

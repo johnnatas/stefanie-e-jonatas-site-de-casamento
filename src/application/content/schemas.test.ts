@@ -101,36 +101,39 @@ describe("homeTopicsContentSchema", () => {
 });
 
 describe("tipsCerimoniaContentSchema", () => {
-  it("defaults to today's hardcoded copy with no event details or routes", () => {
+  it("defaults to the reference copy with no event details or routes", () => {
     const result = tipsCerimoniaContentSchema.parse({});
 
-    expect(result.eyebrow).toBe("O grande dia");
-    expect(result.title).toBe("Local e horário");
-    expect(result.body).toContain("**16h**");
+    expect(result.title).toBe("Informações sobre o grande dia!");
     expect(result.photo).toBeNull();
     expect(result.eventDateLabel).toBeNull();
     expect(result.eventTimeLabel).toBeNull();
+    expect(result.eventVenueLabel).toBeNull();
     expect(result.eventAddress).toBeNull();
     expect(result.routes).toEqual([]);
   });
 
-  it("accepts event details and a list of routes", () => {
+  it("strips legacy eyebrow/body keys from stored content", () => {
+    const result = tipsCerimoniaContentSchema.parse({ eyebrow: "x", body: "y" });
+    expect(result).not.toHaveProperty("eyebrow");
+    expect(result).not.toHaveProperty("body");
+  });
+
+  it("accepts event details (incl. venue) and a list of routes", () => {
     const result = tipsCerimoniaContentSchema.safeParse({
       eventDateLabel: "29 de junho de 2027",
       eventTimeLabel: "A realizar-se às 16h",
-      eventAddress: "Fazenda Santa Rita, Minas Gerais",
+      eventVenueLabel: "Cerimônia e recepção — Ville La Rochelle",
+      eventAddress: "Estrada Municipal do Bairro Caioçara 1100, Jarinu - SP",
       routes: [
-        { originLabel: "Vindo de Belo Horizonte", instructions: "Siga pela **BR-040**.", mapUrl: "https://maps.google.com/x" },
+        { originLabel: "Para quem vem de SP Zona Sul", instructions: "1. Pela **Via Anhanguera**...", mapUrl: "https://maps.google.com/x" },
       ],
     });
-
     expect(result.success).toBe(true);
   });
 
   it("rejects a route missing required fields", () => {
-    const result = tipsCerimoniaContentSchema.safeParse({
-      routes: [{ originLabel: "Vindo de BH" }],
-    });
+    const result = tipsCerimoniaContentSchema.safeParse({ routes: [{ originLabel: "Vindo de BH" }] });
     expect(result.success).toBe(false);
   });
 
@@ -146,50 +149,56 @@ describe("tipsCerimoniaContentSchema", () => {
 });
 
 describe("tipsTrajeContentSchema", () => {
-  it("defaults to today's hardcoded copy with no gender sections or Pinterest board", () => {
+  it("defaults to the reference copy with two null Pinterest boards", () => {
     const result = tipsTrajeContentSchema.parse({});
 
-    expect(result.eyebrow).toBe("Como se vestir");
-    expect(result.title).toBe("Traje esporte fino");
-    expect(result.forHim).toBeNull();
-    expect(result.forHer).toBeNull();
-    expect(result.pinterestBoardUrl).toBeNull();
+    expect(result.title).toBe("Convidados, preparem suas vestimentas!");
+    expect(result.dressCodeName).toBe("Passeio completo");
+    expect(result.body).toContain("inverno");
+    expect(result.pinterestHimUrl).toBeNull();
+    expect(result.pinterestHerUrl).toBeNull();
   });
 
-  it("accepts forHim, forHer, and a Pinterest board URL", () => {
+  it("strips legacy forHim/forHer/pinterestBoardUrl keys", () => {
+    const result = tipsTrajeContentSchema.parse({ forHim: "a", forHer: "b", pinterestBoardUrl: "c" });
+    expect(result).not.toHaveProperty("forHim");
+    expect(result).not.toHaveProperty("forHer");
+    expect(result).not.toHaveProperty("pinterestBoardUrl");
+  });
+
+  it("accepts two Pinterest board URLs", () => {
     const result = tipsTrajeContentSchema.safeParse({
-      forHim: "Terno em tons terrosos.",
-      forHer: "Vestido midi ou longo.",
-      pinterestBoardUrl: "https://www.pinterest.com/stefanie/casamento",
+      pinterestHimUrl: "https://www.pinterest.com/stefanie/ele",
+      pinterestHerUrl: "https://www.pinterest.com/stefanie/ela",
     });
     expect(result.success).toBe(true);
   });
 });
 
 describe("tipsHospedagemContentSchema", () => {
-  it("defaults to today's hardcoded copy with empty lists and the boilerplate disclaimer", () => {
+  it("defaults to the reference copy with empty lists, no map, and the boilerplate disclaimer", () => {
     const result = tipsHospedagemContentSchema.parse({});
 
-    expect(result.eyebrow).toBe("Fique por perto");
+    expect(result.title).toBe("Dicas de hospedagem e locomoção");
+    expect(result.mapAddress).toBeNull();
     expect(result.distances).toEqual([]);
     expect(result.hotels).toEqual([]);
     expect(result.airports).toEqual([]);
     expect(result.disclaimer).toBe("Não temos vínculo, parceria ou comissão com as indicações acima.");
   });
 
-  it("accepts distances, hotels, and airports", () => {
+  it("accepts a map address, distances, hotels, and airports", () => {
     const result = tipsHospedagemContentSchema.safeParse({
-      distances: [{ label: "Belo Horizonte", km: "120 km" }],
-      hotels: [{ name: "Pousada Serra Verde", distanceLabel: "500m", url: "https://example.com" }],
-      airports: [{ name: "Aeroporto de Confins", distanceLabel: "90 km", driveTimeLabel: "1h20" }],
+      mapAddress: "Ville La Rochelle, Jarinu - SP",
+      distances: [{ label: "São Paulo", km: "75 km" }],
+      hotels: [{ name: "La Maison Caiçara", distanceLabel: "500m", url: "https://example.com" }],
+      airports: [{ name: "Viracopos", distanceLabel: "69,5 km", driveTimeLabel: "1h10" }],
     });
     expect(result.success).toBe(true);
   });
 
   it("rejects a hotel entry missing its required name", () => {
-    const result = tipsHospedagemContentSchema.safeParse({
-      hotels: [{ distanceLabel: "500m" }],
-    });
+    const result = tipsHospedagemContentSchema.safeParse({ hotels: [{ distanceLabel: "500m" }] });
     expect(result.success).toBe(false);
   });
 
@@ -200,11 +209,7 @@ describe("tipsHospedagemContentSchema", () => {
   });
 
   it("rejects more than 6 airports", () => {
-    const airports = Array.from({ length: 7 }, (_, i) => ({
-      name: `Aeroporto ${i}`,
-      distanceLabel: null,
-      driveTimeLabel: null,
-    }));
+    const airports = Array.from({ length: 7 }, (_, i) => ({ name: `Aeroporto ${i}`, distanceLabel: null, driveTimeLabel: null }));
     const result = tipsHospedagemContentSchema.safeParse({ airports });
     expect(result.success).toBe(false);
   });

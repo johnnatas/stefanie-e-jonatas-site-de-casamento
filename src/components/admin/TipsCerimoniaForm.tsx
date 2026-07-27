@@ -54,37 +54,16 @@ export function TipsCerimoniaForm({ defaultValues }: TipsCerimoniaFormProps) {
   return (
     <form action={formAction} className="flex max-w-md flex-col gap-4">
       <div>
-        <label htmlFor="eyebrow" className="block font-sans text-sm text-forest">
-          Texto de destaque (opcional)
-        </label>
-        <input id="eyebrow" name="eyebrow" defaultValue={defaultValues.eyebrow ?? ""} className={inputClassName} />
-      </div>
-
-      <div>
         <label htmlFor="title" className="block font-sans text-sm text-forest">
           Título
         </label>
         <input id="title" name="title" defaultValue={defaultValues.title} required className={inputClassName} />
       </div>
 
-      <div>
-        <label htmlFor="body" className="block font-sans text-sm text-forest">
-          Texto (use **negrito** e *itálico*; linha em branco separa parágrafos)
-        </label>
-        <textarea
-          id="body"
-          name="body"
-          defaultValue={defaultValues.body}
-          required
-          rows={6}
-          className={inputClassName}
-        />
-      </div>
-
       <PhotoUploadField
         name="photo"
         currentUrl={defaultValues.photo}
-        label="Local da cerimônia"
+        label="Imagem do local (topo)"
         className="h-32 w-full rounded-md"
       />
 
@@ -109,6 +88,17 @@ export function TipsCerimoniaForm({ defaultValues }: TipsCerimoniaFormProps) {
             id="eventTimeLabel"
             name="eventTimeLabel"
             defaultValue={defaultValues.eventTimeLabel ?? ""}
+            className={inputClassName}
+          />
+        </div>
+        <div>
+          <label htmlFor="eventVenueLabel" className="block font-sans text-sm text-forest">
+            Local (ex.: Cerimônia e recepção — Ville La Rochelle)
+          </label>
+          <input
+            id="eventVenueLabel"
+            name="eventVenueLabel"
+            defaultValue={defaultValues.eventVenueLabel ?? ""}
             className={inputClassName}
           />
         </div>

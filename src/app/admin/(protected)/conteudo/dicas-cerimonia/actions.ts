@@ -28,12 +28,11 @@ export async function updateTipsCerimoniaAction(
   }
 
   const parsed = tipsCerimoniaContentSchema.safeParse({
-    eyebrow: formData.get("eyebrow") || null,
     title: formData.get("title"),
-    body: formData.get("body"),
     photo,
     eventDateLabel: formData.get("eventDateLabel") || null,
     eventTimeLabel: formData.get("eventTimeLabel") || null,
+    eventVenueLabel: formData.get("eventVenueLabel") || null,
     eventAddress: formData.get("eventAddress") || null,
     routes,
   });
@@ -48,6 +47,6 @@ export async function updateTipsCerimoniaAction(
     return { status: "error", message: "Não foi possível salvar agora." };
   }
 
-  revalidatePath("/dicas-e-instrucoes/cerimonia");
+  revalidatePath("/dicas-e-instrucoes");
   redirect("/admin/conteudo");
 }

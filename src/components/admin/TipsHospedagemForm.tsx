@@ -1,7 +1,6 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { PhotoUploadField } from "@/components/admin/PhotoUploadField";
 import { updateTipsHospedagemAction } from "@/app/admin/(protected)/conteudo/dicas-hospedagem/actions";
 import type { SiteContentActionState } from "@/application/content/actionState";
 import type { TipsHospedagemContent } from "@/application/content/schemas";
@@ -69,13 +68,6 @@ export function TipsHospedagemForm({ defaultValues }: TipsHospedagemFormProps) {
   return (
     <form action={formAction} className="flex max-w-md flex-col gap-4">
       <div>
-        <label htmlFor="eyebrow" className="block font-sans text-sm text-forest">
-          Texto de destaque (opcional)
-        </label>
-        <input id="eyebrow" name="eyebrow" defaultValue={defaultValues.eyebrow ?? ""} className={inputClassName} />
-      </div>
-
-      <div>
         <label htmlFor="title" className="block font-sans text-sm text-forest">
           Título
         </label>
@@ -83,25 +75,17 @@ export function TipsHospedagemForm({ defaultValues }: TipsHospedagemFormProps) {
       </div>
 
       <div>
-        <label htmlFor="body" className="block font-sans text-sm text-forest">
-          Texto (use **negrito** e *itálico*; linha em branco separa parágrafos)
+        <label htmlFor="mapAddress" className="block font-sans text-sm text-forest">
+          Endereço do local (para o mapa do Google Maps)
         </label>
-        <textarea
-          id="body"
-          name="body"
-          defaultValue={defaultValues.body}
-          required
-          rows={6}
+        <input
+          id="mapAddress"
+          name="mapAddress"
+          defaultValue={defaultValues.mapAddress ?? ""}
+          placeholder="Ville La Rochelle, Jarinu - SP"
           className={inputClassName}
         />
       </div>
-
-      <PhotoUploadField
-        name="photo"
-        currentUrl={defaultValues.photo}
-        label="Hospedagem"
-        className="h-32 w-full rounded-md"
-      />
 
       <fieldset className="flex flex-col gap-4 border-t border-line pt-4">
         <legend className="font-sans text-sm text-forest">Distâncias (até {MAX_DISTANCES})</legend>

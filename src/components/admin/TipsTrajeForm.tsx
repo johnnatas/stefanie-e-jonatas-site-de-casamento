@@ -1,7 +1,6 @@
 "use client";
 
 import { useActionState } from "react";
-import { PhotoUploadField } from "@/components/admin/PhotoUploadField";
 import { updateTipsTrajeAction } from "@/app/admin/(protected)/conteudo/dicas-traje/actions";
 import type { SiteContentActionState } from "@/application/content/actionState";
 import type { TipsTrajeContent } from "@/application/content/schemas";
@@ -21,22 +20,28 @@ export function TipsTrajeForm({ defaultValues }: TipsTrajeFormProps) {
   return (
     <form action={formAction} className="flex max-w-md flex-col gap-4">
       <div>
-        <label htmlFor="eyebrow" className="block font-sans text-sm text-forest">
-          Texto de destaque (opcional)
-        </label>
-        <input id="eyebrow" name="eyebrow" defaultValue={defaultValues.eyebrow ?? ""} className={inputClassName} />
-      </div>
-
-      <div>
         <label htmlFor="title" className="block font-sans text-sm text-forest">
-          Título
+          Título (script)
         </label>
         <input id="title" name="title" defaultValue={defaultValues.title} required className={inputClassName} />
       </div>
 
       <div>
+        <label htmlFor="dressCodeName" className="block font-sans text-sm text-forest">
+          Nome do traje (ex.: Passeio completo)
+        </label>
+        <input
+          id="dressCodeName"
+          name="dressCodeName"
+          defaultValue={defaultValues.dressCodeName}
+          required
+          className={inputClassName}
+        />
+      </div>
+
+      <div>
         <label htmlFor="body" className="block font-sans text-sm text-forest">
-          Texto geral (use **negrito** e *itálico*; linha em branco separa parágrafos)
+          Orientações (use **negrito** e *itálico*; linha em branco separa parágrafos)
         </label>
         <textarea
           id="body"
@@ -48,48 +53,28 @@ export function TipsTrajeForm({ defaultValues }: TipsTrajeFormProps) {
         />
       </div>
 
-      <PhotoUploadField
-        name="photo"
-        currentUrl={defaultValues.photo}
-        label="Inspiração de traje"
-        className="h-32 w-full rounded-md"
-      />
-
       <div className="border-t border-line pt-4">
-        <label htmlFor="forHim" className="block font-sans text-sm text-forest">
-          Para ele (opcional)
-        </label>
-        <textarea
-          id="forHim"
-          name="forHim"
-          defaultValue={defaultValues.forHim ?? ""}
-          rows={4}
-          className={inputClassName}
-        />
-      </div>
-
-      <div>
-        <label htmlFor="forHer" className="block font-sans text-sm text-forest">
-          Para ela (opcional)
-        </label>
-        <textarea
-          id="forHer"
-          name="forHer"
-          defaultValue={defaultValues.forHer ?? ""}
-          rows={4}
-          className={inputClassName}
-        />
-      </div>
-
-      <div>
-        <label htmlFor="pinterestBoardUrl" className="block font-sans text-sm text-forest">
-          Link do board do Pinterest (opcional)
+        <label htmlFor="pinterestHimUrl" className="block font-sans text-sm text-forest">
+          Board do Pinterest — Ele (opcional)
         </label>
         <input
-          id="pinterestBoardUrl"
-          name="pinterestBoardUrl"
-          defaultValue={defaultValues.pinterestBoardUrl ?? ""}
-          placeholder="https://www.pinterest.com/usuario/board/"
+          id="pinterestHimUrl"
+          name="pinterestHimUrl"
+          defaultValue={defaultValues.pinterestHimUrl ?? ""}
+          placeholder="https://www.pinterest.com/usuario/board-ele/"
+          className={inputClassName}
+        />
+      </div>
+
+      <div>
+        <label htmlFor="pinterestHerUrl" className="block font-sans text-sm text-forest">
+          Board do Pinterest — Ela (opcional)
+        </label>
+        <input
+          id="pinterestHerUrl"
+          name="pinterestHerUrl"
+          defaultValue={defaultValues.pinterestHerUrl ?? ""}
+          placeholder="https://www.pinterest.com/usuario/board-ela/"
           className={inputClassName}
         />
       </div>

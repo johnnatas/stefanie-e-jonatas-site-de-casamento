@@ -11,19 +11,28 @@ import { cn } from "@/shared/utils/cn";
  * React hydration alone, since that can complete before images/fonts finish.
  */
 export function PageLoader() {
-  const [loaded, setLoaded] = useState(() => typeof document !== "undefined" && document.readyState === "complete");
+  const [loaded, setLoaded] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
-    if (loaded) return;
-
     function handleLoad() {
       setLoaded(true);
     }
 
+    // `readyState` is checked fresh here (not just once, before this effect
+    // ever ran) because the browser's `load` event can fire in the gap
+    // between the initial render and this effect committing — if it does,
+    // a listener added only for *future* `load` events would wait forever
+    // (the infinite-loader bug). `readyState` itself, unlike the one-shot
+    // event, stays "complete" once true, so checking it here is race-free.
+    if (document.readyState === "complete") {
+      const timeoutId = setTimeout(handleLoad, 0);
+      return () => clearTimeout(timeoutId);
+    }
+
     window.addEventListener("load", handleLoad);
     return () => window.removeEventListener("load", handleLoad);
-  }, [loaded]);
+  }, []);
 
   return (
     <div

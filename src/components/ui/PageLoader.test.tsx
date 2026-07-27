@@ -32,10 +32,12 @@ describe("PageLoader", () => {
     expect(screen.getByTestId("page-loader")).toHaveAttribute("aria-hidden", "true");
   });
 
-  it("starts already hidden if the document was already fully loaded at mount", () => {
+  it("hides itself if the document was already fully loaded at mount, without waiting for another load event", async () => {
     setReadyState("complete");
     render(<PageLoader />);
 
-    expect(screen.getByTestId("page-loader")).toHaveClass("opacity-0");
+    await waitFor(() => {
+      expect(screen.getByTestId("page-loader")).toHaveClass("opacity-0");
+    });
   });
 });

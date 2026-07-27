@@ -11,7 +11,7 @@ const THEMES: { theme: TipsTheme; label: string }[] = [
 
 export function TipsThemeMenu({ active }: { active: TipsTheme }) {
   return (
-    <nav className="flex flex-col items-center gap-5 lg:items-start lg:self-center">
+    <nav className="flex flex-col items-center gap-5 lg:sticky lg:top-28 lg:items-start lg:self-center">
       {THEMES.map(({ theme, label }) => {
         const isActive = theme === active;
         return (

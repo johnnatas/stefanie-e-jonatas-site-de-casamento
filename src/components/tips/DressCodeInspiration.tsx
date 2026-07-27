@@ -20,7 +20,7 @@ interface Board {
   label?: string | null;
 }
 
-const toggleBase = "rounded-full px-6 py-2 font-serif text-sm uppercase tracking-wide transition-colors";
+const toggleBase = "flex-1 rounded-full px-6 py-3 font-serif text-sm uppercase tracking-wide transition-colors";
 
 export function DressCodeInspiration({ him, her, himLabel, herLabel }: DressCodeInspirationProps) {
   const boards: Board[] = [
@@ -58,7 +58,7 @@ export function DressCodeInspiration({ him, her, himLabel, herLabel }: DressCode
           <div
             role="group"
             aria-label="Escolha entre Ela e Ele"
-            className="mx-auto inline-flex rounded-full border border-line bg-paper p-1"
+            className="flex w-full rounded-full border border-line bg-paper p-1"
           >
             {boards.map((board, index) => (
               <button

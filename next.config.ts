@@ -11,6 +11,25 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "150mb",
     },
   },
+  async redirects() {
+    return [
+      {
+        source: "/dicas-e-instrucoes/cerimonia",
+        destination: "/dicas-e-instrucoes?tema=cerimonia",
+        permanent: true,
+      },
+      {
+        source: "/dicas-e-instrucoes/codigo-de-vestimenta",
+        destination: "/dicas-e-instrucoes?tema=vestimenta",
+        permanent: true,
+      },
+      {
+        source: "/dicas-e-instrucoes/hospedagem",
+        destination: "/dicas-e-instrucoes?tema=hospedagem",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

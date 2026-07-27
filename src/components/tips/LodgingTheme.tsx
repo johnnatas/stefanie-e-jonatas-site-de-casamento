@@ -35,13 +35,13 @@ export function LodgingTheme({ content }: { content: TipsHospedagemContent }) {
             <h2 className="font-serif text-2xl uppercase tracking-wide text-forest">Hotéis</h2>
             <ol className="mt-4 flex flex-col gap-2 font-sans text-sm text-forest/80">
               {content.hotels.map((hotel, index) => (
-                <li key={index} className="flex flex-wrap items-baseline justify-between gap-2 border-b border-line py-2">
+                <li key={index} className="flex flex-col gap-0.5 border-b border-line py-2">
                   {hotel.url ? (
                     <a
                       href={hotel.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-moss underline decoration-moss/40 underline-offset-2 transition-colors hover:text-forest hover:decoration-forest/40"
+                      className="inline-flex w-fit items-center gap-1 text-moss underline decoration-moss/40 underline-offset-2 transition-colors hover:text-forest hover:decoration-forest/40"
                     >
                       {hotel.name}
                       <span aria-hidden="true">↗</span>
@@ -49,7 +49,7 @@ export function LodgingTheme({ content }: { content: TipsHospedagemContent }) {
                   ) : (
                     <span>{hotel.name}</span>
                   )}
-                  {hotel.distanceLabel && <span className="text-forest/60">{hotel.distanceLabel}</span>}
+                  {hotel.distanceLabel && <span className="text-xs text-forest/60">{hotel.distanceLabel}</span>}
                 </li>
               ))}
             </ol>

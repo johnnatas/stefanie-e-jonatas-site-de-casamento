@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import useEmblaCarousel from "embla-carousel-react";
 import { cn } from "@/shared/utils/cn";
 import { PinterestBoardEmbed } from "@/components/ui/PinterestBoardEmbed";
 
@@ -11,68 +12,103 @@ interface DressCodeInspirationProps {
   herLabel?: string | null;
 }
 
-const toggleBase =
-  "rounded-full px-6 py-2 font-serif text-sm uppercase tracking-wide transition-colors";
+interface Board {
+  key: "her" | "him";
+  title: string;
+  toggleLabel: string;
+  url: string;
+  label?: string | null;
+}
+
+const toggleBase = "rounded-full px-6 py-2 font-serif text-sm uppercase tracking-wide transition-colors";
 
 export function DressCodeInspiration({ him, her, himLabel, herLabel }: DressCodeInspirationProps) {
-  const [selected, setSelected] = useState<"him" | "her">(her ? "her" : "him");
+  const boards: Board[] = [
+    ...(her ? [{ key: "her" as const, title: "ELA", toggleLabel: "Ela", url: her, label: herLabel }] : []),
+    ...(him ? [{ key: "him" as const, title: "ELE", toggleLabel: "Ele", url: him, label: himLabel }] : []),
+  ];
 
-  if (!him && !her) return null;
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: "start" });
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
+    emblaApi.on("select", onSelect);
+    return () => {
+      emblaApi.off("select", onSelect);
+    };
+  }, [emblaApi]);
+
+  const scrollTo = useCallback(
+    (index: number) => {
+      setSelectedIndex(index);
+      emblaApi?.scrollTo(index);
+    },
+    [emblaApi]
+  );
+
+  if (boards.length === 0) return null;
 
   return (
     <div>
-      {/* Mobile: segmented toggle + single board */}
+      {/* Mobile: full-width swipeable (or tap-to-select) carousel with a slide transition */}
       <div className="lg:hidden">
-        <div
-          role="group"
-          aria-label="Escolha entre Ela e Ele"
-          className="inline-flex rounded-full border border-line bg-paper p-1"
-        >
-          {her && (
-            <button
-              type="button"
-              aria-pressed={selected === "her"}
-              onClick={() => setSelected("her")}
-              className={cn(toggleBase, selected === "her" ? "bg-moss text-paper" : "text-forest/70 hover:text-forest")}
-            >
-              Ela
-            </button>
-          )}
-          {him && (
-            <button
-              type="button"
-              aria-pressed={selected === "him"}
-              onClick={() => setSelected("him")}
-              className={cn(toggleBase, selected === "him" ? "bg-moss text-paper" : "text-forest/70 hover:text-forest")}
-            >
-              Ele
-            </button>
-          )}
+        {boards.length > 1 && (
+          <div
+            role="group"
+            aria-label="Escolha entre Ela e Ele"
+            className="mx-auto inline-flex rounded-full border border-line bg-paper p-1"
+          >
+            {boards.map((board, index) => (
+              <button
+                key={board.key}
+                type="button"
+                aria-pressed={selectedIndex === index}
+                onClick={() => scrollTo(index)}
+                className={cn(
+                  toggleBase,
+                  selectedIndex === index ? "bg-moss text-paper" : "text-forest/70 hover:text-forest"
+                )}
+              >
+                {board.toggleLabel}
+              </button>
+            ))}
+          </div>
+        )}
+        <div className="mx-auto mt-6 flex justify-center">
+          {boards.length === 1 && <PinterestBoardEmbed boardUrl={boards[0].url} label={boards[0].label} />}
         </div>
-        <div className="mt-6 flex justify-center">
-          {selected === "her" && her && <PinterestBoardEmbed boardUrl={her} label={herLabel} />}
-          {selected === "him" && him && <PinterestBoardEmbed boardUrl={him} label={himLabel} />}
-        </div>
+        {boards.length > 1 && (
+          <div className="mt-6 w-full overflow-hidden" ref={emblaRef}>
+            <div className="flex">
+              {boards.map((board) => (
+                <div key={board.key} className="min-w-0 flex-[0_0_100%]">
+                  <div className="flex justify-center px-1">
+                    <PinterestBoardEmbed boardUrl={board.url} label={board.label} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Desktop: Ela | Ele side by side with a central divider */}
-      <div className="hidden lg:grid lg:grid-cols-2 lg:gap-8 lg:divide-x lg:divide-line">
-        {her && (
-          <div className="flex flex-col items-center">
-            <h3 className="font-serif text-3xl text-forest">ELA</h3>
-            <div className="mt-6 w-full">
-              <PinterestBoardEmbed boardUrl={her} label={herLabel} />
+      {/* Desktop: Ela | Ele side by side with a central divider (single column if only one board exists) */}
+      <div
+        className={cn(
+          "hidden lg:flex lg:justify-center",
+          boards.length > 1 && "lg:grid lg:grid-cols-2 lg:gap-8 lg:divide-x lg:divide-line"
+        )}
+      >
+        {boards.map((board, index) => (
+          <div key={board.key} className={cn("flex flex-col items-center", index === 1 && "lg:pl-8")}>
+            <h3 className="font-serif text-3xl text-forest">{board.title}</h3>
+            <div className="mt-6 flex w-full justify-center">
+              <PinterestBoardEmbed boardUrl={board.url} label={board.label} />
             </div>
           </div>
-        )}
-        {him && (
-          <div className="flex flex-col items-center lg:pl-8">
-            <h3 className="font-serif text-3xl text-forest">ELE</h3>
-            <div className="mt-6 w-full">
-              <PinterestBoardEmbed boardUrl={him} label={himLabel} />
-            </div>
-          </div>
-        )}
+        ))}
       </div>
     </div>
   );

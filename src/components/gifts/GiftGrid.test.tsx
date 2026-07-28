@@ -44,7 +44,7 @@ describe("GiftGrid", () => {
     render(<GiftGrid gifts={gifts} canReserveForLater openGiftId="gift-2" />);
 
     expect(screen.getByRole("dialog")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Jogo de taças" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Jogo de taças", level: 2 })).toBeInTheDocument();
   });
 
   it("opens no modal when openGiftId is null", () => {

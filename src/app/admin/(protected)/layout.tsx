@@ -19,7 +19,13 @@ interface AdminNavGroup {
 
 const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   { label: "Visão geral", items: [{ label: "Dashboard", href: "/admin/dashboard" }] },
-  { label: "Convidados", items: [{ label: "Convidados", href: "/admin/convidados" }] },
+  {
+    label: "Convidados",
+    items: [
+      { label: "Convidados", href: "/admin/convidados" },
+      { label: "Mensagens", href: "/admin/mensagens" },
+    ],
+  },
   {
     label: "Presentes",
     items: [

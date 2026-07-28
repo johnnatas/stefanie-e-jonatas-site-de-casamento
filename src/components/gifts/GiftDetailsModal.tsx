@@ -6,6 +6,7 @@ import { formatCurrency } from "@/shared/utils/formatCurrency";
 import { GiftDto } from "@/components/gifts/GiftDto";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { shareOrCopyLink } from "@/shared/utils/shareOrCopyLink";
+import { ShareIcon, CheckIcon } from "@/components/ui/ShareIcon";
 import {
   createGiftContributionAction,
   reserveGiftForLaterAction,
@@ -85,9 +86,10 @@ export function GiftDetailsModal({ gift, canReserveForLater, onClose }: GiftDeta
           <button
             type="button"
             onClick={handleShare}
-            className="font-sans text-xs uppercase tracking-widest text-forest/60 hover:text-forest"
+            aria-label={copyFeedback ? "Link copiado!" : "Compartilhar"}
+            className="text-forest/60 hover:text-forest"
           >
-            {copyFeedback ? "Link copiado!" : "Compartilhar"}
+            {copyFeedback ? <CheckIcon /> : <ShareIcon />}
           </button>
           <button
             type="button"
@@ -99,8 +101,12 @@ export function GiftDetailsModal({ gift, canReserveForLater, onClose }: GiftDeta
           </button>
         </div>
 
-        <div className="relative h-56 w-full flex-shrink-0 sm:h-auto sm:w-1/2">
-          <PhotoOrPlaceholder src={gift.imageUrl} label={gift.name} className="absolute inset-0 h-full w-full" />
+        <div className="relative h-56 w-full flex-shrink-0 bg-mist sm:h-auto sm:w-1/2">
+          <PhotoOrPlaceholder
+            src={gift.imageUrl}
+            label={gift.name}
+            className="absolute inset-0 h-full w-full object-contain p-6"
+          />
         </div>
 
         <div className="flex flex-1 flex-col items-center gap-4 p-6 text-center sm:p-10">

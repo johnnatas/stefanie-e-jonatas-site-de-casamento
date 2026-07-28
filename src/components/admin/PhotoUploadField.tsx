@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type ClipboardEvent } from "react";
 import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
 import { compressImage, BALANCED_COMPRESSION } from "@/shared/utils/compressImage";
 
@@ -32,10 +32,7 @@ export function PhotoUploadField({
     };
   }, [previewUrl]);
 
-  async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
+  async function processFile(file: File) {
     setIsCompressing(true);
     try {
       const compressed = await compressImage(file, BALANCED_COMPRESSION);
@@ -65,8 +62,25 @@ export function PhotoUploadField({
     }
   }
 
+  async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    await processFile(file);
+  }
+
+  async function handlePaste(event: ClipboardEvent<HTMLDivElement>) {
+    const item = Array.from(event.clipboardData.items).find((entry) => entry.type.startsWith("image/"));
+    if (!item) return;
+
+    const file = item.getAsFile();
+    if (!file) return;
+
+    event.preventDefault();
+    await processFile(file);
+  }
+
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2" tabIndex={0} onPaste={handlePaste}>
       <input type="hidden" name={`${name}CurrentUrl`} value={currentUrl ?? ""} />
       {previewUrl ? (
         <img src={previewUrl} alt={label} className={`object-cover ${className}`} />
@@ -81,6 +95,7 @@ export function PhotoUploadField({
         onChange={handleFileChange}
         className="font-sans text-sm text-forest"
       />
+      <span className="font-sans text-xs text-forest/60">Ou clique aqui e cole uma imagem (Ctrl+V)</span>
       {isCompressing && <span className="font-sans text-xs text-forest/70">Comprimindo...</span>}
       {showRemoveCheckbox && (currentUrl || previewUrl) && (
         <label className="flex items-center gap-2 font-sans text-xs text-forest/70">

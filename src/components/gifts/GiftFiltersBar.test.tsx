@@ -30,26 +30,32 @@ beforeEach(() => {
 });
 
 describe("GiftFiltersBar", () => {
-  it("renders every category as a toggle button", () => {
-    render(<GiftFiltersBar categories={["casa", "cozinha"]} />);
-    expect(screen.getAllByRole("button", { name: "casa" })[0]).toHaveAttribute("aria-pressed", "false");
-    expect(screen.getAllByRole("button", { name: "cozinha" })[0]).toHaveAttribute("aria-pressed", "false");
-  });
-
-  it("pushes a categoria param when a category toggle is clicked", async () => {
+  it("opens the category dropdown and lists every category as an option", async () => {
     const user = userEvent.setup();
     render(<GiftFiltersBar categories={["casa", "cozinha"]} />);
 
-    await user.click(screen.getAllByRole("button", { name: "casa" })[0]);
+    await user.click(screen.getAllByRole("button", { name: /categoria/i })[0]);
+
+    expect(screen.getAllByRole("option", { name: "casa" })[0]).toHaveAttribute("aria-selected", "false");
+    expect(screen.getAllByRole("option", { name: "cozinha" })[0]).toHaveAttribute("aria-selected", "false");
+  });
+
+  it("pushes a categoria param when a category option is clicked", async () => {
+    const user = userEvent.setup();
+    render(<GiftFiltersBar categories={["casa", "cozinha"]} />);
+
+    await user.click(screen.getAllByRole("button", { name: /categoria/i })[0]);
+    await user.click(screen.getAllByRole("option", { name: "casa" })[0]);
 
     expect(pushMock).toHaveBeenCalledWith("/presentes?categoria=casa");
   });
 
-  it("pushes a situacao param when the status select changes", async () => {
+  it("pushes a situacao param when a status option is chosen from the custom dropdown", async () => {
     const user = userEvent.setup();
     render(<GiftFiltersBar categories={[]} />);
 
-    await user.selectOptions(screen.getAllByLabelText("Situação")[0], "available");
+    await user.click(screen.getAllByRole("button", { name: /situação/i })[0]);
+    await user.click(screen.getAllByRole("option", { name: "Disponível" })[0]);
 
     expect(pushMock).toHaveBeenCalledWith("/presentes?situacao=available");
   });

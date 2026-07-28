@@ -61,4 +61,40 @@ describe("PhotoUploadField", () => {
       expect(screen.getByAltText("Foto")).toHaveAttribute("src", "blob:preview");
     });
   });
+
+  it("shows a preview after an image is pasted", async () => {
+    vi.stubGlobal("Image", FakeImage);
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue({
+      drawImage: vi.fn(),
+    } as unknown as CanvasRenderingContext2D);
+    vi.spyOn(HTMLCanvasElement.prototype, "toBlob").mockImplementation((callback) => {
+      callback(new Blob(["x"], { type: "image/jpeg" }));
+    });
+    URL.createObjectURL = vi.fn(() => "blob:pasted-preview");
+    URL.revokeObjectURL = vi.fn();
+
+    const { container } = render(<PhotoUploadField name="photo" currentUrl={null} label="Foto" />);
+    const root = container.firstChild as HTMLElement;
+    const file = new File(["data"], "pasted.png", { type: "image/png" });
+
+    fireEvent.paste(root, {
+      clipboardData: {
+        items: [{ type: "image/png", getAsFile: () => file }],
+      },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByAltText("Foto")).toHaveAttribute("src", "blob:pasted-preview");
+    });
+  });
+
+  it("ignores a paste with no image data", () => {
+    render(<PhotoUploadField name="photo" currentUrl={null} label="Foto" />);
+
+    fireEvent.paste(screen.getByText(/cole uma imagem/i).closest("div")!, {
+      clipboardData: { items: [{ type: "text/plain", getAsFile: () => null }] },
+    });
+
+    expect(screen.queryByAltText("Foto")).not.toBeInTheDocument();
+  });
 });

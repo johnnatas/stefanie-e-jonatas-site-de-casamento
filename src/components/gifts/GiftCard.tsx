@@ -9,6 +9,7 @@ import { GiftDetailsModal } from "@/components/gifts/GiftDetailsModal";
 interface GiftCardProps {
   gift: GiftDto;
   canReserveForLater: boolean;
+  autoOpen?: boolean;
 }
 
 const STATUS_LABEL: Record<Exclude<GiftDto["status"], "available">, string> = {
@@ -16,13 +17,13 @@ const STATUS_LABEL: Record<Exclude<GiftDto["status"], "available">, string> = {
   paid: "Presenteado",
 };
 
-export function GiftCard({ gift, canReserveForLater }: GiftCardProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+export function GiftCard({ gift, canReserveForLater, autoOpen = false }: GiftCardProps) {
+  const [isModalOpen, setIsModalOpen] = useState(autoOpen);
   const isAvailable = gift.status === "available";
 
   return (
-    <div className="flex flex-col items-center rounded-lg border border-line bg-paper p-4 text-center">
-      <PhotoOrPlaceholder src={gift.imageUrl} label={gift.name} className="h-40 w-full rounded-md" />
+    <div className="flex flex-col items-center rounded-lg border border-line/40 bg-paper/60 p-5 text-center backdrop-blur-sm">
+      <PhotoOrPlaceholder src={gift.imageUrl} label={gift.name} className="h-48 w-full rounded-md" />
       <h3 className="mt-4 font-serif text-sm uppercase tracking-wide text-forest">{gift.name}</h3>
       <p className="mt-2 font-serif text-base text-forest">{formatCurrency(gift.price)}</p>
 

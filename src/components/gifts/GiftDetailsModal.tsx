@@ -5,6 +5,7 @@ import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
 import { formatCurrency } from "@/shared/utils/formatCurrency";
 import { GiftDto } from "@/components/gifts/GiftDto";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
+import { shareOrCopyLink } from "@/shared/utils/shareOrCopyLink";
 import {
   createGiftContributionAction,
   reserveGiftForLaterAction,
@@ -58,6 +59,18 @@ export function GiftDetailsModal({ gift, canReserveForLater, onClose }: GiftDeta
   const dialogRef = useRef<HTMLDivElement>(null);
   useFocusTrap(dialogRef, true, showConfirmation ? dismissConfirmation : onClose);
 
+  const [copyFeedback, setCopyFeedback] = useState(false);
+
+  async function handleShare() {
+    const url = new URL(window.location.href);
+    url.searchParams.set("presente", gift.id);
+    const result = await shareOrCopyLink({ title: gift.name, url: url.toString() });
+    if (result === "copied") {
+      setCopyFeedback(true);
+      setTimeout(() => setCopyFeedback(false), 2000);
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-forest/40 p-4" onClick={onClose}>
       <div
@@ -68,14 +81,23 @@ export function GiftDetailsModal({ gift, canReserveForLater, onClose }: GiftDeta
         onClick={(event) => event.stopPropagation()}
         className="relative flex max-h-[90vh] w-full max-w-3xl flex-col overflow-y-auto rounded-lg bg-paper sm:flex-row sm:overflow-hidden"
       >
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Fechar"
-          className="absolute right-4 top-4 z-10 font-sans text-2xl leading-none text-forest/60 hover:text-forest"
-        >
-          &times;
-        </button>
+        <div className="absolute right-4 top-4 z-10 flex items-center gap-4">
+          <button
+            type="button"
+            onClick={handleShare}
+            className="font-sans text-xs uppercase tracking-widest text-forest/60 hover:text-forest"
+          >
+            {copyFeedback ? "Link copiado!" : "Compartilhar"}
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Fechar"
+            className="font-sans text-2xl leading-none text-forest/60 hover:text-forest"
+          >
+            &times;
+          </button>
+        </div>
 
         <div className="relative h-56 w-full flex-shrink-0 sm:h-auto sm:w-1/2">
           <PhotoOrPlaceholder src={gift.imageUrl} label={gift.name} className="absolute inset-0 h-full w-full" />

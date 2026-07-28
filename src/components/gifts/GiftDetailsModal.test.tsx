@@ -7,10 +7,15 @@ import { formatCurrency } from "@/shared/utils/formatCurrency";
 
 const createGiftContributionActionMock = vi.fn();
 const reserveGiftForLaterActionMock = vi.fn();
+const shareOrCopyLinkMock = vi.fn();
 
 vi.mock("@/app/presentes/actions", () => ({
   createGiftContributionAction: (...args: unknown[]) => createGiftContributionActionMock(...args),
   reserveGiftForLaterAction: (...args: unknown[]) => reserveGiftForLaterActionMock(...args),
+}));
+
+vi.mock("@/shared/utils/shareOrCopyLink", () => ({
+  shareOrCopyLink: (...args: unknown[]) => shareOrCopyLinkMock(...args),
 }));
 
 const gift: GiftDto = {
@@ -27,6 +32,7 @@ describe("GiftDetailsModal", () => {
   beforeEach(() => {
     createGiftContributionActionMock.mockReset();
     reserveGiftForLaterActionMock.mockReset();
+    shareOrCopyLinkMock.mockReset();
   });
 
   it("shows the gift name, price, both action buttons, and the payment icons in the initial view", () => {
@@ -170,5 +176,38 @@ describe("GiftDetailsModal", () => {
 
     expect(screen.queryByText("Presente reservado!")).not.toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("shares a link containing the gift id when 'Compartilhar' is clicked", async () => {
+    shareOrCopyLinkMock.mockResolvedValue("shared");
+    Object.defineProperty(window, "location", {
+      value: new URL("https://sjcasamento.site/presentes"),
+      writable: true,
+    });
+    const user = userEvent.setup();
+    render(<GiftDetailsModal gift={gift} canReserveForLater onClose={vi.fn()} />);
+
+    await user.click(screen.getByRole("button", { name: "Compartilhar" }));
+
+    expect(shareOrCopyLinkMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: "Air fryer",
+        url: expect.stringContaining("presente=gift-1"),
+      })
+    );
+  });
+
+  it("shows 'Link copiado!' feedback when the share falls back to clipboard copy", async () => {
+    shareOrCopyLinkMock.mockResolvedValue("copied");
+    Object.defineProperty(window, "location", {
+      value: new URL("https://sjcasamento.site/presentes"),
+      writable: true,
+    });
+    const user = userEvent.setup();
+    render(<GiftDetailsModal gift={gift} canReserveForLater onClose={vi.fn()} />);
+
+    await user.click(screen.getByRole("button", { name: "Compartilhar" }));
+
+    expect(await screen.findByRole("button", { name: "Link copiado!" })).toBeInTheDocument();
   });
 });

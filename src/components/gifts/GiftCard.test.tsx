@@ -59,4 +59,9 @@ describe("GiftCard", () => {
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
+
+  it("opens the modal on mount when autoOpen is true", () => {
+    render(<GiftCard gift={availableGift} canReserveForLater autoOpen />);
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
 });

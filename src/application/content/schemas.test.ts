@@ -7,6 +7,7 @@ import {
   tipsCerimoniaContentSchema,
   tipsTrajeContentSchema,
   tipsHospedagemContentSchema,
+  presentesContentSchema,
   SITE_CONTENT_SLUGS,
   SITE_CONTENT_SCHEMAS,
 } from "@/application/content/schemas";
@@ -211,6 +212,24 @@ describe("tipsHospedagemContentSchema", () => {
   it("rejects more than 6 airports", () => {
     const airports = Array.from({ length: 7 }, (_, i) => ({ name: `Aeroporto ${i}`, distanceLabel: null, driveTimeLabel: null }));
     const result = tipsHospedagemContentSchema.safeParse({ airports });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("presentesContentSchema", () => {
+  it("defaults to no background image", () => {
+    const result = presentesContentSchema.parse({});
+    expect(result).toEqual({ backgroundImage: null });
+  });
+
+  it("accepts a non-empty background image URL", () => {
+    const result = presentesContentSchema.safeParse({ backgroundImage: "https://example.com/bg.jpg" });
+    expect(result.success).toBe(true);
+    expect(result.data?.backgroundImage).toBe("https://example.com/bg.jpg");
+  });
+
+  it("rejects an empty-string background image", () => {
+    const result = presentesContentSchema.safeParse({ backgroundImage: "" });
     expect(result.success).toBe(false);
   });
 });

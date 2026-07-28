@@ -28,6 +28,16 @@ const CONTENT_GROUPS: ContentGroup[] = [
     ],
   },
   {
+    label: "Presentes",
+    sections: [
+      {
+        label: "Imagem de fundo",
+        description: "Imagem de fundo exibida atrás da lista de presentes.",
+        href: "/admin/conteudo/presentes",
+      },
+    ],
+  },
+  {
     label: "Home",
     sections: [
       {

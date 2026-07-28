@@ -7,6 +7,7 @@ export interface ConfirmRsvpActionInput {
   guestId: string;
   attendanceStatus: "confirmed" | "declined";
   companionsCount?: number;
+  companionGuestIds?: string[];
   message?: string;
 }
 

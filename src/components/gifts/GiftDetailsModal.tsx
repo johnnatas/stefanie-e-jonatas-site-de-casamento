@@ -124,6 +124,10 @@ export function GiftDetailsModal({ gift, canReserveForLater, onClose }: GiftDeta
               <p className="font-sans text-sm text-forest/70">
                 Se preferir, você já pode pagar agora clicando no botão abaixo, ou voltar e pagar depois.
               </p>
+              <p className="font-sans text-xs text-forest/60">
+                Enviamos um e-mail de confirmação — se não aparecer na caixa de entrada, dê uma olhada na caixa de
+                spam.
+              </p>
               <div className="flex w-full max-w-xs flex-col gap-2">
                 <a href={laterState.checkoutUrl} className={`flex items-center justify-center ${primaryButtonClassName}`}>
                   Ir para pagamento

@@ -78,6 +78,12 @@ export default async function GiftsPage({ searchParams }: GiftsPageProps) {
           <p className="rounded-md border border-moss/40 bg-moss/10 px-4 py-3 text-center font-sans text-sm text-forest">
             {STATUS_MESSAGES[status]}
           </p>
+          {status === "sucesso" && (
+            <p className="mt-2 text-center font-sans text-xs text-forest/60">
+              Enviamos um e-mail de agradecimento — se não aparecer na caixa de entrada, dê uma olhada na caixa de
+              spam.
+            </p>
+          )}
         </div>
       )}
 

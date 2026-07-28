@@ -16,11 +16,89 @@ function displayNameFor(guest: GuestNameCandidate): string {
   return guest.nickname ?? guest.fullName;
 }
 
+interface CompanionNameFieldProps {
+  index: number;
+  guests: GuestNameCandidate[];
+  excludeIds: string[];
+  value: GuestNameCandidate | null;
+  onSelect: (guest: GuestNameCandidate | null) => void;
+}
+
+function CompanionNameField({ index, guests, excludeIds, value, onSelect }: CompanionNameFieldProps) {
+  const [query, setQuery] = useState(value ? displayNameFor(value) : "");
+  const trimmedQuery = query.trim();
+
+  const availableGuests = useMemo(
+    () => guests.filter((guest) => !excludeIds.includes(guest.id)),
+    [guests, excludeIds]
+  );
+  const matches = useMemo(
+    () => (trimmedQuery.length >= 2 ? findGuestMatches(trimmedQuery, availableGuests) : []),
+    [trimmedQuery, availableGuests]
+  );
+
+  function handleChange(nextValue: string) {
+    setQuery(nextValue);
+    if (value && nextValue !== displayNameFor(value)) {
+      onSelect(null);
+    }
+  }
+
+  function handleSelect(guest: GuestNameCandidate) {
+    setQuery(displayNameFor(guest));
+    onSelect(guest);
+  }
+
+  const fieldId = `companion-${index}`;
+
+  return (
+    <div>
+      <label htmlFor={fieldId} className="block font-sans text-sm text-forest">
+        Nome do acompanhante {index + 1}
+      </label>
+      <input
+        id={fieldId}
+        value={query}
+        onChange={(event) => handleChange(event.target.value)}
+        autoComplete="off"
+        className="mt-1 w-full border border-line bg-paper px-4 py-2 font-sans text-forest focus:border-moss focus:outline-none"
+      />
+      {trimmedQuery.length >= 2 && !value && matches.length > 0 && (
+        <ul className="mt-2 flex flex-col gap-1" aria-label={`Sugestões para o acompanhante ${index + 1}`}>
+          {matches.map((guest) => (
+            <li key={guest.id}>
+              <button
+                type="button"
+                onClick={() => handleSelect(guest)}
+                className="w-full rounded-md border border-line px-3 py-2 text-left font-sans text-sm text-forest transition-colors hover:border-moss hover:text-moss"
+              >
+                {displayNameFor(guest)}
+                {guest.nickname && guest.fullName !== guest.nickname && (
+                  <span className="ml-2 font-sans text-xs text-forest/60">({guest.fullName})</span>
+                )}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {trimmedQuery.length >= 2 && !value && matches.length === 0 && (
+        <p className="mt-1 font-sans text-xs text-danger">Não encontramos esse nome na lista de convidados.</p>
+      )}
+      {value && (
+        <p className="mt-1 font-sans text-xs text-moss">✓ {displayNameFor(value)} está na lista de convidados.</p>
+      )}
+    </div>
+  );
+}
+
 export function RsvpSearch({ guests }: RsvpSearchProps) {
   const [query, setQuery] = useState("");
   const [selectedGuest, setSelectedGuest] = useState<GuestNameCandidate | null>(null);
   const [step, setStep] = useState<Step>("searching");
   const [companionsCount, setCompanionsCount] = useState(0);
+  const [previousCompanionsCount, setPreviousCompanionsCount] = useState(0);
+  const [companionGuests, setCompanionGuests] = useState<Array<GuestNameCandidate | null>>([]);
+  const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -28,6 +106,23 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
   const trimmedQuery = query.trim();
   const matches = useMemo(() => findGuestMatches(trimmedQuery, guests), [trimmedQuery, guests]);
   const displayName = selectedGuest ? selectedGuest.nickname ?? selectedGuest.fullName.split(" ")[0] : "";
+
+  if (previousCompanionsCount !== companionsCount) {
+    setPreviousCompanionsCount(companionsCount);
+    setCompanionGuests((current) => {
+      const next = current.slice(0, companionsCount);
+      while (next.length < companionsCount) next.push(null);
+      return next;
+    });
+  }
+
+  const excludedIds = useMemo(
+    () => [selectedGuest?.id, ...companionGuests.map((guest) => guest?.id)].filter((id): id is string => Boolean(id)),
+    [selectedGuest, companionGuests]
+  );
+
+  const allCompanionsIdentified = companionGuests.length === companionsCount && companionGuests.every(Boolean);
+  const trimmedEmail = email.trim();
 
   function handleQueryChange(value: string) {
     setQuery(value);
@@ -41,6 +136,14 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
     setSelectedGuest(guest);
   }
 
+  function handleSelectCompanion(index: number, guest: GuestNameCandidate | null) {
+    setCompanionGuests((current) => {
+      const next = [...current];
+      next[index] = guest;
+      return next;
+    });
+  }
+
   async function handleDecline() {
     if (!selectedGuest) return;
     setIsSubmitting(true);
@@ -51,12 +154,14 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
   }
 
   async function handleConfirmSubmit() {
-    if (!selectedGuest) return;
+    if (!selectedGuest || !allCompanionsIdentified || !trimmedEmail) return;
     setIsSubmitting(true);
     const result = await confirmRsvpAction({
       guestId: selectedGuest.id,
       attendanceStatus: "confirmed",
       companionsCount,
+      companionGuestIds: companionGuests.map((guest) => guest!.id),
+      email: trimmedEmail,
       message: message.trim() || undefined,
     });
     setIsSubmitting(false);
@@ -153,10 +258,36 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
                     min={0}
                     max={10}
                     value={companionsCount}
-                    onChange={(event) => setCompanionsCount(Number(event.target.value))}
+                    onChange={(event) => setCompanionsCount(Math.max(0, Number(event.target.value)))}
                     className="mt-1 w-full border border-line bg-paper px-4 py-2 font-sans text-forest focus:border-moss focus:outline-none"
                   />
                 </div>
+
+                {companionGuests.map((companion, index) => (
+                  <CompanionNameField
+                    key={index}
+                    index={index}
+                    guests={guests}
+                    excludeIds={excludedIds.filter((id) => id !== companion?.id)}
+                    value={companion}
+                    onSelect={(guest) => handleSelectCompanion(index, guest)}
+                  />
+                ))}
+
+                <div>
+                  <label htmlFor="guestEmail" className="block font-sans text-sm text-forest">
+                    Seu e-mail
+                  </label>
+                  <input
+                    id="guestEmail"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    className="mt-1 w-full border border-line bg-paper px-4 py-2 font-sans text-forest focus:border-moss focus:outline-none"
+                  />
+                </div>
+
                 <div>
                   <label htmlFor="message" className="block font-sans text-sm text-forest">
                     Mensagem para o casal (opcional)
@@ -169,9 +300,18 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
                     className="mt-1 w-full border border-line bg-paper px-4 py-2 font-sans text-forest focus:border-moss focus:outline-none"
                   />
                 </div>
-                <PillButton type="submit" disabled={isSubmitting} className="self-center">
+                <PillButton
+                  type="submit"
+                  disabled={isSubmitting || !allCompanionsIdentified || !trimmedEmail}
+                  className="self-center"
+                >
                   {isSubmitting ? "Enviando..." : "Confirmar presença"}
                 </PillButton>
+                {companionsCount > 0 && !allCompanionsIdentified && (
+                  <p className="text-center font-sans text-xs text-forest/60">
+                    Selecione cada acompanhante na lista de sugestões para continuar.
+                  </p>
+                )}
               </form>
             )}
           </>

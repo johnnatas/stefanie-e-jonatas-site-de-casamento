@@ -6,6 +6,23 @@ import { getEnv } from "@/infrastructure/config/env";
 const FROM_ADDRESS = "Stéfanie & Jonatas <lembretes@sjcasamento.site>";
 
 /**
+ * Derives a plain-text alternative from a template's simple body HTML
+ * (only <p>, <strong>, <br/> and <a href> are ever used — see templates.ts).
+ * Spam filters weigh the absence of a text/plain MIME part heavily, so
+ * every email needs one alongside the HTML part, not just for looks.
+ */
+export function htmlToPlainText(html: string): string {
+  return html
+    .replace(/<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/gi, "$2 ($1)")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>/gi, "\n\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&amp;/g, "&")
+    .replace(/&nbsp;/g, " ")
+    .trim();
+}
+
+/**
  * Wraps every outgoing notification in the site's own visual identity
  * (centered logo, light-green card on a light-green page background, the
  * same Playfair Display / Inter fonts as the site) so emails read as an
@@ -56,6 +73,7 @@ export class ResendEmailGateway implements EmailGateway {
       to: input.to,
       subject: input.subject,
       html: renderEmailShell(input.html),
+      text: htmlToPlainText(input.html),
     });
 
     if (result.error) {

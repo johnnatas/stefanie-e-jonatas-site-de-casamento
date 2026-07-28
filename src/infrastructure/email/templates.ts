@@ -7,6 +7,14 @@ function ctaButton(label: string, url: string): string {
   return `<p><a href="${url}" style="display: inline-block; background: #4a5335; color: #feffed; padding: 12px 24px; border-radius: 999px; text-decoration: none; font-family: 'Inter', Helvetica, Arial, sans-serif; font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase;">${label}</a></p>`;
 }
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 export function reservationConfirmationEmail(params: {
   guestName: string;
   giftName: string;
@@ -81,6 +89,32 @@ export function secretKeyResetEmail(params: { resetUrl: string }): EmailContent 
       <p>Se foi você, clique no botão abaixo para definir uma nova chave. Este link expira em 1 hora.</p>
       ${ctaButton("Redefinir chave secreta", params.resetUrl)}
       <p>Se você não pediu essa redefinição, pode ignorar este e-mail com segurança.</p>
+    `,
+  };
+}
+
+export function rsvpConfirmationEmail(params: {
+  guestName: string;
+  companionNames: string[];
+  message?: string;
+}): EmailContent {
+  const companionsBlock =
+    params.companionNames.length > 0
+      ? `<p>Você confirmou presença também para: <strong>${params.companionNames.map(escapeHtml).join(", ")}</strong>.</p>`
+      : "";
+  const messageBlock = params.message
+    ? `<p>Você deixou esta mensagem para a gente: <em>"${escapeHtml(params.message)}"</em></p>`
+    : "";
+
+  return {
+    subject: "Presença confirmada! 💛",
+    html: `
+      <p>Oi ${params.guestName}!</p>
+      <p>Recebemos sua confirmação de presença com muita alegria!</p>
+      ${companionsBlock}
+      ${messageBlock}
+      <p>Mal podemos esperar para celebrar esse dia tão especial ao seu lado. Obrigado por fazer parte da nossa história!</p>
+      <p>Com todo carinho,<br/>Stéfanie &amp; Jonatas</p>
     `,
   };
 }

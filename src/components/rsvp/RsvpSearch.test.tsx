@@ -12,6 +12,7 @@ vi.mock("@/app/confirmar-presenca/actions", () => ({
 const GUESTS = [
   { id: "guest-1", fullName: "João Pedro Almeida", nickname: "JP" },
   { id: "guest-2", fullName: "Maria da Silva" },
+  { id: "guest-3", fullName: "Bruno Ferreira Costa" },
 ];
 
 describe("RsvpSearch", () => {
@@ -107,7 +108,7 @@ describe("RsvpSearch", () => {
     expect(screen.getByRole("link", { name: /voltar ao início/i })).toHaveAttribute("href", "/");
   });
 
-  it("reveals the companions/message form and submits with the confirmed status", async () => {
+  it("reveals the companions/message form and submits with the confirmed status once every companion is identified", async () => {
     confirmRsvpActionMock.mockResolvedValue({
       success: true,
       message: "Presença confirmada com sucesso! Mal podemos esperar para celebrar com você.",
@@ -121,7 +122,10 @@ describe("RsvpSearch", () => {
 
     const companionsInput = await screen.findByLabelText(/número de acompanhantes/i);
     await user.clear(companionsInput);
-    await user.type(companionsInput, "2");
+    await user.type(companionsInput, "1");
+    await user.type(screen.getByLabelText(/nome do acompanhante 1/i), "maria");
+    await user.click(await screen.findByRole("button", { name: /maria da silva/i }));
+    await user.type(screen.getByLabelText(/seu e-mail/i), "joao@example.com");
     await user.type(screen.getByLabelText(/mensagem para o casal/i), "Vai ser lindo!");
     await user.click(screen.getByRole("button", { name: /confirmar presença/i }));
 
@@ -129,8 +133,78 @@ describe("RsvpSearch", () => {
     expect(confirmRsvpActionMock).toHaveBeenCalledWith({
       guestId: "guest-1",
       attendanceStatus: "confirmed",
-      companionsCount: 2,
+      companionsCount: 1,
+      companionGuestIds: ["guest-2"],
+      email: "joao@example.com",
       message: "Vai ser lindo!",
     });
+  });
+
+  it("keeps the confirm button disabled until every companion slot has a selected, registered guest", async () => {
+    const user = userEvent.setup();
+    render(<RsvpSearch guests={GUESTS} />);
+
+    await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
+    await user.click(await screen.findByRole("button", { name: /JP/i }));
+    await user.click(screen.getByRole("button", { name: /confirmar presença/i }));
+
+    const companionsInput = await screen.findByLabelText(/número de acompanhantes/i);
+    await user.clear(companionsInput);
+    await user.type(companionsInput, "2");
+
+    expect(screen.getByRole("button", { name: /confirmar presença/i })).toBeDisabled();
+
+    await user.type(screen.getByLabelText(/nome do acompanhante 1/i), "maria");
+    await user.click(await screen.findByRole("button", { name: /maria da silva/i }));
+
+    expect(screen.getByRole("button", { name: /confirmar presença/i })).toBeDisabled();
+
+    await user.type(screen.getByLabelText(/nome do acompanhante 2/i), "bruno");
+    await user.click(await screen.findByRole("button", { name: /bruno ferreira costa/i }));
+
+    expect(screen.getByRole("button", { name: /confirmar presença/i })).toBeDisabled();
+
+    await user.type(screen.getByLabelText(/seu e-mail/i), "joao@example.com");
+
+    expect(screen.getByRole("button", { name: /confirmar presença/i })).toBeEnabled();
+  });
+
+  it("keeps the confirm button disabled without an email even with no companions", async () => {
+    const user = userEvent.setup();
+    render(<RsvpSearch guests={GUESTS} />);
+
+    await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
+    await user.click(await screen.findByRole("button", { name: /JP/i }));
+    await user.click(screen.getByRole("button", { name: /confirmar presença/i }));
+
+    await screen.findByLabelText(/número de acompanhantes/i);
+    expect(screen.getByRole("button", { name: /confirmar presença/i })).toBeDisabled();
+
+    await user.type(screen.getByLabelText(/seu e-mail/i), "joao@example.com");
+
+    expect(screen.getByRole("button", { name: /confirmar presença/i })).toBeEnabled();
+  });
+
+  it("shows a not-found message for a companion name typed but not selected, and excludes already-chosen guests from other companion suggestions", async () => {
+    const user = userEvent.setup();
+    render(<RsvpSearch guests={GUESTS} />);
+
+    await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
+    await user.click(await screen.findByRole("button", { name: /JP/i }));
+    await user.click(screen.getByRole("button", { name: /confirmar presença/i }));
+
+    const companionsInput = await screen.findByLabelText(/número de acompanhantes/i);
+    await user.clear(companionsInput);
+    await user.type(companionsInput, "2");
+
+    await user.type(screen.getByLabelText(/nome do acompanhante 1/i), "zzzzz");
+    expect(await screen.findByText(/não encontramos esse nome na lista de convidados/i)).toBeInTheDocument();
+
+    await user.clear(screen.getByLabelText(/nome do acompanhante 1/i));
+    await user.type(screen.getByLabelText(/nome do acompanhante 1/i), "maria");
+    await user.click(await screen.findByRole("button", { name: /maria da silva/i }));
+
+    await user.type(screen.getByLabelText(/nome do acompanhante 2/i), "maria");
+    expect(screen.queryByRole("button", { name: /maria da silva/i })).not.toBeInTheDocument();
   });
 });

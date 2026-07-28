@@ -11,7 +11,8 @@ export type NotificationKind =
   | "gift_suggestion_t15"
   | "gift_suggestion_t3"
   | "wedding_day"
-  | "payment_thank_you";
+  | "payment_thank_you"
+  | "rsvp_confirmation";
 
 export type NotificationEntityType = "gift_contribution" | "guest";
 

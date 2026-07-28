@@ -73,6 +73,18 @@ export function weddingDayEmail(params: { guestName: string }): EmailContent {
   };
 }
 
+export function secretKeyResetEmail(params: { resetUrl: string }): EmailContent {
+  return {
+    subject: "Redefinir chave secreta de segurança",
+    html: `
+      <p>Recebemos um pedido para redefinir a chave secreta de segurança do painel administrativo.</p>
+      <p>Se foi você, clique no botão abaixo para definir uma nova chave. Este link expira em 1 hora.</p>
+      ${ctaButton("Redefinir chave secreta", params.resetUrl)}
+      <p>Se você não pediu essa redefinição, pode ignorar este e-mail com segurança.</p>
+    `,
+  };
+}
+
 export function paymentThankYouEmail(params: { guestName: string; giftName: string }): EmailContent {
   return {
     subject: `Muito obrigado pelo carinho! 💛`,

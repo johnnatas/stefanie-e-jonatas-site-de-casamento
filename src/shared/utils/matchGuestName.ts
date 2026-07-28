@@ -51,32 +51,56 @@ function fieldScore(normalizedQuery: string, field: string): number | null {
   return minDistance <= MAX_TYPO_DISTANCE ? minDistance + 1 : null;
 }
 
+const MAX_SUGGESTIONS = 6;
+
 /**
- * Finds the closest guest to a typed name, tolerating accents, casing,
- * partial names, and small typos. Used by the public RSVP search — never
- * hits the network, matches against the already-loaded public name list.
+ * Finds every guest close to a typed name, ranked best-first, tolerating
+ * accents, casing, partial names, and small typos. Used by the public RSVP
+ * search to list every plausible candidate for the visitor to pick from —
+ * never hits the network, matches against the already-loaded public name
+ * list.
+ */
+export function findGuestMatches(
+  query: string,
+  candidates: GuestNameCandidate[],
+  limit = MAX_SUGGESTIONS
+): GuestNameCandidate[] {
+  const normalizedQuery = normalize(query);
+  if (normalizedQuery.length < MIN_QUERY_LENGTH) {
+    return [];
+  }
+
+  const scored: { candidate: GuestNameCandidate; score: number }[] = [];
+
+  for (const candidate of candidates) {
+    const fields = [candidate.nickname, candidate.fullName].filter((value): value is string => Boolean(value));
+
+    let bestScore: number | null = null;
+    for (const field of fields) {
+      const score = fieldScore(normalizedQuery, field);
+      if (score !== null && (bestScore === null || score < bestScore)) {
+        bestScore = score;
+      }
+    }
+
+    if (bestScore !== null) {
+      scored.push({ candidate, score: bestScore });
+    }
+  }
+
+  scored.sort((a, b) => a.score - b.score);
+  return scored.slice(0, limit).map((entry) => entry.candidate);
+}
+
+/**
+ * Finds the single closest guest to a typed name. Kept for callers that only
+ * need one best guess; the RSVP search itself now uses {@link findGuestMatches}
+ * so the visitor can pick the correct person from a list instead of relying
+ * on an automatic single guess.
  */
 export function findBestGuestMatch(
   query: string,
   candidates: GuestNameCandidate[]
 ): GuestNameCandidate | null {
-  const normalizedQuery = normalize(query);
-  if (normalizedQuery.length < MIN_QUERY_LENGTH) {
-    return null;
-  }
-
-  let best: { candidate: GuestNameCandidate; score: number } | null = null;
-
-  for (const candidate of candidates) {
-    const fields = [candidate.nickname, candidate.fullName].filter((value): value is string => Boolean(value));
-
-    for (const field of fields) {
-      const score = fieldScore(normalizedQuery, field);
-      if (score !== null && (!best || score < best.score)) {
-        best = { candidate, score };
-      }
-    }
-  }
-
-  return best?.candidate ?? null;
+  return findGuestMatches(query, candidates, 1)[0] ?? null;
 }

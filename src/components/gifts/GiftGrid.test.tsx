@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { GiftGrid } from "@/components/gifts/GiftGrid";
 import { GiftDto } from "@/components/gifts/GiftDto";
 
@@ -50,5 +50,46 @@ describe("GiftGrid", () => {
   it("opens no modal when openGiftId is null", () => {
     render(<GiftGrid gifts={gifts} canReserveForLater openGiftId={null} />);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("shows only the first page of gifts and reveals more when the sentinel intersects", () => {
+    let intersectionCallback: IntersectionObserverCallback = () => {};
+    class FakeIntersectionObserver implements IntersectionObserver {
+      readonly root = null;
+      readonly rootMargin = "";
+      readonly thresholds: ReadonlyArray<number> = [];
+      constructor(callback: IntersectionObserverCallback) {
+        intersectionCallback = callback;
+      }
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+      takeRecords(): IntersectionObserverEntry[] {
+        return [];
+      }
+    }
+    vi.stubGlobal("IntersectionObserver", FakeIntersectionObserver);
+
+    const manyGifts: GiftDto[] = Array.from({ length: 14 }, (_, index) => ({
+      id: `gift-${index}`,
+      name: `Presente ${index}`,
+      description: "",
+      imageUrl: null,
+      price: 100,
+      category: "casa",
+      status: "available",
+    }));
+
+    render(<GiftGrid gifts={manyGifts} canReserveForLater />);
+
+    expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(12);
+
+    act(() => {
+      intersectionCallback([{ isIntersecting: true } as IntersectionObserverEntry], null as unknown as IntersectionObserver);
+    });
+
+    expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(14);
+
+    vi.unstubAllGlobals();
   });
 });

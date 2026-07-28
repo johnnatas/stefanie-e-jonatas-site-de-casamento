@@ -1,6 +1,7 @@
 import {
   AdminSecuritySettings,
   AdminSecuritySettingsRepository,
+  SecretResetToken,
 } from "@/domain/repositories/AdminSecuritySettingsRepository";
 
 export class InMemoryAdminSecuritySettingsRepository implements AdminSecuritySettingsRepository {
@@ -10,6 +11,7 @@ export class InMemoryAdminSecuritySettingsRepository implements AdminSecuritySet
     priceChangeSecretSalt: null,
     resendApiKey: null,
   };
+  private secretResetToken: SecretResetToken | null = null;
 
   async getSettings(): Promise<AdminSecuritySettings> {
     return { ...this.settings };
@@ -26,5 +28,17 @@ export class InMemoryAdminSecuritySettingsRepository implements AdminSecuritySet
 
   async updateResendApiKey(key: string): Promise<void> {
     this.settings.resendApiKey = key;
+  }
+
+  async setSecretResetToken(hash: string, salt: string, expiresAt: Date): Promise<void> {
+    this.secretResetToken = { hash, salt, expiresAt };
+  }
+
+  async getSecretResetToken(): Promise<SecretResetToken | null> {
+    return this.secretResetToken ? { ...this.secretResetToken } : null;
+  }
+
+  async clearSecretResetToken(): Promise<void> {
+    this.secretResetToken = null;
   }
 }

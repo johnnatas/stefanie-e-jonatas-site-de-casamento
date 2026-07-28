@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
 import { formatCurrency } from "@/shared/utils/formatCurrency";
 import { GiftDto } from "@/components/gifts/GiftDto";
@@ -41,9 +42,11 @@ export function GiftCard({ gift, canReserveForLater, autoOpen = false }: GiftCar
         </span>
       )}
 
-      {isModalOpen && (
-        <GiftDetailsModal gift={gift} canReserveForLater={canReserveForLater} onClose={() => setIsModalOpen(false)} />
-      )}
+      {isModalOpen &&
+        createPortal(
+          <GiftDetailsModal gift={gift} canReserveForLater={canReserveForLater} onClose={() => setIsModalOpen(false)} />,
+          document.body
+        )}
     </div>
   );
 }

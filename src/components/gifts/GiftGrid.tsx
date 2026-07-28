@@ -16,7 +16,7 @@ export function GiftGrid({ gifts, canReserveForLater }: GiftGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-5">
       {gifts.map((gift) => (
         <GiftCard key={gift.id} gift={gift} canReserveForLater={canReserveForLater} />
       ))}

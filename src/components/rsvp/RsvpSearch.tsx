@@ -98,6 +98,7 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
   const [companionsCount, setCompanionsCount] = useState(0);
   const [previousCompanionsCount, setPreviousCompanionsCount] = useState(0);
   const [companionGuests, setCompanionGuests] = useState<Array<GuestNameCandidate | null>>([]);
+  const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -121,6 +122,7 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
   );
 
   const allCompanionsIdentified = companionGuests.length === companionsCount && companionGuests.every(Boolean);
+  const trimmedEmail = email.trim();
 
   function handleQueryChange(value: string) {
     setQuery(value);
@@ -152,13 +154,14 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
   }
 
   async function handleConfirmSubmit() {
-    if (!selectedGuest || !allCompanionsIdentified) return;
+    if (!selectedGuest || !allCompanionsIdentified || !trimmedEmail) return;
     setIsSubmitting(true);
     const result = await confirmRsvpAction({
       guestId: selectedGuest.id,
       attendanceStatus: "confirmed",
       companionsCount,
       companionGuestIds: companionGuests.map((guest) => guest!.id),
+      email: trimmedEmail,
       message: message.trim() || undefined,
     });
     setIsSubmitting(false);
@@ -272,6 +275,20 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
                 ))}
 
                 <div>
+                  <label htmlFor="guestEmail" className="block font-sans text-sm text-forest">
+                    Seu e-mail
+                  </label>
+                  <input
+                    id="guestEmail"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    className="mt-1 w-full border border-line bg-paper px-4 py-2 font-sans text-forest focus:border-moss focus:outline-none"
+                  />
+                </div>
+
+                <div>
                   <label htmlFor="message" className="block font-sans text-sm text-forest">
                     Mensagem para o casal (opcional)
                   </label>
@@ -285,7 +302,7 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
                 </div>
                 <PillButton
                   type="submit"
-                  disabled={isSubmitting || !allCompanionsIdentified}
+                  disabled={isSubmitting || !allCompanionsIdentified || !trimmedEmail}
                   className="self-center"
                 >
                   {isSubmitting ? "Enviando..." : "Confirmar presença"}

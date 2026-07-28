@@ -1,6 +1,6 @@
 "use server";
 
-import { createConfirmRsvpUseCase } from "@/infrastructure/composition";
+import { createConfirmRsvpUseCase, createSendRsvpConfirmationUseCase } from "@/infrastructure/composition";
 import { DomainError } from "@/domain/errors/DomainError";
 
 export interface ConfirmRsvpActionInput {
@@ -8,6 +8,7 @@ export interface ConfirmRsvpActionInput {
   attendanceStatus: "confirmed" | "declined";
   companionsCount?: number;
   companionGuestIds?: string[];
+  email?: string;
   message?: string;
 }
 
@@ -20,7 +21,21 @@ export async function confirmRsvpAction(
   input: ConfirmRsvpActionInput
 ): Promise<ConfirmRsvpActionResult> {
   try {
-    await createConfirmRsvpUseCase().execute(input);
+    const guest = await createConfirmRsvpUseCase().execute(input);
+
+    if (input.attendanceStatus === "confirmed" && input.email) {
+      try {
+        await createSendRsvpConfirmationUseCase().execute({
+          guestId: guest.id!,
+          guestName: guest.nickname ?? guest.fullName,
+          guestEmail: input.email,
+          companionGuestIds: input.companionGuestIds ?? [],
+          message: input.message,
+        });
+      } catch (emailError) {
+        console.error("Failed to send RSVP confirmation email", emailError);
+      }
+    }
 
     return {
       success: true,

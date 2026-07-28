@@ -2,11 +2,14 @@ import { Guest } from "@/domain/entities/Guest";
 import { GuestRepository } from "@/domain/repositories/GuestRepository";
 import { GuestNotFoundError, InvalidGuestDataError } from "@/domain/errors/DomainError";
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export interface ConfirmRsvpInput {
   guestId: string;
   attendanceStatus: "confirmed" | "declined";
   companionsCount?: number;
   companionGuestIds?: string[];
+  email?: string;
   message?: string;
 }
 
@@ -34,6 +37,14 @@ export class ConfirmRsvpUseCase {
       throw new InvalidGuestDataError("A guest cannot be their own companion.");
     }
 
+    const email = input.email?.trim();
+    if (input.attendanceStatus === "confirmed" && !email) {
+      throw new InvalidGuestDataError("Email is required to confirm attendance.");
+    }
+    if (email && !EMAIL_PATTERN.test(email)) {
+      throw new InvalidGuestDataError("Guest email is invalid.");
+    }
+
     const guest = await this.guestRepository.findById(input.guestId);
     if (!guest) {
       throw new GuestNotFoundError("Guest not found.");
@@ -50,6 +61,7 @@ export class ConfirmRsvpUseCase {
       attendanceStatus: input.attendanceStatus,
       companionsCount,
       message: input.message?.trim() || undefined,
+      email,
     });
 
     for (const companionId of companionGuestIds) {

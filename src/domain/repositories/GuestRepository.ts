@@ -10,6 +10,7 @@ export interface GuestAttendanceUpdate {
   attendanceStatus: AttendanceStatus;
   companionsCount?: number;
   message?: string;
+  email?: string;
 }
 
 export interface GuestRepository {

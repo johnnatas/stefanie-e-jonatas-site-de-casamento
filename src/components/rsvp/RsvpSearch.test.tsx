@@ -125,6 +125,7 @@ describe("RsvpSearch", () => {
     await user.type(companionsInput, "1");
     await user.type(screen.getByLabelText(/nome do acompanhante 1/i), "maria");
     await user.click(await screen.findByRole("button", { name: /maria da silva/i }));
+    await user.type(screen.getByLabelText(/seu e-mail/i), "joao@example.com");
     await user.type(screen.getByLabelText(/mensagem para o casal/i), "Vai ser lindo!");
     await user.click(screen.getByRole("button", { name: /confirmar presença/i }));
 
@@ -134,6 +135,7 @@ describe("RsvpSearch", () => {
       attendanceStatus: "confirmed",
       companionsCount: 1,
       companionGuestIds: ["guest-2"],
+      email: "joao@example.com",
       message: "Vai ser lindo!",
     });
   });
@@ -159,6 +161,26 @@ describe("RsvpSearch", () => {
 
     await user.type(screen.getByLabelText(/nome do acompanhante 2/i), "bruno");
     await user.click(await screen.findByRole("button", { name: /bruno ferreira costa/i }));
+
+    expect(screen.getByRole("button", { name: /confirmar presença/i })).toBeDisabled();
+
+    await user.type(screen.getByLabelText(/seu e-mail/i), "joao@example.com");
+
+    expect(screen.getByRole("button", { name: /confirmar presença/i })).toBeEnabled();
+  });
+
+  it("keeps the confirm button disabled without an email even with no companions", async () => {
+    const user = userEvent.setup();
+    render(<RsvpSearch guests={GUESTS} />);
+
+    await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
+    await user.click(await screen.findByRole("button", { name: /JP/i }));
+    await user.click(screen.getByRole("button", { name: /confirmar presença/i }));
+
+    await screen.findByLabelText(/número de acompanhantes/i);
+    expect(screen.getByRole("button", { name: /confirmar presença/i })).toBeDisabled();
+
+    await user.type(screen.getByLabelText(/seu e-mail/i), "joao@example.com");
 
     expect(screen.getByRole("button", { name: /confirmar presença/i })).toBeEnabled();
   });

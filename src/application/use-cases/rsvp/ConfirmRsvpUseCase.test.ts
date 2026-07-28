@@ -20,12 +20,14 @@ describe("ConfirmRsvpUseCase", () => {
       guestId: guest.id!,
       attendanceStatus: "confirmed",
       companionsCount: 2,
+      email: "ana@example.com",
       message: "Mal podemos esperar!",
     });
 
     expect(updated.attendanceStatus).toBe("confirmed");
     expect(updated.companionsCount).toBe(2);
     expect(updated.message).toBe("Mal podemos esperar!");
+    expect(updated.email).toBe("ana@example.com");
   });
 
   it("declines a pending guest and forces companions to zero", async () => {
@@ -48,7 +50,11 @@ describe("ConfirmRsvpUseCase", () => {
     const guest = await seedPendingGuest(repository);
     const useCase = new ConfirmRsvpUseCase(repository);
 
-    const updated = await useCase.execute({ guestId: guest.id!, attendanceStatus: "confirmed" });
+    const updated = await useCase.execute({
+      guestId: guest.id!,
+      attendanceStatus: "confirmed",
+      email: "ana@example.com",
+    });
 
     expect(updated.companionsCount).toBe(0);
   });
@@ -57,7 +63,7 @@ describe("ConfirmRsvpUseCase", () => {
     const useCase = new ConfirmRsvpUseCase(new InMemoryGuestRepository());
 
     await expect(
-      useCase.execute({ guestId: "does-not-exist", attendanceStatus: "confirmed" })
+      useCase.execute({ guestId: "does-not-exist", attendanceStatus: "confirmed", email: "ana@example.com" })
     ).rejects.toThrow(GuestNotFoundError);
   });
 
@@ -68,6 +74,26 @@ describe("ConfirmRsvpUseCase", () => {
 
     await expect(
       useCase.execute({ guestId: guest.id!, attendanceStatus: "confirmed", companionsCount: 11 })
+    ).rejects.toThrow(InvalidGuestDataError);
+  });
+
+  it("requires an email to confirm attendance", async () => {
+    const repository = new InMemoryGuestRepository();
+    const guest = await seedPendingGuest(repository);
+    const useCase = new ConfirmRsvpUseCase(repository);
+
+    await expect(
+      useCase.execute({ guestId: guest.id!, attendanceStatus: "confirmed" })
+    ).rejects.toThrow(InvalidGuestDataError);
+  });
+
+  it("rejects a malformed email", async () => {
+    const repository = new InMemoryGuestRepository();
+    const guest = await seedPendingGuest(repository);
+    const useCase = new ConfirmRsvpUseCase(repository);
+
+    await expect(
+      useCase.execute({ guestId: guest.id!, attendanceStatus: "confirmed", email: "not-an-email" })
     ).rejects.toThrow(InvalidGuestDataError);
   });
 
@@ -87,6 +113,7 @@ describe("ConfirmRsvpUseCase", () => {
       attendanceStatus: "confirmed",
       companionsCount: 2,
       companionGuestIds: [companionA.id!, companionB.id!],
+      email: "ana@example.com",
     });
 
     expect((await repository.findById(companionA.id!))?.attendanceStatus).toBe("confirmed");
@@ -104,6 +131,7 @@ describe("ConfirmRsvpUseCase", () => {
         attendanceStatus: "confirmed",
         companionsCount: 1,
         companionGuestIds: ["does-not-exist"],
+        email: "ana@example.com",
       })
     ).rejects.toThrow(GuestNotFoundError);
   });

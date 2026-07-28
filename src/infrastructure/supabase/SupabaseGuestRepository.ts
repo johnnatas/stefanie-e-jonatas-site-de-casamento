@@ -142,6 +142,9 @@ export class SupabaseGuestRepository implements GuestRepository {
     if (update.message !== undefined) {
       patch.message = update.message;
     }
+    if (update.email !== undefined) {
+      patch.email = update.email;
+    }
 
     const { data, error } = await this.client
       .from("guests")

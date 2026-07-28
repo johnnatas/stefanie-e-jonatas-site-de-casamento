@@ -12,7 +12,7 @@
 }
 
 @theme inline {
-  --color-background: var(--color-paper);
+  --color-background: #fff;
   --color-foreground: var(--color-forest);
   --color-gold: var(--color-gold);
   --color-line: var(--color-line);

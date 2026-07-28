@@ -25,7 +25,7 @@ export default async function TipsPage({
   const active = tema as TipsTheme;
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-16 lg:grid lg:grid-cols-[220px_1fr] lg:gap-16">
+    <div data-tips-shell className="mx-auto max-w-6xl px-6 py-16 lg:grid lg:grid-cols-[220px_1fr] lg:gap-16">
       <TipsThemeMenu active={active} />
       <div className="mt-12 lg:mt-0">
         {active === "cerimonia" && <CeremonyTheme content={await getSiteContentOrDefault("tips-cerimonia")} />}

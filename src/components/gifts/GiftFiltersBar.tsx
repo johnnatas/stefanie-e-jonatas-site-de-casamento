@@ -23,10 +23,26 @@ const STATUS_OPTIONS = [
   { value: "paid", label: "Presenteado" },
 ];
 
+const labelClassName = "block font-sans text-xs uppercase tracking-widest text-forest/70";
 const fieldClassName =
-  "mt-1 w-full rounded-md border border-line bg-paper px-3 py-2 font-sans text-sm text-forest focus:border-moss focus:outline-none";
+  "mt-1 min-h-11 w-full rounded-md border border-line bg-paper px-3 py-2 font-sans text-sm text-forest focus:border-moss focus:outline-none";
+const selectClassName = `${fieldClassName} appearance-none pr-9`;
 const buttonClassName =
   "min-h-11 rounded-full border border-line px-4 py-2 font-sans text-xs uppercase tracking-widest text-forest transition-colors hover:border-moss";
+const pillToggleClassName =
+  "min-h-11 rounded-full border px-4 py-2 font-sans text-xs uppercase tracking-widest transition-colors";
+
+function SelectChevron() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 12 8"
+      className="pointer-events-none absolute right-3 top-1/2 h-2.5 w-2.5 -translate-y-1/2 fill-none stroke-forest/60"
+    >
+      <path d="M1 1.5L6 6.5L11 1.5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
   const router = useRouter();
@@ -118,8 +134,8 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
   function renderControls(idPrefix: string) {
     return (
       <>
-        <div>
-          <label htmlFor={`${idPrefix}-search`} className="block font-sans text-xs uppercase tracking-widest text-forest/70">
+        <div className="sm:min-w-[180px] sm:flex-1">
+          <label htmlFor={`${idPrefix}-search`} className={labelClassName}>
             Buscar
           </label>
           <input
@@ -132,59 +148,71 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
         </div>
 
         <div>
-          <span className="block font-sans text-xs uppercase tracking-widest text-forest/70">Categoria</span>
-          <div className="mt-2 flex flex-wrap gap-3">
-            {categories.map((category) => (
-              <label key={category} className="flex items-center gap-1.5 font-sans text-sm text-forest">
-                <input
-                  type="checkbox"
-                  checked={currentCategories.includes(category)}
-                  onChange={() => toggleCategory(category)}
-                />
-                {category}
-              </label>
-            ))}
+          <span className={labelClassName}>Categoria</span>
+          <div className="mt-1 flex min-h-11 flex-wrap items-center gap-2">
+            {categories.map((category) => {
+              const isActive = currentCategories.includes(category);
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  aria-pressed={isActive}
+                  onClick={() => toggleCategory(category)}
+                  className={`${pillToggleClassName} ${
+                    isActive ? "border-moss bg-moss text-paper" : "border-line text-forest hover:border-moss"
+                  }`}
+                >
+                  {category}
+                </button>
+              );
+            })}
           </div>
         </div>
 
         <div>
-          <label htmlFor={`${idPrefix}-situacao`} className="block font-sans text-xs uppercase tracking-widest text-forest/70">
+          <label htmlFor={`${idPrefix}-situacao`} className={labelClassName}>
             Situação
           </label>
-          <select
-            id={`${idPrefix}-situacao`}
-            value={currentSituacao}
-            onChange={(event) => setSingleParam("situacao", event.target.value || null)}
-            className={fieldClassName}
-          >
-            <option value="">Todas</option>
-            {STATUS_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              id={`${idPrefix}-situacao`}
+              value={currentSituacao}
+              onChange={(event) => setSingleParam("situacao", event.target.value || null)}
+              className={selectClassName}
+            >
+              <option value="">Todas</option>
+              {STATUS_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <SelectChevron />
+          </div>
         </div>
 
         <div>
-          <label htmlFor={`${idPrefix}-ordenar`} className="block font-sans text-xs uppercase tracking-widest text-forest/70">
+          <label htmlFor={`${idPrefix}-ordenar`} className={labelClassName}>
             Ordenar por
           </label>
-          <select
-            id={`${idPrefix}-ordenar`}
-            value={currentOrdenar}
-            onChange={(event) => setSingleParam("ordenar", event.target.value === "recentes" ? null : event.target.value)}
-            className={fieldClassName}
-          >
-            {SORT_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              id={`${idPrefix}-ordenar`}
+              value={currentOrdenar}
+              onChange={(event) => setSingleParam("ordenar", event.target.value === "recentes" ? null : event.target.value)}
+              className={selectClassName}
+            >
+              {SORT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <SelectChevron />
+          </div>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-end gap-2">
           <button type="button" onClick={clearFilters} className={buttonClassName}>
             Limpar filtros
           </button>
@@ -198,7 +226,9 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
 
   return (
     <div className="mb-8">
-      <div className="hidden sm:flex sm:flex-wrap sm:items-end sm:gap-4">{renderControls("filters-desktop")}</div>
+      <div className="hidden rounded-lg border border-line bg-paper/70 p-5 sm:flex sm:flex-wrap sm:items-end sm:gap-5">
+        {renderControls("filters-desktop")}
+      </div>
 
       <div className="sm:hidden">
         <button
@@ -208,7 +238,7 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
         >
           Filtros
           {activeFilterCount > 0 && (
-            <span className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-moss text-[10px] text-paper">
+            <span className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-moss text-xs text-paper">
               {activeFilterCount}
             </span>
           )}

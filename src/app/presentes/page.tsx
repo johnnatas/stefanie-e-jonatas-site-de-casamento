@@ -87,9 +87,15 @@ export default async function GiftsPage({ searchParams }: GiftsPageProps) {
         ) : (
           <>
             {gifts.length > 0 && (
-              <Suspense fallback={<div className="mb-8 h-11" />}>
-                <GiftFiltersBar categories={categories} />
-              </Suspense>
+              <>
+                <h2 className="sr-only">Filtrar e ordenar presentes</h2>
+                <Suspense fallback={<div className="mb-8 h-11" />}>
+                  <GiftFiltersBar categories={categories} />
+                </Suspense>
+                <p className="mb-4 font-sans text-xs text-forest/60">
+                  {visibleGifts.length} de {gifts.length} presentes
+                </p>
+              </>
             )}
             <GiftGrid
               gifts={visibleGifts}

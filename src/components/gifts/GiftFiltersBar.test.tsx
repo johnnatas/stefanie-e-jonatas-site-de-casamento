@@ -30,17 +30,17 @@ beforeEach(() => {
 });
 
 describe("GiftFiltersBar", () => {
-  it("renders every category as a checkbox", () => {
+  it("renders every category as a toggle button", () => {
     render(<GiftFiltersBar categories={["casa", "cozinha"]} />);
-    expect(screen.getAllByRole("checkbox", { name: "casa" })[0]).toBeInTheDocument();
-    expect(screen.getAllByRole("checkbox", { name: "cozinha" })[0]).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "casa" })[0]).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getAllByRole("button", { name: "cozinha" })[0]).toHaveAttribute("aria-pressed", "false");
   });
 
-  it("pushes a categoria param when a category checkbox is checked", async () => {
+  it("pushes a categoria param when a category toggle is clicked", async () => {
     const user = userEvent.setup();
     render(<GiftFiltersBar categories={["casa", "cozinha"]} />);
 
-    await user.click(screen.getAllByRole("checkbox", { name: "casa" })[0]);
+    await user.click(screen.getAllByRole("button", { name: "casa" })[0]);
 
     expect(pushMock).toHaveBeenCalledWith("/presentes?categoria=casa");
   });

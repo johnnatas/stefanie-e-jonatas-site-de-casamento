@@ -4,8 +4,6 @@ import { isBackendConfigured } from "@/infrastructure/config/env";
 import { mapGiftToDto, GiftDto } from "@/components/gifts/GiftDto";
 import { GiftGrid } from "@/components/gifts/GiftGrid";
 import { ConfigurationNotice } from "@/components/ui/ConfigurationNotice";
-import { SplitPanel } from "@/components/ui/SplitPanel";
-import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
 import { canReserveForLater } from "@/shared/utils/giftReservationWindow";
 
 export const metadata: Metadata = {
@@ -43,29 +41,18 @@ export default async function GiftsPage({ searchParams }: GiftsPageProps) {
   }
 
   return (
-    <div className="pb-20">
+    <div className="pb-20 pt-16">
       <h1 className="sr-only">Lista de Presentes</h1>
 
-      <SplitPanel
-        title="Lista de Presentes"
-        tone="dark"
-        image={<PlaceholderImage label="Lista de presentes" className="absolute inset-0 h-full w-full" />}
-      >
-        <p>
-          Sua presença já é o nosso maior presente. Mas se quiser nos ajudar a começar essa nova
-          fase da vida, preparamos esta lista com muito carinho.
-        </p>
-      </SplitPanel>
-
       {status && STATUS_MESSAGES[status] && (
-        <div className="mx-auto mt-8 max-w-2xl px-6">
+        <div className="mx-auto max-w-2xl px-6">
           <p className="rounded-md border border-moss/40 bg-moss/10 px-4 py-3 text-center font-sans text-sm text-forest">
             {STATUS_MESSAGES[status]}
           </p>
         </div>
       )}
 
-      <div className="mx-auto mt-12 max-w-5xl px-6">
+      <div className="mx-auto mt-8 max-w-6xl px-6">
         {!isBackendConfigured() || loadError ? (
           <ConfigurationNotice message="A lista de presentes será exibida assim que o backend (Supabase) estiver configurado." />
         ) : (

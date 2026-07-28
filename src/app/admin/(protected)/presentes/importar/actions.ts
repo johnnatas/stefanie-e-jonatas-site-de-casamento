@@ -101,6 +101,7 @@ export async function importGiftsAction(
     );
     revalidatePath("/presentes");
     revalidatePath("/admin/presentes");
+    revalidatePath("/admin/presentes/novo");
     return { status: "done", result };
   } catch {
     return { status: "error", message: "Não foi possível importar os presentes agora." };

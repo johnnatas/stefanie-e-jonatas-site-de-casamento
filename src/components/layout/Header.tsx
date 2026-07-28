@@ -3,7 +3,7 @@
 import { useLayoutEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { NAV_ITEMS } from "@/shared/navigation";
+import { isNavItemActive, NAV_ITEMS } from "@/shared/navigation";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { Monogram } from "@/components/ui/Monogram";
 import { cn } from "@/shared/utils/cn";
@@ -43,7 +43,7 @@ export function Header() {
 
         <nav className="hidden items-center gap-8 md:flex">
           {NAV_ITEMS.map((item) => {
-            const isActive = pathname === item.href;
+            const isActive = isNavItemActive(pathname, item.href);
             return (
               <Link
                 key={item.href}

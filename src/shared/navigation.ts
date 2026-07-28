@@ -12,3 +12,14 @@ export const NAV_ITEMS: NavItem[] = [
 ];
 
 export const COUPLE_NAMES = "Stéfanie & Jonatas";
+
+/**
+ * A nav item's href may carry a query string (e.g. the Dicas e Instruções
+ * link defaults to `?tema=cerimonia`), but `usePathname()` never includes
+ * one — comparing them directly would never mark that item active. Strip
+ * the href's query string before comparing.
+ */
+export function isNavItemActive(pathname: string, href: string): boolean {
+  const hrefPath = href.split("?")[0];
+  return pathname === hrefPath;
+}

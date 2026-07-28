@@ -23,7 +23,7 @@ export function GiftCard({ gift, canReserveForLater, autoOpen = false }: GiftCar
   const isAvailable = gift.status === "available";
 
   return (
-    <div className="flex flex-col items-center rounded-lg border border-forest/15 bg-mist/75 p-5 text-center backdrop-blur-md">
+    <div className="flex flex-col items-center rounded-lg border border-forest/15 bg-mist/60 p-5 text-center backdrop-blur-md">
       <PhotoOrPlaceholder
         src={gift.imageUrl}
         label={gift.name}
@@ -36,7 +36,7 @@ export function GiftCard({ gift, canReserveForLater, autoOpen = false }: GiftCar
         <button
           type="button"
           onClick={() => setIsModalOpen(true)}
-          className="mt-4 min-h-11 rounded-full border border-line px-6 py-2 font-serif text-sm italic text-forest transition-colors hover:border-moss hover:text-moss"
+          className="mt-4 min-h-11 rounded-full border border-forest/40 px-6 py-2 font-serif text-sm italic text-forest transition-colors hover:border-moss hover:text-moss"
         >
           Ver detalhes
         </button>

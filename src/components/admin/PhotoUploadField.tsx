@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState, type ChangeEvent, type ClipboardEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type ClipboardEvent, type KeyboardEvent } from "react";
 import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
 import { compressImage, BALANCED_COMPRESSION } from "@/shared/utils/compressImage";
+import { cn } from "@/shared/utils/cn";
 
 interface PhotoUploadFieldProps {
   name: string;
@@ -79,25 +80,65 @@ export function PhotoUploadField({
     await processFile(file);
   }
 
+  function openFilePicker() {
+    fileInputRef.current?.click();
+  }
+
+  function handleDropzoneKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openFilePicker();
+    }
+  }
+
+  const hasPhoto = Boolean(previewUrl || currentUrl);
+
   return (
-    <div className="flex flex-col gap-2" tabIndex={0} onPaste={handlePaste}>
+    <div className="flex flex-col gap-2">
       <input type="hidden" name={`${name}CurrentUrl`} value={currentUrl ?? ""} />
-      {previewUrl ? (
-        <img src={previewUrl} alt={label} className={`object-cover ${className}`} />
-      ) : (
-        <PhotoOrPlaceholder src={currentUrl} label={label} className={className} />
-      )}
-      <input
-        ref={fileInputRef}
-        type="file"
-        name={`${name}File`}
-        accept="image/*"
-        onChange={handleFileChange}
-        className="font-sans text-sm text-forest"
-      />
-      <span className="font-sans text-xs text-forest/60">Ou clique aqui e cole uma imagem (Ctrl+V)</span>
+      <div
+        role="button"
+        tabIndex={0}
+        aria-label={`Adicionar ${label}`}
+        onClick={openFilePicker}
+        onKeyDown={handleDropzoneKeyDown}
+        onPaste={handlePaste}
+        className={cn(
+          "relative flex cursor-pointer items-center justify-center overflow-hidden border-2 border-dashed border-line bg-paper-soft/40 transition-colors hover:border-moss focus:border-moss focus:outline-none",
+          className
+        )}
+      >
+        {previewUrl ? (
+          <img src={previewUrl} alt={label} className="h-full w-full object-contain p-2" />
+        ) : currentUrl ? (
+          <PhotoOrPlaceholder src={currentUrl} label={label} className="h-full w-full object-contain p-2" />
+        ) : (
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            className="h-6 w-6 stroke-forest/50"
+            fill="none"
+            strokeWidth={1.5}
+            strokeLinecap="round"
+          >
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          name={`${name}File`}
+          accept="image/*"
+          onChange={handleFileChange}
+          onClick={(event) => event.stopPropagation()}
+          className="sr-only"
+          tabIndex={-1}
+        />
+      </div>
+      <span className="font-sans text-xs text-forest/60">Clique ou cole uma imagem (Ctrl+V)</span>
       {isCompressing && <span className="font-sans text-xs text-forest/70">Comprimindo...</span>}
-      {showRemoveCheckbox && (currentUrl || previewUrl) && (
+      {showRemoveCheckbox && hasPhoto && (
         <label className="flex items-center gap-2 font-sans text-xs text-forest/70">
           <input ref={removeCheckboxRef} type="checkbox" name={`${name}Remove`} />
           Remover esta foto

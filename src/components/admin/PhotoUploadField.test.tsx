@@ -73,11 +73,11 @@ describe("PhotoUploadField", () => {
     URL.createObjectURL = vi.fn(() => "blob:pasted-preview");
     URL.revokeObjectURL = vi.fn();
 
-    const { container } = render(<PhotoUploadField name="photo" currentUrl={null} label="Foto" />);
-    const root = container.firstChild as HTMLElement;
+    render(<PhotoUploadField name="photo" currentUrl={null} label="Foto" />);
+    const dropzone = screen.getByRole("button", { name: "Adicionar Foto" });
     const file = new File(["data"], "pasted.png", { type: "image/png" });
 
-    fireEvent.paste(root, {
+    fireEvent.paste(dropzone, {
       clipboardData: {
         items: [{ type: "image/png", getAsFile: () => file }],
       },
@@ -91,10 +91,21 @@ describe("PhotoUploadField", () => {
   it("ignores a paste with no image data", () => {
     render(<PhotoUploadField name="photo" currentUrl={null} label="Foto" />);
 
-    fireEvent.paste(screen.getByText(/cole uma imagem/i).closest("div")!, {
+    fireEvent.paste(screen.getByRole("button", { name: "Adicionar Foto" }), {
       clipboardData: { items: [{ type: "text/plain", getAsFile: () => null }] },
     });
 
     expect(screen.queryByAltText("Foto")).not.toBeInTheDocument();
+  });
+
+  it("opens the file picker when the dropzone is clicked", async () => {
+    render(<PhotoUploadField name="photo" currentUrl={null} label="Foto" />);
+    const dropzone = screen.getByRole("button", { name: "Adicionar Foto" });
+    const input = dropzone.querySelector('input[type="file"]') as HTMLInputElement;
+    const clickSpy = vi.spyOn(input, "click");
+
+    fireEvent.click(dropzone);
+
+    expect(clickSpy).toHaveBeenCalledTimes(1);
   });
 });

@@ -20,7 +20,7 @@ describe("HomeHeroForm", () => {
     const content = homeHeroContentSchema.parse({ photos: [] });
     render(<HomeHeroForm defaultValues={content} />);
 
-    expect(screen.getByText("Foto 1")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Adicionar Foto 1" })).toBeInTheDocument();
     expect(screen.queryByText("× Remover esta foto")).not.toBeInTheDocument();
   });
 
@@ -33,7 +33,7 @@ describe("HomeHeroForm", () => {
       await user.click(screen.getByText("+ Adicionar foto"));
     }
 
-    expect(screen.getByText("Foto 5")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Adicionar Foto 5" })).toBeInTheDocument();
     expect(screen.queryByText("+ Adicionar foto")).not.toBeInTheDocument();
   });
 

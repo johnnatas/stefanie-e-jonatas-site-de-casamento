@@ -27,18 +27,18 @@ const STATUS_SELECT_OPTIONS = [
 
 const labelClassName = "block font-sans text-xs uppercase tracking-widest text-forest/70";
 const fieldClassName =
-  "mt-1 min-h-11 w-full rounded-md border border-line bg-paper px-3 py-2 font-sans text-sm text-forest focus:border-moss focus:outline-none";
+  "mt-1 min-h-11 w-full rounded-md border border-line bg-mist px-3 py-2 font-sans text-sm text-forest focus:border-moss focus:outline-none";
 const buttonClassName =
-  "flex min-h-11 items-center justify-center rounded-full border border-line px-4 py-2 font-sans text-xs uppercase tracking-widest text-forest transition-colors hover:border-moss";
+  "flex min-h-11 items-center justify-center gap-2 rounded-full border border-line px-4 py-2 font-sans text-xs uppercase tracking-widest text-forest transition-colors hover:border-moss";
 const optionButtonClassName =
-  "flex w-full items-center justify-between px-3 py-2 text-left font-sans text-sm transition-colors hover:bg-paper-soft";
+  "flex w-full items-center justify-between whitespace-nowrap px-3 py-2 text-left font-sans text-sm transition-colors hover:bg-paper-soft";
 
-function SelectChevron() {
+function SelectChevron({ isOpen }: { isOpen: boolean }) {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 12 8"
-      className="pointer-events-none h-2.5 w-2.5 flex-shrink-0 fill-none stroke-forest/60"
+      className={`pointer-events-none h-2.5 w-2.5 flex-shrink-0 fill-none stroke-forest/60 transition-transform ${isOpen ? "rotate-180" : ""}`}
     >
       <path d="M1 1.5L6 6.5L11 1.5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
@@ -99,13 +99,13 @@ function CustomSelect({ id, label, value, options, onChange }: CustomSelectProps
           className={`${fieldClassName} flex items-center justify-between gap-2 text-left`}
         >
           <span>{selectedLabel}</span>
-          <SelectChevron />
+          <SelectChevron isOpen={isOpen} />
         </button>
         {isOpen && (
           <ul
             role="listbox"
             aria-labelledby={`${id}-label`}
-            className="absolute z-20 mt-1 w-full overflow-hidden rounded-md border border-line bg-paper"
+            className="absolute z-20 mt-1 w-max min-w-full max-w-xs overflow-hidden rounded-md border border-line bg-mist"
           >
             {options.map((option) => (
               <li key={option.value}>
@@ -164,14 +164,14 @@ function CustomMultiSelect({ id, label, options, selected, onToggle }: CustomMul
           className={`${fieldClassName} flex items-center justify-between gap-2 text-left`}
         >
           <span>{triggerLabel}</span>
-          <SelectChevron />
+          <SelectChevron isOpen={isOpen} />
         </button>
         {isOpen && (
           <ul
             role="listbox"
             aria-multiselectable="true"
             aria-labelledby={`${id}-label`}
-            className="absolute z-20 mt-1 w-full overflow-hidden rounded-md border border-line bg-paper"
+            className="absolute z-20 mt-1 w-max min-w-full max-w-xs overflow-hidden rounded-md border border-line bg-mist"
           >
             {options.map((option) => {
               const isActive = selected.includes(option);
@@ -328,13 +328,9 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
           <button type="button" onClick={clearFilters} className={buttonClassName}>
             Limpar filtros
           </button>
-          <button
-            type="button"
-            onClick={handleShare}
-            aria-label={copyFeedback ? "Link copiado!" : "Compartilhar"}
-            className={buttonClassName}
-          >
+          <button type="button" onClick={handleShare} className={buttonClassName}>
             {copyFeedback ? <CheckIcon className="h-4 w-4" /> : <ShareIcon className="h-4 w-4" />}
+            <span>{copyFeedback ? "Link copiado!" : "Compartilhar"}</span>
           </button>
         </div>
       </>
@@ -343,7 +339,7 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
 
   return (
     <div className="mb-8">
-      <div className="hidden rounded-lg border border-line bg-paper p-5 sm:flex sm:flex-wrap sm:items-end sm:gap-5">
+      <div className="hidden rounded-lg border border-line bg-mist p-5 sm:flex sm:flex-wrap sm:items-end sm:gap-5">
         {renderControls("filters-desktop")}
       </div>
 
@@ -351,7 +347,7 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
         <button
           type="button"
           onClick={() => setIsPanelOpen(true)}
-          className="relative min-h-11 w-full rounded-full border border-line bg-paper px-4 py-2 font-sans text-xs uppercase tracking-widest text-forest"
+          className="relative min-h-11 w-full rounded-full border border-line bg-mist px-4 py-2 font-sans text-xs uppercase tracking-widest text-forest"
         >
           Filtros
           {activeFilterCount > 0 && (
@@ -369,7 +365,7 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
               aria-modal="true"
               aria-label="Filtros"
               onClick={(event) => event.stopPropagation()}
-              className="flex h-full w-full flex-col gap-4 overflow-y-auto rounded-lg bg-paper p-6"
+              className="flex h-full w-full flex-col gap-4 overflow-y-auto rounded-lg bg-mist p-6"
             >
               <button
                 type="button"

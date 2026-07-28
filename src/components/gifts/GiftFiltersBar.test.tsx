@@ -60,18 +60,47 @@ describe("GiftFiltersBar", () => {
     expect(pushMock).toHaveBeenCalledWith("/presentes?situacao=available");
   });
 
-  it("pushes a q param after the debounce delay once the user stops typing", async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-    const user = userEvent.setup({ delay: null, advanceTimers: vi.advanceTimersByTime });
+  it("does not push a q param while typing (no dynamic/debounced filtering)", async () => {
+    const user = userEvent.setup();
     render(<GiftFiltersBar categories={[]} />);
 
     await user.type(screen.getAllByLabelText("Buscar")[0], "air fryer");
-    expect(pushMock).not.toHaveBeenCalled();
 
-    vi.advanceTimersByTime(300);
+    expect(pushMock).not.toHaveBeenCalled();
+  });
+
+  it("pushes a q param when the Buscar button is clicked", async () => {
+    const user = userEvent.setup();
+    render(<GiftFiltersBar categories={[]} />);
+
+    await user.type(screen.getAllByLabelText("Buscar")[0], "air fryer");
+    await user.click(screen.getAllByRole("button", { name: "Buscar" })[0]);
 
     expect(pushMock).toHaveBeenCalledWith("/presentes?q=air+fryer");
-    vi.useRealTimers();
+  });
+
+  it("pushes a q param when Enter is pressed in the search field", async () => {
+    const user = userEvent.setup();
+    render(<GiftFiltersBar categories={[]} />);
+
+    await user.type(screen.getAllByLabelText("Buscar")[0], "air fryer{Enter}");
+
+    expect(pushMock).toHaveBeenCalledWith("/presentes?q=air+fryer");
+  });
+
+  it("does not push category/situacao/ordenar changes immediately on mobile — only when Aplicar is clicked", async () => {
+    const user = userEvent.setup();
+    render(<GiftFiltersBar categories={["casa", "cozinha"]} />);
+
+    await user.click(screen.getByRole("button", { name: "Filtros" }));
+    await user.click(screen.getAllByRole("button", { name: /situação/i })[1]);
+    await user.click(screen.getAllByRole("option", { name: "Disponível" })[0]);
+
+    expect(pushMock).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole("button", { name: "Aplicar" }));
+
+    expect(pushMock).toHaveBeenCalledWith("/presentes?situacao=available");
   });
 
   it("clears every filter param but preserves an existing status param", async () => {

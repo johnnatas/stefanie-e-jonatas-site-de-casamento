@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { shareOrCopyLink } from "@/shared/utils/shareOrCopyLink";
-import { ShareIcon, CheckIcon } from "@/components/ui/ShareIcon";
+import { ShareIcon, CheckIcon, ArrowRightIcon } from "@/components/ui/ShareIcon";
 
 interface GiftFiltersBarProps {
   categories: string[];
@@ -197,6 +197,18 @@ function CustomMultiSelect({ id, label, options, selected, onToggle }: CustomMul
   );
 }
 
+interface FilterValues {
+  categorias: string[];
+  situacao: string;
+  ordenar: string;
+}
+
+interface FilterHandlers {
+  onToggleCategory: (category: string) => void;
+  onChangeSituacao: (value: string) => void;
+  onChangeOrdenar: (value: string) => void;
+}
+
 export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -208,9 +220,12 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
   const currentOrdenar = searchParams.get("ordenar") ?? "recentes";
 
   const [searchInput, setSearchInput] = useState(currentQuery);
+  const [previousQuery, setPreviousQuery] = useState(currentQuery);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState(false);
-  const [previousQuery, setPreviousQuery] = useState(currentQuery);
+  const [draftCategorias, setDraftCategorias] = useState<string[]>(currentCategories);
+  const [draftSituacao, setDraftSituacao] = useState(currentSituacao);
+  const [draftOrdenar, setDraftOrdenar] = useState(currentOrdenar);
   const panelRef = useRef<HTMLDivElement>(null);
 
   useFocusTrap(panelRef, isPanelOpen, () => setIsPanelOpen(false));
@@ -219,21 +234,6 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
     setPreviousQuery(currentQuery);
     setSearchInput(currentQuery);
   }
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (searchInput === currentQuery) return;
-      const params = new URLSearchParams(searchParams.toString());
-      if (searchInput) {
-        params.set("q", searchInput);
-      } else {
-        params.delete("q");
-      }
-      const query = params.toString();
-      router.push(query ? `${pathname}?${query}` : pathname);
-    }, 300);
-    return () => clearTimeout(timeoutId);
-  }, [searchInput, currentQuery, searchParams, pathname, router]);
 
   function pushParams(mutate: (params: URLSearchParams) => void) {
     const params = new URLSearchParams(searchParams.toString());
@@ -252,6 +252,10 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
     });
   }
 
+  function commitSearch() {
+    setSingleParam("q", searchInput.trim() || null);
+  }
+
   function toggleCategory(category: string) {
     pushParams((params) => {
       const selected = new Set(params.getAll("categoria"));
@@ -265,12 +269,46 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
     });
   }
 
+  function toggleDraftCategory(category: string) {
+    setDraftCategorias((current) =>
+      current.includes(category) ? current.filter((item) => item !== category) : [...current, category]
+    );
+  }
+
+  function openMobilePanel() {
+    setDraftCategorias(currentCategories);
+    setDraftSituacao(currentSituacao);
+    setDraftOrdenar(currentOrdenar);
+    setIsPanelOpen(true);
+  }
+
+  function applyMobileFilters() {
+    pushParams((params) => {
+      params.delete("categoria");
+      draftCategorias.forEach((category) => params.append("categoria", category));
+      if (draftSituacao) {
+        params.set("situacao", draftSituacao);
+      } else {
+        params.delete("situacao");
+      }
+      if (draftOrdenar && draftOrdenar !== "recentes") {
+        params.set("ordenar", draftOrdenar);
+      } else {
+        params.delete("ordenar");
+      }
+    });
+    setIsPanelOpen(false);
+  }
+
   function clearFilters() {
     const params = new URLSearchParams();
     const status = searchParams.get("status");
     if (status) params.set("status", status);
     const query = params.toString();
     router.push(query ? `${pathname}?${query}` : pathname);
+    setDraftCategorias([]);
+    setDraftSituacao("");
+    setDraftOrdenar("recentes");
   }
 
   async function handleShare() {
@@ -284,44 +322,59 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
   const activeFilterCount =
     (currentQuery ? 1 : 0) + (currentCategories.length > 0 ? 1 : 0) + (currentSituacao ? 1 : 0);
 
-  function renderControls(idPrefix: string) {
+  function renderControls(idPrefix: string, values: FilterValues, handlers: FilterHandlers) {
     return (
       <>
         <div className="sm:min-w-[180px] sm:flex-1">
           <label htmlFor={`${idPrefix}-search`} className={labelClassName}>
             Buscar
           </label>
-          <input
-            id={`${idPrefix}-search`}
-            value={searchInput}
-            onChange={(event) => setSearchInput(event.target.value)}
-            placeholder="Nome do presente"
-            className={fieldClassName}
-          />
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              commitSearch();
+            }}
+            className="mt-1 flex min-h-11 items-center gap-2 rounded-md border border-line bg-mist pl-3 pr-1.5"
+          >
+            <input
+              id={`${idPrefix}-search`}
+              value={searchInput}
+              onChange={(event) => setSearchInput(event.target.value)}
+              placeholder="Nome do presente"
+              className="min-w-0 flex-1 bg-transparent font-sans text-sm text-forest focus:outline-none"
+            />
+            <button
+              type="submit"
+              aria-label="Buscar"
+              className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-moss text-paper transition-colors hover:bg-moss/80"
+            >
+              <ArrowRightIcon className="h-4 w-4" />
+            </button>
+          </form>
         </div>
 
         <CustomMultiSelect
           id={`${idPrefix}-categoria`}
           label="Categoria"
           options={categories}
-          selected={currentCategories}
-          onToggle={toggleCategory}
+          selected={values.categorias}
+          onToggle={handlers.onToggleCategory}
         />
 
         <CustomSelect
           id={`${idPrefix}-situacao`}
           label="Situação"
-          value={currentSituacao}
+          value={values.situacao}
           options={STATUS_SELECT_OPTIONS}
-          onChange={(value) => setSingleParam("situacao", value || null)}
+          onChange={handlers.onChangeSituacao}
         />
 
         <CustomSelect
           id={`${idPrefix}-ordenar`}
           label="Ordenar por"
-          value={currentOrdenar}
+          value={values.ordenar}
           options={SORT_OPTIONS}
-          onChange={(value) => setSingleParam("ordenar", value === "recentes" ? null : value)}
+          onChange={handlers.onChangeOrdenar}
         />
 
         <div className="flex flex-wrap items-end gap-2">
@@ -339,15 +392,23 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
 
   return (
     <div className="mb-8">
-      <div className="hidden rounded-lg border border-line bg-mist p-5 sm:flex sm:flex-wrap sm:items-end sm:gap-5">
-        {renderControls("filters-desktop")}
+      <div className="hidden rounded-lg border border-mist bg-mist p-5 sm:flex sm:flex-wrap sm:items-end sm:gap-5">
+        {renderControls(
+          "filters-desktop",
+          { categorias: currentCategories, situacao: currentSituacao, ordenar: currentOrdenar },
+          {
+            onToggleCategory: toggleCategory,
+            onChangeSituacao: (value) => setSingleParam("situacao", value || null),
+            onChangeOrdenar: (value) => setSingleParam("ordenar", value === "recentes" ? null : value),
+          }
+        )}
       </div>
 
       <div className="sm:hidden">
         <button
           type="button"
-          onClick={() => setIsPanelOpen(true)}
-          className="relative min-h-11 w-full rounded-full border border-line bg-mist px-4 py-2 font-sans text-xs uppercase tracking-widest text-forest"
+          onClick={openMobilePanel}
+          className="relative min-h-11 w-full rounded-full border border-mist bg-mist px-4 py-2 font-sans text-xs uppercase tracking-widest text-forest"
         >
           Filtros
           {activeFilterCount > 0 && (
@@ -375,10 +436,18 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
               >
                 &times;
               </button>
-              {renderControls("filters-mobile")}
+              {renderControls(
+                "filters-mobile",
+                { categorias: draftCategorias, situacao: draftSituacao, ordenar: draftOrdenar },
+                {
+                  onToggleCategory: toggleDraftCategory,
+                  onChangeSituacao: setDraftSituacao,
+                  onChangeOrdenar: setDraftOrdenar,
+                }
+              )}
               <button
                 type="button"
-                onClick={() => setIsPanelOpen(false)}
+                onClick={applyMobileFilters}
                 className="min-h-11 rounded-full bg-moss px-4 py-2 font-sans text-xs uppercase tracking-widest text-paper"
               >
                 Aplicar

@@ -157,8 +157,6 @@ describe("tipsTrajeContentSchema", () => {
     expect(result.body).toContain("inverno");
     expect(result.pinterestHimUrl).toBeNull();
     expect(result.pinterestHerUrl).toBeNull();
-    expect(result.pinterestHimLabel).toBeNull();
-    expect(result.pinterestHerLabel).toBeNull();
   });
 
   it("strips legacy forHim/forHer/pinterestBoardUrl keys", () => {
@@ -168,12 +166,10 @@ describe("tipsTrajeContentSchema", () => {
     expect(result).not.toHaveProperty("pinterestBoardUrl");
   });
 
-  it("accepts two Pinterest board URLs with custom fallback labels", () => {
+  it("accepts two Pinterest board URLs", () => {
     const result = tipsTrajeContentSchema.safeParse({
       pinterestHimUrl: "https://www.pinterest.com/stefanie/ele",
       pinterestHerUrl: "https://www.pinterest.com/stefanie/ela",
-      pinterestHimLabel: "Inspirações para ele",
-      pinterestHerLabel: "Inspirações para ela",
     });
     expect(result.success).toBe(true);
   });

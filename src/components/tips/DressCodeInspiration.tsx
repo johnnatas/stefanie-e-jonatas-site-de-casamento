@@ -3,29 +3,27 @@
 import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { cn } from "@/shared/utils/cn";
-import { PinterestBoardEmbed } from "@/components/ui/PinterestBoardEmbed";
+import { PinterestPinGrid } from "@/components/tips/PinterestPinGrid";
+import type { PinterestPin } from "@/infrastructure/pinterest/fetchPinterestBoardPins";
 
 interface DressCodeInspirationProps {
-  him: string | null;
-  her: string | null;
-  himLabel?: string | null;
-  herLabel?: string | null;
+  himPins: PinterestPin[];
+  herPins: PinterestPin[];
 }
 
 interface Board {
   key: "her" | "him";
   title: string;
   toggleLabel: string;
-  url: string;
-  label?: string | null;
+  pins: PinterestPin[];
 }
 
 const toggleBase = "flex-1 rounded-full px-6 py-3 font-serif text-sm uppercase tracking-wide transition-colors";
 
-export function DressCodeInspiration({ him, her, himLabel, herLabel }: DressCodeInspirationProps) {
+export function DressCodeInspiration({ himPins, herPins }: DressCodeInspirationProps) {
   const boards: Board[] = [
-    ...(her ? [{ key: "her" as const, title: "ELA", toggleLabel: "Ela", url: her, label: herLabel }] : []),
-    ...(him ? [{ key: "him" as const, title: "ELE", toggleLabel: "Ele", url: him, label: himLabel }] : []),
+    ...(herPins.length > 0 ? [{ key: "her" as const, title: "ELA", toggleLabel: "Ela", pins: herPins }] : []),
+    ...(himPins.length > 0 ? [{ key: "him" as const, title: "ELE", toggleLabel: "Ele", pins: himPins }] : []),
   ];
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: "start" });
@@ -76,17 +74,19 @@ export function DressCodeInspiration({ him, her, himLabel, herLabel }: DressCode
             ))}
           </div>
         )}
-        <div className="mx-auto mt-6 flex justify-center">
-          {boards.length === 1 && <PinterestBoardEmbed boardUrl={boards[0].url} label={boards[0].label} />}
-        </div>
+
+        {boards.length === 1 && (
+          <div className="mt-6">
+            <PinterestPinGrid pins={boards[0].pins} />
+          </div>
+        )}
+
         {boards.length > 1 && (
           <div className="mt-6 w-full overflow-hidden" ref={emblaRef}>
             <div className="flex">
               {boards.map((board) => (
-                <div key={board.key} className="min-w-0 flex-[0_0_100%]">
-                  <div className="flex justify-center px-1">
-                    <PinterestBoardEmbed boardUrl={board.url} label={board.label} />
-                  </div>
+                <div key={board.key} className="min-w-0 flex-[0_0_100%] px-1">
+                  <PinterestPinGrid pins={board.pins} />
                 </div>
               ))}
             </div>
@@ -95,17 +95,12 @@ export function DressCodeInspiration({ him, her, himLabel, herLabel }: DressCode
       </div>
 
       {/* Desktop: Ela | Ele side by side with a central divider (single column if only one board exists) */}
-      <div
-        className={cn(
-          "hidden lg:flex lg:justify-center",
-          boards.length > 1 && "lg:grid lg:grid-cols-2 lg:gap-8 lg:divide-x lg:divide-line"
-        )}
-      >
+      <div className={cn("hidden lg:block", boards.length > 1 && "lg:grid lg:grid-cols-2 lg:gap-8 lg:divide-x lg:divide-line")}>
         {boards.map((board, index) => (
-          <div key={board.key} className={cn("flex flex-col items-center", index === 1 && "lg:pl-8")}>
-            <h3 className="font-serif text-3xl text-forest">{board.title}</h3>
-            <div className="mt-6 flex w-full justify-center">
-              <PinterestBoardEmbed boardUrl={board.url} label={board.label} />
+          <div key={board.key} className={index === 1 ? "lg:pl-8" : undefined}>
+            <h3 className="text-center font-serif text-3xl text-forest">{board.title}</h3>
+            <div className="mt-6">
+              <PinterestPinGrid pins={board.pins} />
             </div>
           </div>
         ))}

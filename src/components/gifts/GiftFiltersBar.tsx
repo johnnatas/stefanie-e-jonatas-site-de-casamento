@@ -41,13 +41,15 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
   const [searchInput, setSearchInput] = useState(currentQuery);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState(false);
+  const [previousQuery, setPreviousQuery] = useState(currentQuery);
   const panelRef = useRef<HTMLDivElement>(null);
 
   useFocusTrap(panelRef, isPanelOpen, () => setIsPanelOpen(false));
 
-  useEffect(() => {
+  if (previousQuery !== currentQuery) {
+    setPreviousQuery(currentQuery);
     setSearchInput(currentQuery);
-  }, [currentQuery]);
+  }
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {

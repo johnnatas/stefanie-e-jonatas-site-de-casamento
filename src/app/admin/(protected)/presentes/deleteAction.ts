@@ -19,6 +19,8 @@ export async function deleteGiftAction(giftId: string): Promise<DeleteGiftResult
     return { status: "error", message: "Não foi possível excluir o presente agora." };
   }
 
+  revalidatePath("/presentes");
   revalidatePath("/admin/presentes");
+  revalidatePath("/admin/presentes/novo");
   return { status: "ok" };
 }

@@ -95,9 +95,9 @@ export function DressCodeInspiration({ himPins, herPins }: DressCodeInspirationP
       </div>
 
       {/* Desktop: Ela | Ele side by side with a central divider (single column if only one board exists) */}
-      <div className={cn("hidden lg:block", boards.length > 1 && "lg:grid lg:grid-cols-2 lg:gap-8 lg:divide-x lg:divide-line")}>
+      <div className={cn("hidden lg:block", boards.length > 1 && "lg:grid lg:grid-cols-2 lg:gap-16 lg:divide-x lg:divide-line")}>
         {boards.map((board, index) => (
-          <div key={board.key} className={index === 1 ? "lg:pl-8" : undefined}>
+          <div key={board.key} className={index === 0 ? "lg:pr-8" : "lg:pl-8"}>
             <h3 className="text-center font-serif text-3xl text-forest">{board.title}</h3>
             <div className="mt-6">
               <PinterestPinGrid pins={board.pins} />

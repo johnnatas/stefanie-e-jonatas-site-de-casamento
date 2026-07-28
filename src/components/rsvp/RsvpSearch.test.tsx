@@ -15,15 +15,51 @@ const GUESTS = [
 ];
 
 describe("RsvpSearch", () => {
-  it("shows a personalized match and action buttons once a close name is typed", async () => {
+  it("lists every plausible name suggestion instead of auto-picking one", async () => {
     const user = userEvent.setup();
     render(<RsvpSearch guests={GUESTS} />);
 
     await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
 
-    expect(await screen.findByText("JP")).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: /JP/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /confirmar presença/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /não poderei ir/i })).not.toBeInTheDocument();
+  });
+
+  it("does not show action buttons just from typing a full matching name — only after selecting the suggestion", async () => {
+    const user = userEvent.setup();
+    render(<RsvpSearch guests={GUESTS} />);
+
+    await user.type(screen.getByLabelText(/digite seu nome/i), "JP");
+
+    expect(await screen.findByRole("button", { name: /JP/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /confirmar presença/i })).not.toBeInTheDocument();
+  });
+
+  it("populates the field and reveals the action buttons once a suggestion is selected", async () => {
+    const user = userEvent.setup();
+    render(<RsvpSearch guests={GUESTS} />);
+
+    await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
+    await user.click(await screen.findByRole("button", { name: /JP/i }));
+
+    expect(screen.getByLabelText(/digite seu nome/i)).toHaveValue("JP");
     expect(screen.getByRole("button", { name: /confirmar presença/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /não poderei ir/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "JP" })).not.toBeInTheDocument();
+  });
+
+  it("hides the action buttons again if the selected name is edited afterward", async () => {
+    const user = userEvent.setup();
+    render(<RsvpSearch guests={GUESTS} />);
+
+    await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
+    await user.click(await screen.findByRole("button", { name: /JP/i }));
+    expect(screen.getByRole("button", { name: /confirmar presença/i })).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText(/digite seu nome/i), "x");
+
+    expect(screen.queryByRole("button", { name: /confirmar presença/i })).not.toBeInTheDocument();
   });
 
   it("shows a not-found message when nothing matches", async () => {
@@ -44,7 +80,8 @@ describe("RsvpSearch", () => {
     render(<RsvpSearch guests={GUESTS} />);
 
     await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
-    await user.click(await screen.findByRole("button", { name: /não poderei ir/i }));
+    await user.click(await screen.findByRole("button", { name: /JP/i }));
+    await user.click(screen.getByRole("button", { name: /não poderei ir/i }));
 
     expect(await screen.findByText(/sentiremos sua falta/i)).toBeInTheDocument();
     expect(confirmRsvpActionMock).toHaveBeenCalledWith({
@@ -62,7 +99,8 @@ describe("RsvpSearch", () => {
     render(<RsvpSearch guests={GUESTS} />);
 
     await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
-    await user.click(await screen.findByRole("button", { name: /não poderei ir/i }));
+    await user.click(await screen.findByRole("button", { name: /JP/i }));
+    await user.click(screen.getByRole("button", { name: /não poderei ir/i }));
 
     await screen.findByText(/sentiremos sua falta/i);
     expect(screen.getByRole("link", { name: /ver lista de presentes/i })).toHaveAttribute("href", "/presentes");
@@ -78,7 +116,8 @@ describe("RsvpSearch", () => {
     render(<RsvpSearch guests={GUESTS} />);
 
     await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
-    await user.click(await screen.findByRole("button", { name: /confirmar presença/i }));
+    await user.click(await screen.findByRole("button", { name: /JP/i }));
+    await user.click(screen.getByRole("button", { name: /confirmar presença/i }));
 
     const companionsInput = await screen.findByLabelText(/número de acompanhantes/i);
     await user.clear(companionsInput);

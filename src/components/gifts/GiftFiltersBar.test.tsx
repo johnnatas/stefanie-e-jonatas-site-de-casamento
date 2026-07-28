@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { GiftFiltersBar } from "@/components/gifts/GiftFiltersBar";
@@ -111,6 +111,44 @@ describe("GiftFiltersBar", () => {
     await user.click(screen.getAllByRole("button", { name: "Limpar filtros" })[0]);
 
     expect(pushMock).toHaveBeenCalledWith("/presentes?status=sucesso");
+  });
+
+  it("does not show a Buscar submit button on the mobile search field, and does not push while typing there", async () => {
+    const user = userEvent.setup();
+    render(<GiftFiltersBar categories={[]} />);
+
+    await user.click(screen.getByRole("button", { name: "Filtros" }));
+    const dialog = screen.getByRole("dialog");
+
+    expect(within(dialog).getByLabelText("Buscar")).toBeInTheDocument();
+    expect(within(dialog).queryByRole("button", { name: "Buscar" })).not.toBeInTheDocument();
+
+    await user.type(within(dialog).getByLabelText("Buscar"), "air fryer");
+    expect(pushMock).not.toHaveBeenCalled();
+  });
+
+  it("commits the mobile search text together with the other staged filters when Aplicar is clicked", async () => {
+    const user = userEvent.setup();
+    render(<GiftFiltersBar categories={[]} />);
+
+    await user.click(screen.getByRole("button", { name: "Filtros" }));
+    const dialog = screen.getByRole("dialog");
+    await user.type(within(dialog).getByLabelText("Buscar"), "air fryer");
+    await user.click(screen.getByRole("button", { name: "Aplicar" }));
+
+    expect(pushMock).toHaveBeenCalledWith("/presentes?q=air+fryer");
+  });
+
+  it("closes the mobile panel automatically when Limpar filtros is clicked", async () => {
+    const user = userEvent.setup();
+    render(<GiftFiltersBar categories={[]} />);
+
+    await user.click(screen.getByRole("button", { name: "Filtros" }));
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+    await user.click(screen.getAllByRole("button", { name: "Limpar filtros" })[1]);
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
   it("calls shareOrCopyLink with the current URL when 'Compartilhar' is clicked", async () => {

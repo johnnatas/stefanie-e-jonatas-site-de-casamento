@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { shareOrCopyLink } from "@/shared/utils/shareOrCopyLink";
@@ -223,12 +223,14 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
   const [previousQuery, setPreviousQuery] = useState(currentQuery);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState(false);
+  const [draftQuery, setDraftQuery] = useState(currentQuery);
   const [draftCategorias, setDraftCategorias] = useState<string[]>(currentCategories);
   const [draftSituacao, setDraftSituacao] = useState(currentSituacao);
   const [draftOrdenar, setDraftOrdenar] = useState(currentOrdenar);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  useFocusTrap(panelRef, isPanelOpen, () => setIsPanelOpen(false));
+  const closePanel = useCallback(() => setIsPanelOpen(false), []);
+  useFocusTrap(panelRef, isPanelOpen, closePanel);
 
   if (previousQuery !== currentQuery) {
     setPreviousQuery(currentQuery);
@@ -276,6 +278,7 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
   }
 
   function openMobilePanel() {
+    setDraftQuery(currentQuery);
     setDraftCategorias(currentCategories);
     setDraftSituacao(currentSituacao);
     setDraftOrdenar(currentOrdenar);
@@ -284,6 +287,11 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
 
   function applyMobileFilters() {
     pushParams((params) => {
+      if (draftQuery.trim()) {
+        params.set("q", draftQuery.trim());
+      } else {
+        params.delete("q");
+      }
       params.delete("categoria");
       draftCategorias.forEach((category) => params.append("categoria", category));
       if (draftSituacao) {
@@ -306,9 +314,11 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
     if (status) params.set("status", status);
     const query = params.toString();
     router.push(query ? `${pathname}?${query}` : pathname);
+    setDraftQuery("");
     setDraftCategorias([]);
     setDraftSituacao("");
     setDraftOrdenar("recentes");
+    setIsPanelOpen(false);
   }
 
   async function handleShare() {
@@ -322,37 +332,58 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
   const activeFilterCount =
     (currentQuery ? 1 : 0) + (currentCategories.length > 0 ? 1 : 0) + (currentSituacao ? 1 : 0);
 
-  function renderControls(idPrefix: string, values: FilterValues, handlers: FilterHandlers) {
+  function renderDesktopSearchField() {
+    return (
+      <div className="sm:min-w-[180px] sm:flex-1">
+        <label htmlFor="filters-desktop-search" className={labelClassName}>
+          Buscar
+        </label>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            commitSearch();
+          }}
+          className="mt-1 flex min-h-11 items-center gap-2 rounded-md border border-line bg-mist pl-3 pr-1.5"
+        >
+          <input
+            id="filters-desktop-search"
+            value={searchInput}
+            onChange={(event) => setSearchInput(event.target.value)}
+            placeholder="Nome do presente"
+            className="min-w-0 flex-1 bg-transparent font-sans text-sm text-forest focus:outline-none"
+          />
+          <button
+            type="submit"
+            aria-label="Buscar"
+            className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-moss text-paper transition-colors hover:bg-moss/80"
+          >
+            <ArrowRightIcon className="h-4 w-4" />
+          </button>
+        </form>
+      </div>
+    );
+  }
+
+  function renderMobileSearchField() {
+    return (
+      <div>
+        <label htmlFor="filters-mobile-search" className={labelClassName}>
+          Buscar
+        </label>
+        <input
+          id="filters-mobile-search"
+          value={draftQuery}
+          onChange={(event) => setDraftQuery(event.target.value)}
+          placeholder="Nome do presente"
+          className={fieldClassName}
+        />
+      </div>
+    );
+  }
+
+  function renderSharedControls(idPrefix: string, values: FilterValues, handlers: FilterHandlers) {
     return (
       <>
-        <div className="sm:min-w-[180px] sm:flex-1">
-          <label htmlFor={`${idPrefix}-search`} className={labelClassName}>
-            Buscar
-          </label>
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              commitSearch();
-            }}
-            className="mt-1 flex min-h-11 items-center gap-2 rounded-md border border-line bg-mist pl-3 pr-1.5"
-          >
-            <input
-              id={`${idPrefix}-search`}
-              value={searchInput}
-              onChange={(event) => setSearchInput(event.target.value)}
-              placeholder="Nome do presente"
-              className="min-w-0 flex-1 bg-transparent font-sans text-sm text-forest focus:outline-none"
-            />
-            <button
-              type="submit"
-              aria-label="Buscar"
-              className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-moss text-paper transition-colors hover:bg-moss/80"
-            >
-              <ArrowRightIcon className="h-4 w-4" />
-            </button>
-          </form>
-        </div>
-
         <CustomMultiSelect
           id={`${idPrefix}-categoria`}
           label="Categoria"
@@ -393,7 +424,8 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
   return (
     <div className="mb-8">
       <div className="hidden rounded-lg border border-mist bg-mist p-5 sm:flex sm:flex-wrap sm:items-end sm:gap-5">
-        {renderControls(
+        {renderDesktopSearchField()}
+        {renderSharedControls(
           "filters-desktop",
           { categorias: currentCategories, situacao: currentSituacao, ordenar: currentOrdenar },
           {
@@ -436,7 +468,8 @@ export function GiftFiltersBar({ categories }: GiftFiltersBarProps) {
               >
                 &times;
               </button>
-              {renderControls(
+              {renderMobileSearchField()}
+              {renderSharedControls(
                 "filters-mobile",
                 { categorias: draftCategorias, situacao: draftSituacao, ordenar: draftOrdenar },
                 {

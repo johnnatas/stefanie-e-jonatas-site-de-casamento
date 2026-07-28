@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { PillButton } from "@/components/ui/PillButton";
-import { findBestGuestMatch, GuestNameCandidate } from "@/shared/utils/matchGuestName";
+import { findGuestMatches, GuestNameCandidate } from "@/shared/utils/matchGuestName";
 import { confirmRsvpAction } from "@/app/confirmar-presenca/actions";
 
 interface RsvpSearchProps {
@@ -12,8 +12,13 @@ interface RsvpSearchProps {
 
 type Step = "searching" | "confirming" | "done";
 
+function displayNameFor(guest: GuestNameCandidate): string {
+  return guest.nickname ?? guest.fullName;
+}
+
 export function RsvpSearch({ guests }: RsvpSearchProps) {
   const [query, setQuery] = useState("");
+  const [selectedGuest, setSelectedGuest] = useState<GuestNameCandidate | null>(null);
   const [step, setStep] = useState<Step>("searching");
   const [companionsCount, setCompanionsCount] = useState(0);
   const [message, setMessage] = useState("");
@@ -21,23 +26,35 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
   const [feedback, setFeedback] = useState<string | null>(null);
 
   const trimmedQuery = query.trim();
-  const match = useMemo(() => findBestGuestMatch(trimmedQuery, guests), [trimmedQuery, guests]);
-  const displayName = match ? match.nickname ?? match.fullName.split(" ")[0] : "";
+  const matches = useMemo(() => findGuestMatches(trimmedQuery, guests), [trimmedQuery, guests]);
+  const displayName = selectedGuest ? selectedGuest.nickname ?? selectedGuest.fullName.split(" ")[0] : "";
+
+  function handleQueryChange(value: string) {
+    setQuery(value);
+    if (selectedGuest && value !== displayNameFor(selectedGuest)) {
+      setSelectedGuest(null);
+    }
+  }
+
+  function handleSelectGuest(guest: GuestNameCandidate) {
+    setQuery(displayNameFor(guest));
+    setSelectedGuest(guest);
+  }
 
   async function handleDecline() {
-    if (!match) return;
+    if (!selectedGuest) return;
     setIsSubmitting(true);
-    const result = await confirmRsvpAction({ guestId: match.id, attendanceStatus: "declined" });
+    const result = await confirmRsvpAction({ guestId: selectedGuest.id, attendanceStatus: "declined" });
     setIsSubmitting(false);
     setFeedback(result.message);
     setStep("done");
   }
 
   async function handleConfirmSubmit() {
-    if (!match) return;
+    if (!selectedGuest) return;
     setIsSubmitting(true);
     const result = await confirmRsvpAction({
-      guestId: match.id,
+      guestId: selectedGuest.id,
       attendanceStatus: "confirmed",
       companionsCount,
       message: message.trim() || undefined,
@@ -69,7 +86,7 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
               <input
                 id="guest-search"
                 value={query}
-                onChange={(event) => setQuery(event.target.value)}
+                onChange={(event) => handleQueryChange(event.target.value)}
                 autoComplete="off"
                 className="mt-2 w-full border-b border-line bg-transparent py-2 text-center font-serif text-4xl text-forest focus:border-moss focus:outline-none"
               />
@@ -78,11 +95,34 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
               </p>
             </div>
 
-            {trimmedQuery.length >= 2 && match && step === "searching" && (
+            {trimmedQuery.length >= 2 && !selectedGuest && matches.length > 0 && (
+              <ul className="flex w-full flex-col gap-2" aria-label="Sugestões de nome">
+                {matches.map((guest) => (
+                  <li key={guest.id}>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectGuest(guest)}
+                      className="w-full rounded-md border border-line px-4 py-3 text-center font-serif text-lg text-forest transition-colors hover:border-moss hover:text-moss"
+                    >
+                      {displayNameFor(guest)}
+                      {guest.nickname && guest.fullName !== guest.nickname && (
+                        <span className="ml-2 font-sans text-sm text-forest/60">({guest.fullName})</span>
+                      )}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {trimmedQuery.length >= 2 && !selectedGuest && matches.length === 0 && (
+              <p className="font-sans text-sm text-forest/70">
+                Não encontramos esse nome — tente digitar como está no convite, com nome e sobrenome.
+              </p>
+            )}
+
+            {selectedGuest && step === "searching" && (
               <div className="flex flex-col items-center gap-4">
-                <p className="font-script text-2xl italic text-moss">
-                  {match.nickname ?? match.fullName}
-                </p>
+                <p className="font-script text-2xl italic text-moss">{displayNameFor(selectedGuest)}</p>
                 <p className="font-serif text-xl text-forest">{displayName}? Que bom que você apareceu! :)</p>
                 <div className="flex flex-col items-center gap-3 sm:flex-row">
                   <PillButton onClick={() => setStep("confirming")} disabled={isSubmitting}>
@@ -95,13 +135,7 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
               </div>
             )}
 
-            {trimmedQuery.length >= 2 && !match && (
-              <p className="font-sans text-sm text-forest/70">
-                Não encontramos esse nome — tente digitar como está no convite, com nome e sobrenome.
-              </p>
-            )}
-
-            {step === "confirming" && match && (
+            {step === "confirming" && selectedGuest && (
               <form
                 onSubmit={(event) => {
                   event.preventDefault();

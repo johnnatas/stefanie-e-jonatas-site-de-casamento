@@ -36,7 +36,7 @@ export function GiftCard({ gift, canReserveForLater }: GiftCardProps) {
         </button>
       ) : (
         <span className="mt-4 inline-block rounded-full bg-line px-4 py-2 text-center font-sans text-xs uppercase tracking-widest text-forest/70">
-          {STATUS_LABEL[gift.status]}
+          {STATUS_LABEL[gift.status as Exclude<typeof gift.status, "available">]}
         </span>
       )}
 

@@ -2,6 +2,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import {
   AdminSecuritySettings,
   AdminSecuritySettingsRepository,
+  SecretResetToken,
 } from "@/domain/repositories/AdminSecuritySettingsRepository";
 
 interface SettingsRow {
@@ -68,6 +69,66 @@ export class SupabaseAdminSecuritySettingsRepository implements AdminSecuritySet
 
     if (error) {
       throw new Error(`Failed to update Resend API key: ${error.message}`);
+    }
+  }
+
+  async setSecretResetToken(hash: string, salt: string, expiresAt: Date): Promise<void> {
+    const { error } = await this.client
+      .from("admin_security_settings")
+      .update({
+        secret_reset_token_hash: hash,
+        secret_reset_token_salt: salt,
+        secret_reset_expires_at: expiresAt.toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", 1);
+
+    if (error) {
+      throw new Error(`Failed to store secret key reset token: ${error.message}`);
+    }
+  }
+
+  async getSecretResetToken(): Promise<SecretResetToken | null> {
+    const { data, error } = await this.client
+      .from("admin_security_settings")
+      .select("secret_reset_token_hash, secret_reset_token_salt, secret_reset_expires_at")
+      .eq("id", 1)
+      .single();
+
+    if (error) {
+      throw new Error(`Failed to load secret key reset token: ${error.message}`);
+    }
+
+    const row = data as {
+      secret_reset_token_hash: string | null;
+      secret_reset_token_salt: string | null;
+      secret_reset_expires_at: string | null;
+    };
+
+    if (!row.secret_reset_token_hash || !row.secret_reset_token_salt || !row.secret_reset_expires_at) {
+      return null;
+    }
+
+    return {
+      hash: row.secret_reset_token_hash,
+      salt: row.secret_reset_token_salt,
+      expiresAt: new Date(row.secret_reset_expires_at),
+    };
+  }
+
+  async clearSecretResetToken(): Promise<void> {
+    const { error } = await this.client
+      .from("admin_security_settings")
+      .update({
+        secret_reset_token_hash: null,
+        secret_reset_token_salt: null,
+        secret_reset_expires_at: null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", 1);
+
+    if (error) {
+      throw new Error(`Failed to clear secret key reset token: ${error.message}`);
     }
   }
 }

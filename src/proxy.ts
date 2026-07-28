@@ -1,8 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
+const PUBLIC_ADMIN_PATHS = ["/admin/login", "/admin/esqueci-senha", "/admin/redefinir-senha"];
+
 export async function proxy(request: NextRequest) {
-  if (request.nextUrl.pathname === "/admin/login") {
+  if (PUBLIC_ADMIN_PATHS.includes(request.nextUrl.pathname)) {
     return NextResponse.next();
   }
 

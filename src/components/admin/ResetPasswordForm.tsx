@@ -1,46 +1,43 @@
 "use client";
 
 import { useActionState } from "react";
-import Link from "next/link";
-import { loginAction, type LoginActionState } from "@/app/admin/login/actions";
+import { resetPasswordAction, type ResetPasswordActionState } from "@/app/admin/redefinir-senha/actions";
 
-const initialLoginActionState: LoginActionState = { status: "idle" };
+const initialState: ResetPasswordActionState = { status: "idle" };
 
-export function LoginForm() {
-  const [state, formAction, isPending] = useActionState(loginAction, initialLoginActionState);
+export function ResetPasswordForm() {
+  const [state, formAction, isPending] = useActionState(resetPasswordAction, initialState);
 
   return (
     <form action={formAction} className="mx-auto flex max-w-sm flex-col gap-4">
       <div>
-        <label htmlFor="email" className="block font-sans text-sm text-forest">
-          E-mail
-        </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          required
-          className="mt-1 w-full rounded-md border border-line bg-paper px-4 py-2 font-sans text-forest focus:border-moss focus:outline-none"
-        />
-      </div>
-
-      <div>
         <label htmlFor="password" className="block font-sans text-sm text-forest">
-          Senha
+          Nova senha
         </label>
         <input
           id="password"
           name="password"
           type="password"
           required
+          minLength={6}
+          autoComplete="new-password"
           className="mt-1 w-full rounded-md border border-line bg-paper px-4 py-2 font-sans text-forest focus:border-moss focus:outline-none"
         />
-        <Link
-          href="/admin/esqueci-senha"
-          className="mt-1 inline-block font-sans text-xs text-forest/70 underline transition-colors hover:text-moss"
-        >
-          Esqueceu sua senha?
-        </Link>
+      </div>
+
+      <div>
+        <label htmlFor="confirmPassword" className="block font-sans text-sm text-forest">
+          Confirmar nova senha
+        </label>
+        <input
+          id="confirmPassword"
+          name="confirmPassword"
+          type="password"
+          required
+          minLength={6}
+          autoComplete="new-password"
+          className="mt-1 w-full rounded-md border border-line bg-paper px-4 py-2 font-sans text-forest focus:border-moss focus:outline-none"
+        />
       </div>
 
       <button
@@ -48,7 +45,7 @@ export function LoginForm() {
         disabled={isPending}
         className="rounded-full bg-moss px-8 py-3 font-sans text-sm uppercase tracking-widest text-paper transition-colors hover:bg-moss/80 disabled:opacity-60"
       >
-        {isPending ? "Entrando..." : "Entrar"}
+        {isPending ? "Salvando..." : "Redefinir senha"}
       </button>
 
       {state.status === "error" && (

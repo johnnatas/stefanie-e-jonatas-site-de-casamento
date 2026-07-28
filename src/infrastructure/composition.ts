@@ -35,6 +35,8 @@ import { UpdateSecretKeyUseCase } from "@/application/use-cases/security/UpdateS
 import { UpdateMercadoPagoAccessTokenUseCase } from "@/application/use-cases/security/UpdateMercadoPagoAccessTokenUseCase";
 import { UpdateResendApiKeyUseCase } from "@/application/use-cases/security/UpdateResendApiKeyUseCase";
 import { GetAdminSecuritySettingsUseCase } from "@/application/use-cases/security/GetAdminSecuritySettingsUseCase";
+import { RequestSecretKeyResetUseCase } from "@/application/use-cases/security/RequestSecretKeyResetUseCase";
+import { ResetSecretKeyWithTokenUseCase } from "@/application/use-cases/security/ResetSecretKeyWithTokenUseCase";
 
 export {
   uploadSiteContentPhoto,
@@ -160,6 +162,15 @@ export function createUpdateMercadoPagoAccessTokenUseCase(): UpdateMercadoPagoAc
 
 export function createGetAdminSecuritySettingsUseCase(): GetAdminSecuritySettingsUseCase {
   return new GetAdminSecuritySettingsUseCase(repositories().securitySettingsRepository);
+}
+
+export function createRequestSecretKeyResetUseCase(): RequestSecretKeyResetUseCase {
+  const { securitySettingsRepository, emailGateway } = repositories();
+  return new RequestSecretKeyResetUseCase(securitySettingsRepository, emailGateway);
+}
+
+export function createResetSecretKeyWithTokenUseCase(): ResetSecretKeyWithTokenUseCase {
+  return new ResetSecretKeyWithTokenUseCase(repositories().securitySettingsRepository);
 }
 
 export function createSearchGuestsUseCase(): SearchGuestsUseCase {

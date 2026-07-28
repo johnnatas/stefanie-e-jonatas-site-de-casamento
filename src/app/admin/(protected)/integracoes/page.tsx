@@ -5,12 +5,18 @@ import { ConfigurationNotice } from "@/components/ui/ConfigurationNotice";
 import { MercadoPagoTokenForm } from "@/components/admin/MercadoPagoTokenForm";
 import { ResendApiKeyForm } from "@/components/admin/ResendApiKeyForm";
 import { SecretKeyForm } from "@/components/admin/SecretKeyForm";
+import { ResetSecretKeyWithTokenForm } from "@/components/admin/ResetSecretKeyWithTokenForm";
 
 export const metadata: Metadata = {
   title: "Integrações | Painel Administrativo",
 };
 
-export default async function IntegracoesPage() {
+interface IntegracoesPageProps {
+  searchParams: Promise<{ resetToken?: string }>;
+}
+
+export default async function IntegracoesPage({ searchParams }: IntegracoesPageProps) {
+  const { resetToken } = await searchParams;
   const backendConfigured = isBackendConfigured();
 
   if (!backendConfigured) {
@@ -43,6 +49,7 @@ export default async function IntegracoesPage() {
       <h1 className="font-serif text-3xl text-forest">Integrações</h1>
 
       <div className="mt-8 flex max-w-md flex-col gap-10">
+        {resetToken && <ResetSecretKeyWithTokenForm token={resetToken} />}
         <MercadoPagoTokenForm
           currentTokenLast4={summary.mercadoPagoAccessTokenLast4}
           hasSecretKey={summary.hasSecretKey}

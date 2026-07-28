@@ -4,8 +4,12 @@ import {
   createUpdateMercadoPagoAccessTokenUseCase,
   createUpdateResendApiKeyUseCase,
   createUpdateSecretKeyUseCase,
+  createRequestSecretKeyResetUseCase,
+  createResetSecretKeyWithTokenUseCase,
 } from "@/infrastructure/composition";
 import { InvalidSecurityCredentialError } from "@/domain/errors/DomainError";
+import { createSupabaseServerAuthClient } from "@/infrastructure/supabase/serverAuthClient";
+import { getEnv } from "@/infrastructure/config/env";
 
 export interface UpdateMercadoPagoTokenActionState {
   status: "idle" | "success" | "error";
@@ -58,6 +62,65 @@ export async function updateSecretKeyAction(
   }
 
   return { status: "success", message: "Chave secreta atualizada com sucesso." };
+}
+
+export interface RequestSecretKeyResetActionState {
+  status: "idle" | "success" | "error";
+  message?: string;
+}
+
+export async function requestSecretKeyResetAction(
+  _prevState: RequestSecretKeyResetActionState,
+  _formData: FormData
+): Promise<RequestSecretKeyResetActionState> {
+  const supabase = await createSupabaseServerAuthClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return { status: "error", message: "Não foi possível identificar seu e-mail de acesso." };
+  }
+
+  try {
+    await createRequestSecretKeyResetUseCase().execute({
+      requesterEmail: user.email,
+      buildResetUrl: (token) => `${getEnv().NEXT_PUBLIC_SITE_URL}/admin/integracoes?resetToken=${token}`,
+    });
+  } catch {
+    return { status: "error", message: "Não foi possível enviar o e-mail agora." };
+  }
+
+  return { status: "success", message: `Enviamos um link de redefinição para ${user.email}.` };
+}
+
+export interface ResetSecretKeyWithTokenActionState {
+  status: "idle" | "success" | "error";
+  message?: string;
+}
+
+export async function resetSecretKeyWithTokenAction(
+  _prevState: ResetSecretKeyWithTokenActionState,
+  formData: FormData
+): Promise<ResetSecretKeyWithTokenActionState> {
+  const token = (formData.get("token") as string) || "";
+  const newKey = (formData.get("newKey") as string) || "";
+  const confirmKey = (formData.get("confirmKey") as string) || "";
+
+  if (newKey !== confirmKey) {
+    return { status: "error", message: "As chaves novas não coincidem." };
+  }
+
+  try {
+    await createResetSecretKeyWithTokenUseCase().execute({ token, newKey });
+  } catch (error) {
+    if (error instanceof InvalidSecurityCredentialError) {
+      return { status: "error", message: error.message };
+    }
+    return { status: "error", message: "Não foi possível redefinir a chave agora." };
+  }
+
+  return { status: "success", message: "Chave secreta redefinida com sucesso." };
 }
 
 export interface UpdateResendApiKeyActionState {

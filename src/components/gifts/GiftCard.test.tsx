@@ -1,15 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GiftCard } from "@/components/gifts/GiftCard";
 import { GiftDto } from "@/components/gifts/GiftDto";
-
-const createGiftContributionActionMock = vi.fn();
-const reserveGiftForLaterActionMock = vi.fn();
+import { formatCurrency } from "@/shared/utils/formatCurrency";
 
 vi.mock("@/app/presentes/actions", () => ({
-  createGiftContributionAction: (...args: unknown[]) => createGiftContributionActionMock(...args),
-  reserveGiftForLaterAction: (...args: unknown[]) => reserveGiftForLaterActionMock(...args),
+  createGiftContributionAction: vi.fn(),
+  reserveGiftForLaterAction: vi.fn(),
 }));
 
 const availableGift: GiftDto = {
@@ -23,112 +21,42 @@ const availableGift: GiftDto = {
 };
 
 describe("GiftCard", () => {
-  it("shows a status badge instead of the buttons when the gift is not available", () => {
+  it("shows the name, price, and a 'Ver detalhes' button for an available gift", () => {
+    render(<GiftCard gift={availableGift} canReserveForLater />);
+
+    expect(screen.getByRole("heading", { name: "Air fryer" })).toBeInTheDocument();
+    expect(screen.getByText(/450,00/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ver detalhes" })).toBeInTheDocument();
+  });
+
+  it("shows a status badge instead of the button when the gift is not available", () => {
     render(<GiftCard gift={{ ...availableGift, status: "paid" }} canReserveForLater />);
 
     expect(screen.getByText("Presenteado")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /presentear agora/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Ver detalhes" })).not.toBeInTheDocument();
   });
 
-  it("reveals the immediate-checkout form when 'Presentear agora' is clicked", async () => {
+  it("does not render the modal until 'Ver detalhes' is clicked", () => {
+    render(<GiftCard gift={availableGift} canReserveForLater />);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("opens the details modal when 'Ver detalhes' is clicked", async () => {
     const user = userEvent.setup();
     render(<GiftCard gift={availableGift} canReserveForLater />);
 
-    await user.click(screen.getByRole("button", { name: /presentear agora/i }));
+    await user.click(screen.getByRole("button", { name: "Ver detalhes" }));
 
-    expect(screen.getByPlaceholderText("Seu nome")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Seu e-mail")).toBeInTheDocument();
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 
-  it("associates a label with the name and email fields in the immediate-checkout form", async () => {
+  it("closes the modal when its close control is clicked", async () => {
     const user = userEvent.setup();
     render(<GiftCard gift={availableGift} canReserveForLater />);
 
-    await user.click(screen.getByRole("button", { name: /presentear agora/i }));
-    expect(screen.getByLabelText("Seu nome")).toBeInTheDocument();
-    expect(screen.getByLabelText("Seu e-mail")).toBeInTheDocument();
-  });
+    await user.click(screen.getByRole("button", { name: "Ver detalhes" }));
+    await user.click(screen.getByRole("button", { name: "Fechar" }));
 
-  it("associates a label with the name and email fields in the reserve-for-later form", async () => {
-    const user = userEvent.setup();
-    render(<GiftCard gift={availableGift} canReserveForLater />);
-
-    await user.click(screen.getByRole("button", { name: /reservar para depois/i }));
-    expect(screen.getByLabelText("Seu nome")).toBeInTheDocument();
-    expect(screen.getByLabelText("Seu e-mail")).toBeInTheDocument();
-  });
-
-  it("shows the error message returned by the action when the immediate contribution fails", async () => {
-    createGiftContributionActionMock.mockResolvedValue({
-      status: "error",
-      message: "Esse presente já foi escolhido por outra pessoa.",
-    });
-    const user = userEvent.setup();
-    render(<GiftCard gift={availableGift} canReserveForLater />);
-
-    await user.click(screen.getByRole("button", { name: /presentear agora/i }));
-    await user.type(screen.getByPlaceholderText("Seu nome"), "Carla Nunes");
-    await user.type(screen.getByPlaceholderText("Seu e-mail"), "carla@example.com");
-    await user.click(screen.getByRole("button", { name: /ir para pagamento/i }));
-
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Esse presente já foi escolhido por outra pessoa."
-    );
-  });
-
-  it("hides the 'Reservar para depois' button when canReserveForLater is false", () => {
-    render(<GiftCard gift={availableGift} canReserveForLater={false} />);
-
-    expect(screen.queryByRole("button", { name: /reservar para depois/i })).not.toBeInTheDocument();
-  });
-
-  it("shows a confirmation modal with a payment link after reserving for later, and 'Voltar' closes it", async () => {
-    reserveGiftForLaterActionMock.mockResolvedValue({
-      status: "success",
-      checkoutUrl: "https://mercadopago.test/checkout",
-      guestName: "Carla Nunes",
-      expectedPaymentDate: "2027-05-01",
-    });
-    const user = userEvent.setup();
-    render(<GiftCard gift={availableGift} canReserveForLater />);
-
-    await user.click(screen.getByRole("button", { name: /reservar para depois/i }));
-    await user.type(screen.getByPlaceholderText("Seu nome"), "Carla Nunes");
-    await user.type(screen.getByPlaceholderText("Seu e-mail"), "carla@example.com");
-    fireEvent.change(screen.getByLabelText("Quando pretende pagar?"), { target: { value: "2027-05-01" } });
-    await user.click(screen.getByRole("button", { name: /reservar presente/i }));
-
-    expect(await screen.findByText("Presente reservado!")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /ir para pagamento/i })).toHaveAttribute(
-      "href",
-      "https://mercadopago.test/checkout"
-    );
-
-    await user.click(screen.getByRole("button", { name: /voltar/i }));
-
-    expect(screen.queryByText("Presente reservado!")).not.toBeInTheDocument();
-  });
-
-  it("exposes the reservation confirmation as a dialog and closes it on Escape", async () => {
-    reserveGiftForLaterActionMock.mockResolvedValue({
-      status: "success",
-      checkoutUrl: "https://mercadopago.test/checkout",
-      guestName: "Carla Nunes",
-      expectedPaymentDate: "2027-05-01",
-    });
-    const user = userEvent.setup();
-    render(<GiftCard gift={availableGift} canReserveForLater />);
-
-    await user.click(screen.getByRole("button", { name: /reservar para depois/i }));
-    await user.type(screen.getByLabelText("Seu nome"), "Carla Nunes");
-    await user.type(screen.getByLabelText("Seu e-mail"), "carla@example.com");
-    fireEvent.change(screen.getByLabelText("Quando pretende pagar?"), { target: { value: "2027-05-01" } });
-    await user.click(screen.getByRole("button", { name: /reservar presente/i }));
-
-    expect(await screen.findByRole("dialog", { name: /presente reservado/i })).toBeInTheDocument();
-
-    await user.keyboard("{Escape}");
-
-    expect(screen.queryByText("Presente reservado!")).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 });

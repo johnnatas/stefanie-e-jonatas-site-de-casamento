@@ -107,4 +107,11 @@ describe("Header", () => {
     expect(screen.getByRole("link", { name: "presentes" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "Nossa História" })).not.toHaveAttribute("aria-current");
   });
+
+  it("marks Dicas e Instruções active even though its href carries a ?tema= query string usePathname() never includes", () => {
+    vi.mocked(usePathname).mockReturnValue("/dicas-e-instrucoes");
+    render(<Header />);
+
+    expect(screen.getByRole("link", { name: "dicas e instruções" })).toHaveAttribute("aria-current", "page");
+  });
 });

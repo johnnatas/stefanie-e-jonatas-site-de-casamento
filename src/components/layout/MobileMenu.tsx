@@ -4,7 +4,7 @@ import { useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { NAV_ITEMS } from "@/shared/navigation";
+import { isNavItemActive, NAV_ITEMS } from "@/shared/navigation";
 import { Monogram } from "@/components/ui/Monogram";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 
@@ -45,7 +45,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           </div>
           <nav className="flex flex-col items-center gap-8 pt-12">
             {NAV_ITEMS.map((item, index) => {
-              const isActive = pathname === item.href;
+              const isActive = isNavItemActive(pathname, item.href);
               return (
                 <motion.div
                   key={item.href}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { NAV_ITEMS } from "@/shared/navigation";
+import { isNavItemActive, NAV_ITEMS } from "@/shared/navigation";
 
 describe("NAV_ITEMS", () => {
   it("does not include the Álbum de Fotos entry", () => {
@@ -18,5 +18,21 @@ describe("NAV_ITEMS", () => {
       { label: "Dicas e Instruções", href: "/dicas-e-instrucoes?tema=cerimonia" },
       { label: "Nossa História", href: "/nossa-historia" },
     ]);
+  });
+});
+
+describe("isNavItemActive", () => {
+  it("matches a plain href against the exact pathname", () => {
+    expect(isNavItemActive("/presentes", "/presentes")).toBe(true);
+    expect(isNavItemActive("/nossa-historia", "/presentes")).toBe(false);
+  });
+
+  it("ignores the query string on the nav item's own href (usePathname() never includes one)", () => {
+    expect(isNavItemActive("/dicas-e-instrucoes", "/dicas-e-instrucoes?tema=cerimonia")).toBe(true);
+    expect(isNavItemActive("/dicas-e-instrucoes", "/dicas-e-instrucoes?tema=hospedagem")).toBe(true);
+  });
+
+  it("does not match a different path that merely starts with the same prefix", () => {
+    expect(isNavItemActive("/presentes-extra", "/presentes")).toBe(false);
   });
 });

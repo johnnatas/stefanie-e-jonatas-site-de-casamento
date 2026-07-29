@@ -6,10 +6,11 @@ const summary = {
   confirmedGuestsCount: 10,
   pendingGuestsCount: 3,
   declinedGuestsCount: 1,
-  totalAttendeesCount: 20,
+  totalGuestsCount: 14,
   totalGiftsCount: 15,
   paidGiftsCount: 5,
   totalAmountReceived: 1234.5,
+  totalAmountRegistered: 5000,
 };
 
 describe("DashboardStats", () => {
@@ -40,6 +41,10 @@ describe("DashboardStats", () => {
     expect(screen.getByRole("link", { name: /valor arrecadado/i })).toHaveAttribute(
       "href",
       "/admin/presentes?status=paid"
+    );
+    expect(screen.getByRole("link", { name: /valor total cadastrado/i })).toHaveAttribute(
+      "href",
+      "/admin/presentes"
     );
   });
 });

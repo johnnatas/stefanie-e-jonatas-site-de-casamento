@@ -41,5 +41,7 @@ export async function upsertGuestAction(
 
   revalidatePath("/admin/convidados");
   revalidatePath("/confirmar-presenca");
+  revalidatePath("/admin/dashboard");
+  revalidatePath("/admin/mensagens");
   redirect("/admin/convidados");
 }

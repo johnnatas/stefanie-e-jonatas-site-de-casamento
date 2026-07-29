@@ -16,5 +16,8 @@ export async function deleteGuestAction(guestId: string): Promise<DeleteGuestRes
   }
 
   revalidatePath("/admin/convidados");
+  revalidatePath("/confirmar-presenca");
+  revalidatePath("/admin/dashboard");
+  revalidatePath("/admin/mensagens");
   return { status: "ok" };
 }

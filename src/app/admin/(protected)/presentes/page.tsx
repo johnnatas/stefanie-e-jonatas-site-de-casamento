@@ -5,6 +5,7 @@ import { createListGiftsUseCase } from "@/infrastructure/composition";
 import { isBackendConfigured } from "@/infrastructure/config/env";
 import { ConfigurationNotice } from "@/components/ui/ConfigurationNotice";
 import { GiftsTable } from "@/components/admin/GiftsTable";
+import { formatCurrency } from "@/shared/utils/formatCurrency";
 import type { Gift } from "@/domain/entities/Gift";
 
 export const metadata: Metadata = {
@@ -56,17 +57,26 @@ export default async function AdminGiftsPage() {
       ) : gifts.length === 0 ? (
         <p className="mt-6 font-sans text-forest/70">Nenhum presente cadastrado ainda.</p>
       ) : (
-        <Suspense fallback={<p className="mt-6 font-sans text-forest/70">Carregando...</p>}>
-          <GiftsTable
-            gifts={gifts.map((gift) => ({
-              id: gift.id!,
-              name: gift.name,
-              category: gift.category,
-              price: gift.price,
-              status: gift.status,
-            }))}
-          />
-        </Suspense>
+        <>
+          <p className="mt-6 font-sans text-sm text-forest/70">
+            Valor total cadastrado:{" "}
+            <span className="font-medium text-forest">
+              {formatCurrency(gifts.reduce((total, gift) => total + gift.price, 0))}
+            </span>
+          </p>
+          <Suspense fallback={<p className="mt-6 font-sans text-forest/70">Carregando...</p>}>
+            <GiftsTable
+              gifts={gifts.map((gift) => ({
+                id: gift.id!,
+                name: gift.name,
+                category: gift.category,
+                price: gift.price,
+                status: gift.status,
+                createdAt: gift.createdAt,
+              }))}
+            />
+          </Suspense>
+        </>
       )}
     </div>
   );

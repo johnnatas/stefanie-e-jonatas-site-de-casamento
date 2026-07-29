@@ -13,6 +13,7 @@ export interface GiftListItem {
   category: string;
   price: number;
   status: GiftStatus;
+  createdAt: Date;
 }
 
 interface GiftsTableProps {
@@ -24,6 +25,8 @@ const STATUS_LABEL: Record<GiftStatus, string> = {
   reserved: "Reservado",
   paid: "Presenteado",
 };
+
+const PAGE_SIZE = 20;
 
 const inputClassName =
   "mt-1 w-full rounded-md border border-line bg-paper px-4 py-2 font-sans text-forest focus:border-moss focus:outline-none";
@@ -43,6 +46,10 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
   const [status, setStatus] = useState<GiftStatus | "all">(
     isValidStatus(searchParams.get("status")) ? (searchParams.get("status") as GiftStatus) : "all"
   );
+  const [page, setPage] = useState(() => {
+    const parsed = Number(searchParams.get("page"));
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : 1;
+  });
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -50,21 +57,43 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
       if (search) params.set("search", search);
       if (category !== "all") params.set("category", category);
       if (status !== "all") params.set("status", status);
+      if (page > 1) params.set("page", String(page));
       router.replace(params.toString() ? `/admin/presentes?${params.toString()}` : "/admin/presentes");
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [search, category, status, router]);
+  }, [search, category, status, page, router]);
+
+  function handleSearchChange(value: string) {
+    setSearch(value);
+    setPage(1);
+  }
+
+  function handleCategoryChange(value: string) {
+    setCategory(value);
+    setPage(1);
+  }
+
+  function handleStatusChange(value: GiftStatus | "all") {
+    setStatus(value);
+    setPage(1);
+  }
 
   const filteredGifts = useMemo(() => {
     const term = search.trim().toLowerCase();
-    return gifts.filter((gift) => {
-      const matchesText = !term || gift.name.toLowerCase().includes(term);
-      const matchesCategory = category === "all" || gift.category === category;
-      const matchesStatus = status === "all" || gift.status === status;
-      return matchesText && matchesCategory && matchesStatus;
-    });
+    return gifts
+      .filter((gift) => {
+        const matchesText = !term || gift.name.toLowerCase().includes(term);
+        const matchesCategory = category === "all" || gift.category === category;
+        const matchesStatus = status === "all" || gift.status === status;
+        return matchesText && matchesCategory && matchesStatus;
+      })
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }, [gifts, search, category, status]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredGifts.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paginatedGifts = filteredGifts.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   return (
     <div>
@@ -76,7 +105,7 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
           <input
             id="gift-search"
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) => handleSearchChange(event.target.value)}
             className={inputClassName}
           />
         </div>
@@ -87,7 +116,7 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
           <select
             id="gift-category"
             value={category}
-            onChange={(event) => setCategory(event.target.value)}
+            onChange={(event) => handleCategoryChange(event.target.value)}
             className={inputClassName}
           >
             <option value="all">Todas</option>
@@ -105,7 +134,7 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
           <select
             id="gift-status"
             value={status}
-            onChange={(event) => setStatus(event.target.value as GiftStatus | "all")}
+            onChange={(event) => handleStatusChange(event.target.value as GiftStatus | "all")}
             className={inputClassName}
           >
             <option value="all">Todos</option>
@@ -132,21 +161,19 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
                   <th className="py-2 pr-4">Valor</th>
                   <th className="py-2 pr-4">Status</th>
                   <th className="py-2 pr-4" />
-                  <th className="py-2 pr-4" />
                 </tr>
               </thead>
               <tbody>
-                {filteredGifts.map((gift) => (
+                {paginatedGifts.map((gift) => (
                   <tr key={gift.id} className="border-b border-line">
-                    <td className="py-3 pr-4 text-forest">{gift.name}</td>
+                    <td className="py-3 pr-4 text-forest">
+                      <Link href={`/admin/presentes/${gift.id}`} className="hover:text-moss">
+                        {gift.name}
+                      </Link>
+                    </td>
                     <td className="py-3 pr-4 text-forest/70">{gift.category}</td>
                     <td className="py-3 pr-4 text-forest/70">{formatCurrency(gift.price)}</td>
                     <td className="py-3 pr-4 text-forest/70">{STATUS_LABEL[gift.status]}</td>
-                    <td className="py-3 pr-4">
-                      <Link href={`/admin/presentes/${gift.id}`} className="text-moss hover:text-moss/80">
-                        Editar
-                      </Link>
-                    </td>
                     <td className="py-3 pr-4">
                       <DeleteGiftButton giftId={gift.id} giftName={gift.name} />
                     </td>
@@ -155,6 +182,29 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
               </tbody>
             </table>
           </div>
+          {totalPages > 1 && (
+            <div className="mt-4 flex items-center justify-center gap-4">
+              <button
+                type="button"
+                onClick={() => setPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="font-sans text-xs uppercase tracking-widest text-forest disabled:opacity-40"
+              >
+                Anterior
+              </button>
+              <span className="font-sans text-xs text-forest/70">
+                Página {currentPage} de {totalPages}
+              </span>
+              <button
+                type="button"
+                onClick={() => setPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="font-sans text-xs uppercase tracking-widest text-forest disabled:opacity-40"
+              >
+                Próxima
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

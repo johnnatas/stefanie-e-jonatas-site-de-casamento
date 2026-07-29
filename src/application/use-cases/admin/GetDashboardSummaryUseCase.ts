@@ -6,10 +6,11 @@ export interface DashboardSummary {
   confirmedGuestsCount: number;
   declinedGuestsCount: number;
   pendingGuestsCount: number;
-  totalAttendeesCount: number;
+  totalGuestsCount: number;
   totalGiftsCount: number;
   paidGiftsCount: number;
   totalAmountReceived: number;
+  totalAmountRegistered: number;
 }
 
 export class GetDashboardSummaryUseCase {
@@ -30,10 +31,11 @@ export class GetDashboardSummaryUseCase {
       confirmedGuestsCount: guests.filter((guest) => guest.attendanceStatus === "confirmed").length,
       declinedGuestsCount: guests.filter((guest) => guest.attendanceStatus === "declined").length,
       pendingGuestsCount: guests.filter((guest) => guest.attendanceStatus === "pending").length,
-      totalAttendeesCount: guests.reduce((total, guest) => total + guest.totalAttendeesCount(), 0),
+      totalGuestsCount: guests.length,
       totalGiftsCount: gifts.length,
       paidGiftsCount: gifts.filter((gift) => gift.status === "paid").length,
       totalAmountReceived: approvedContributions.reduce((total, contribution) => total + contribution.amount, 0),
+      totalAmountRegistered: gifts.reduce((total, gift) => total + gift.price, 0),
     };
   }
 }

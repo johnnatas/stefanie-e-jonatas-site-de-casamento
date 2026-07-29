@@ -56,23 +56,30 @@ export class CreateGiftContributionUseCase {
     let referenceId: string;
     let checkoutUrl: string;
 
-    if (reservedGift.hasLinkFor(activePaymentProvider)) {
+    if (activePaymentProvider === "infinite_pay") {
+      // Infinite Pay's checkout only skips asking the guest for their contact
+      // details again when that data is embedded at link-creation time — so,
+      // unlike Mercado Pago, always generate a fresh link here instead of
+      // reusing whatever was pre-generated. Only fall back to a pre-existing
+      // link if fresh generation fails, so the guest is never left stuck.
+      try {
+        const preference = await this.generatePreference(reservedGift, activePaymentProvider, input);
+        referenceId = preference.referenceId;
+        checkoutUrl = preference.checkoutUrl;
+      } catch (error) {
+        if (!reservedGift.hasLinkFor(activePaymentProvider)) {
+          throw error;
+        }
+        referenceId = reservedGift.providerReferenceIdFor(activePaymentProvider)!;
+        checkoutUrl = reservedGift.checkoutUrlFor(activePaymentProvider)!;
+      }
+    } else if (reservedGift.hasLinkFor(activePaymentProvider)) {
       referenceId = reservedGift.providerReferenceIdFor(activePaymentProvider)!;
       checkoutUrl = reservedGift.checkoutUrlFor(activePaymentProvider)!;
     } else {
-      const gateway = this.resolvePaymentGateway(activePaymentProvider);
-      const preference = await gateway.createPreference({
-        title: gift.name,
-        amount: gift.price,
-        externalReference: gift.id!,
-        payerName: input.guestName,
-        payerEmail: input.guestEmail,
-        payerPhone: input.guestPhone ?? undefined,
-      });
-      referenceId = preference.preferenceId;
+      const preference = await this.generatePreference(reservedGift, activePaymentProvider, input);
+      referenceId = preference.referenceId;
       checkoutUrl = preference.checkoutUrl;
-
-      await this.giftRepository.update(reservedGift.withProviderLink(activePaymentProvider, referenceId, checkoutUrl));
     }
 
     const contributionWithReference = await this.giftContributionRepository.update(
@@ -80,5 +87,25 @@ export class CreateGiftContributionUseCase {
     );
 
     return { contribution: contributionWithReference, checkoutUrl };
+  }
+
+  private async generatePreference(
+    gift: Gift,
+    provider: PaymentProvider,
+    input: CreateGiftContributionInput
+  ): Promise<{ referenceId: string; checkoutUrl: string }> {
+    const gateway = this.resolvePaymentGateway(provider);
+    const preference = await gateway.createPreference({
+      title: gift.name,
+      amount: gift.price,
+      externalReference: gift.id!,
+      payerName: input.guestName,
+      payerEmail: input.guestEmail,
+      payerPhone: input.guestPhone ?? undefined,
+    });
+
+    await this.giftRepository.update(gift.withProviderLink(provider, preference.preferenceId, preference.checkoutUrl));
+
+    return { referenceId: preference.preferenceId, checkoutUrl: preference.checkoutUrl };
   }
 }

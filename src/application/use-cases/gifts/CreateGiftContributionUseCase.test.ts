@@ -73,6 +73,66 @@ describe("CreateGiftContributionUseCase", () => {
     expect(result.contribution.mercadoPagoPreferenceId).toBeUndefined();
   });
 
+  it("always generates a fresh Infinite Pay link with the guest's data, even when one is already stored", async () => {
+    await securitySettingsRepository.updateActivePaymentProvider("infinite_pay");
+    await securitySettingsRepository.updateInfinitePayHandle("meu_handle");
+    const gift = await giftRepository.findById("gift-1");
+    await giftRepository.update(gift!.withProviderLink("infinite_pay", "order-old", "https://infinitepay.test/old-link"));
+
+    let receivedName: string | undefined;
+    const capturingGateway = {
+      createPreference: async (input: { payerName?: string }) => {
+        receivedName = input.payerName;
+        return { preferenceId: "order-new", checkoutUrl: "https://infinitepay.test/new-link" };
+      },
+    };
+    useCase = new CreateGiftContributionUseCase(giftRepository, contributionRepository, securitySettingsRepository, () => capturingGateway);
+
+    const result = await useCase.execute({ giftId: "gift-1", guestName: "Carla Nunes", guestEmail: "carla@example.com" });
+
+    expect(receivedName).toBe("Carla Nunes");
+    expect(result.checkoutUrl).toBe("https://infinitepay.test/new-link");
+    expect(result.contribution.infinitePayOrderNsu).toBe("order-new");
+
+    const updatedGift = await giftRepository.findById("gift-1");
+    expect(updatedGift?.infinitePayCheckoutUrl).toBe("https://infinitepay.test/new-link");
+  });
+
+  it("falls back to the gift's pre-generated Infinite Pay link when fresh generation fails", async () => {
+    await securitySettingsRepository.updateActivePaymentProvider("infinite_pay");
+    await securitySettingsRepository.updateInfinitePayHandle("meu_handle");
+    const gift = await giftRepository.findById("gift-1");
+    await giftRepository.update(gift!.withProviderLink("infinite_pay", "order-fallback", "https://infinitepay.test/fallback-link"));
+
+    const failingGateway = {
+      createPreference: async () => {
+        throw new Error("Infinite Pay indisponível");
+      },
+    };
+    useCase = new CreateGiftContributionUseCase(giftRepository, contributionRepository, securitySettingsRepository, () => failingGateway);
+
+    const result = await useCase.execute({ giftId: "gift-1", guestName: "Carla Nunes", guestEmail: "carla@example.com" });
+
+    expect(result.checkoutUrl).toBe("https://infinitepay.test/fallback-link");
+    expect(result.contribution.infinitePayOrderNsu).toBe("order-fallback");
+  });
+
+  it("throws when Infinite Pay generation fails and no pre-generated link exists", async () => {
+    await securitySettingsRepository.updateActivePaymentProvider("infinite_pay");
+    await securitySettingsRepository.updateInfinitePayHandle("meu_handle");
+
+    const failingGateway = {
+      createPreference: async () => {
+        throw new Error("Infinite Pay indisponível");
+      },
+    };
+    useCase = new CreateGiftContributionUseCase(giftRepository, contributionRepository, securitySettingsRepository, () => failingGateway);
+
+    await expect(
+      useCase.execute({ giftId: "gift-1", guestName: "Carla Nunes", guestEmail: "carla@example.com" })
+    ).rejects.toThrow("Infinite Pay indisponível");
+  });
+
   it("forwards the guest name to the gateway so the checkout can skip asking for it again", async () => {
     let receivedName: string | undefined;
     const capturingGateway = {

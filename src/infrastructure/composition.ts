@@ -28,6 +28,7 @@ import { DeleteGiftUseCase } from "@/application/use-cases/admin/DeleteGiftUseCa
 import { GetDashboardSummaryUseCase } from "@/application/use-cases/admin/GetDashboardSummaryUseCase";
 import { UpsertGiftUseCase } from "@/application/use-cases/admin/UpsertGiftUseCase";
 import { RefreshGiftPaymentLinkUseCase } from "@/application/use-cases/gifts/RefreshGiftPaymentLinkUseCase";
+import { GenerateMissingPaymentLinksUseCase } from "@/application/use-cases/gifts/GenerateMissingPaymentLinksUseCase";
 import { ListGiftContributionsUseCase } from "@/application/use-cases/gifts/ListGiftContributionsUseCase";
 import { SendReservationConfirmationUseCase } from "@/application/use-cases/notifications/SendReservationConfirmationUseCase";
 import { SendReservationRemindersUseCase } from "@/application/use-cases/notifications/SendReservationRemindersUseCase";
@@ -122,6 +123,11 @@ export function createUpsertGiftUseCase(): UpsertGiftUseCase {
 export function createRefreshGiftPaymentLinkUseCase(): RefreshGiftPaymentLinkUseCase {
   const { giftRepository } = repositories();
   return new RefreshGiftPaymentLinkUseCase(giftRepository, resolvePaymentGateway);
+}
+
+export function createGenerateMissingPaymentLinksUseCase(): GenerateMissingPaymentLinksUseCase {
+  const { giftRepository } = repositories();
+  return new GenerateMissingPaymentLinksUseCase(giftRepository, createRefreshGiftPaymentLinkUseCase());
 }
 
 export function createListGiftContributionsUseCase(): ListGiftContributionsUseCase {

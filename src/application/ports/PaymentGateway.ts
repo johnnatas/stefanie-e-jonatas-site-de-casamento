@@ -3,6 +3,7 @@ export interface CreatePreferenceInput {
   amount: number;
   externalReference: string;
   payerEmail?: string;
+  payerPhone?: string;
 }
 
 export interface CreatePreferenceOutput {
@@ -20,5 +21,4 @@ export interface PaymentDetails {
 
 export interface PaymentGateway {
   createPreference(input: CreatePreferenceInput): Promise<CreatePreferenceOutput>;
-  getPayment(paymentId: string): Promise<PaymentDetails>;
 }

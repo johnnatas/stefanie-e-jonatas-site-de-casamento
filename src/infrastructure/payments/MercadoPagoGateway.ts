@@ -42,7 +42,9 @@ export class MercadoPagoGateway implements PaymentGateway {
             currency_id: "BRL",
           },
         ],
-        payer: input.payerEmail ? { email: input.payerEmail } : undefined,
+        payer: input.payerEmail
+          ? { email: input.payerEmail, phone: input.payerPhone ? { number: input.payerPhone } : undefined }
+          : undefined,
         external_reference: input.externalReference,
         back_urls: {
           success: `${siteUrl}/presentes?status=sucesso`,

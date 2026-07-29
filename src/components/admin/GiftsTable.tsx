@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useActionState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type { GiftStatus } from "@/domain/entities/Gift";
 import { formatCurrency } from "@/shared/utils/formatCurrency";
 import { DeleteGiftButton } from "@/components/admin/DeleteGiftButton";
+import { generateMissingPaymentLinksAction } from "@/app/admin/(protected)/presentes/generateLinksAction";
 
 export interface GiftListItem {
   id: string;
@@ -14,6 +16,7 @@ export interface GiftListItem {
   price: number;
   status: GiftStatus;
   createdAt: Date;
+  hasPaymentLink: boolean;
 }
 
 interface GiftsTableProps {
@@ -95,8 +98,32 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
   const currentPage = Math.min(page, totalPages);
   const paginatedGifts = filteredGifts.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
+  const hasMissingLinks = gifts.some((gift) => !gift.hasPaymentLink);
+  const [generateState, generateAction, isGenerating] = useActionState(generateMissingPaymentLinksAction, {
+    status: "idle" as const,
+  });
+
   return (
     <div>
+      {hasMissingLinks && (
+        <form action={generateAction} className="mt-4">
+          <button
+            type="submit"
+            disabled={isGenerating}
+            className="rounded-full border border-moss px-5 py-2 font-sans text-xs uppercase tracking-widest text-moss transition-colors hover:bg-moss/10 disabled:opacity-60"
+          >
+            {isGenerating ? "Gerando..." : "Gerar links pendentes"}
+          </button>
+          {generateState.status === "success" && (
+            <p className="mt-2 font-sans text-xs text-moss">{generateState.message}</p>
+          )}
+          {generateState.status === "error" && (
+            <p role="alert" className="mt-2 font-sans text-xs text-danger">
+              {generateState.message}
+            </p>
+          )}
+        </form>
+      )}
       <div className="mt-6 flex flex-wrap gap-4">
         <div className="flex-1 min-w-[160px]">
           <label htmlFor="gift-search" className="block font-sans text-sm text-forest">
@@ -160,6 +187,7 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
                   <th className="py-2 pr-4">Categoria</th>
                   <th className="py-2 pr-4">Valor</th>
                   <th className="py-2 pr-4">Status</th>
+                  <th className="py-2 pr-4">Link</th>
                   <th className="py-2 pr-4" />
                 </tr>
               </thead>
@@ -174,6 +202,15 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
                     <td className="py-3 pr-4 text-forest/70">{gift.category}</td>
                     <td className="py-3 pr-4 text-forest/70">{formatCurrency(gift.price)}</td>
                     <td className="py-3 pr-4 text-forest/70">{STATUS_LABEL[gift.status]}</td>
+                    <td className="py-3 pr-4">
+                      {gift.hasPaymentLink ? (
+                        <span className="rounded-full bg-moss/10 px-2 py-1 font-sans text-xs text-moss">Gerado</span>
+                      ) : (
+                        <span className="rounded-full bg-danger/10 px-2 py-1 font-sans text-xs text-danger">
+                          Sem link
+                        </span>
+                      )}
+                    </td>
                     <td className="py-3 pr-4">
                       <DeleteGiftButton giftId={gift.id} giftName={gift.name} />
                     </td>

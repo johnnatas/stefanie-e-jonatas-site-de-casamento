@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { normalizePhoneToE164 } from "@/shared/utils/phoneMask";
 import {
   createGiftContributionUseCase,
   createListGiftsUseCase,
@@ -20,6 +21,7 @@ const contributionSchema = z.object({
   giftId: z.string().min(1, "Presente inválido."),
   guestName: z.string().min(3, "Informe seu nome completo."),
   guestEmail: z.string().email("Informe um e-mail válido."),
+  guestPhone: z.string().optional(),
 });
 
 export interface CreateGiftContributionActionState {
@@ -35,6 +37,7 @@ export async function createGiftContributionAction(
     giftId: formData.get("giftId"),
     guestName: formData.get("guestName"),
     guestEmail: formData.get("guestEmail"),
+    guestPhone: formData.get("guestPhone"),
   });
 
   if (!parsed.success) {
@@ -43,7 +46,10 @@ export async function createGiftContributionAction(
 
   let checkoutUrl: string;
   try {
-    const result = await createGiftContributionUseCase().execute(parsed.data);
+    const result = await createGiftContributionUseCase().execute({
+      ...parsed.data,
+      guestPhone: normalizePhoneToE164(parsed.data.guestPhone ?? ""),
+    });
     checkoutUrl = result.checkoutUrl;
     revalidatePath("/presentes");
     revalidatePath("/admin/presentes");
@@ -69,6 +75,7 @@ const reserveForLaterSchema = z.object({
   giftId: z.string().min(1, "Presente inválido."),
   guestName: z.string().min(3, "Informe seu nome completo."),
   guestEmail: z.string().email("Informe um e-mail válido."),
+  guestPhone: z.string().optional(),
   expectedPaymentDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Informe uma data válida."),
 });
 
@@ -88,6 +95,7 @@ export async function reserveGiftForLaterAction(
     giftId: formData.get("giftId"),
     guestName: formData.get("guestName"),
     guestEmail: formData.get("guestEmail"),
+    guestPhone: formData.get("guestPhone"),
     expectedPaymentDate: formData.get("expectedPaymentDate"),
   });
 
@@ -118,6 +126,7 @@ export async function reserveGiftForLaterAction(
       giftId: parsed.data.giftId,
       guestName: parsed.data.guestName,
       guestEmail: parsed.data.guestEmail,
+      guestPhone: normalizePhoneToE164(parsed.data.guestPhone ?? ""),
       expectedPaymentDate,
     });
 

@@ -5,6 +5,7 @@ import { GiftForm } from "@/components/admin/GiftForm";
 
 const upsertGiftActionMock = vi.fn();
 const fetchGiftLinkMetadataActionMock = vi.fn();
+const generateSingleLinkActionMock = vi.fn();
 
 vi.mock("@/app/admin/(protected)/presentes/actions", () => ({
   upsertGiftAction: (...args: unknown[]) => upsertGiftActionMock(...args),
@@ -12,6 +13,10 @@ vi.mock("@/app/admin/(protected)/presentes/actions", () => ({
 
 vi.mock("@/app/admin/(protected)/presentes/linkAutofillAction", () => ({
   fetchGiftLinkMetadataAction: (...args: unknown[]) => fetchGiftLinkMetadataActionMock(...args),
+}));
+
+vi.mock("@/app/admin/(protected)/presentes/generateSingleLinkAction", () => ({
+  generateSingleLinkAction: (...args: unknown[]) => generateSingleLinkActionMock(...args),
 }));
 
 describe("GiftForm", () => {
@@ -100,5 +105,16 @@ describe("GiftForm", () => {
     render(<GiftForm />);
 
     expect(screen.getByRole("link", { name: "Cancelar" })).toHaveAttribute("href", "/admin/presentes");
+  });
+
+  it("shows the Gerar link de pagamento button on the edit form", () => {
+    render(
+      <GiftForm
+        defaultValues={{ id: "gift-1", name: "Jogo de panelas", description: "d", imageUrl: "", price: 100, category: "casa" }}
+        checkoutUrl={null}
+      />
+    );
+
+    expect(screen.getByRole("button", { name: "Gerar link de pagamento" })).toBeInTheDocument();
   });
 });

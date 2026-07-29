@@ -10,7 +10,7 @@ describe("importGiftRows", () => {
   it("creates gifts from valid rows, accepting comma or dot decimals", async () => {
     const repository = new InMemoryGiftRepository();
     const useCase = new UpsertGiftUseCase(repository);
-    const refreshUseCase = new RefreshGiftPaymentLinkUseCase(repository, new FakePaymentGateway());
+    const refreshUseCase = new RefreshGiftPaymentLinkUseCase(repository, () => new FakePaymentGateway());
 
     const result = await importGiftRows(
       [
@@ -19,7 +19,8 @@ describe("importGiftRows", () => {
       ],
       repository,
       useCase,
-      refreshUseCase
+      refreshUseCase,
+      "mercado_pago"
     );
 
     expect(result).toEqual({ created: 2, skipped: 0, withoutPaymentLink: 0, errors: [] });
@@ -34,13 +35,14 @@ describe("importGiftRows", () => {
       Gift.create({ name: "Jogo de panelas", description: "x", imageUrl: "/a.jpg", price: 100, category: "cozinha" })
     );
     const useCase = new UpsertGiftUseCase(repository);
-    const refreshUseCase = new RefreshGiftPaymentLinkUseCase(repository, new FakePaymentGateway());
+    const refreshUseCase = new RefreshGiftPaymentLinkUseCase(repository, () => new FakePaymentGateway());
 
     const result = await importGiftRows(
       [{ Nome: "jogo de panelas", Descrição: "x", Categoria: "cozinha", Valor: "100" }],
       repository,
       useCase,
-      refreshUseCase
+      refreshUseCase,
+      "mercado_pago"
     );
 
     expect(result).toEqual({ created: 0, skipped: 1, withoutPaymentLink: 0, errors: [] });
@@ -49,13 +51,14 @@ describe("importGiftRows", () => {
   it("reports a per-row error for an invalid value", async () => {
     const repository = new InMemoryGiftRepository();
     const useCase = new UpsertGiftUseCase(repository);
-    const refreshUseCase = new RefreshGiftPaymentLinkUseCase(repository, new FakePaymentGateway());
+    const refreshUseCase = new RefreshGiftPaymentLinkUseCase(repository, () => new FakePaymentGateway());
 
     const result = await importGiftRows(
       [{ Nome: "Item", Descrição: "x", Categoria: "casa", Valor: "não é número" }],
       repository,
       useCase,
-      refreshUseCase
+      refreshUseCase,
+      "mercado_pago"
     );
 
     expect(result.created).toBe(0);
@@ -69,17 +72,15 @@ describe("importGiftRows", () => {
       createPreference: async () => {
         throw new Error("Mercado Pago indisponível");
       },
-      getPayment: async () => {
-        throw new Error("not used");
-      },
     };
-    const refreshUseCase = new RefreshGiftPaymentLinkUseCase(repository, failingGateway);
+    const refreshUseCase = new RefreshGiftPaymentLinkUseCase(repository, () => failingGateway);
 
     const result = await importGiftRows(
       [{ Nome: "Jogo de toalhas", Descrição: "4 toalhas", Categoria: "casa", Valor: "150" }],
       repository,
       upsertUseCase,
-      refreshUseCase
+      refreshUseCase,
+      "mercado_pago"
     );
 
     expect(result.created).toBe(1);
@@ -91,13 +92,14 @@ describe("importGiftRows", () => {
   it("creates the gift with a payment link when the gateway succeeds", async () => {
     const repository = new InMemoryGiftRepository();
     const upsertUseCase = new UpsertGiftUseCase(repository);
-    const refreshUseCase = new RefreshGiftPaymentLinkUseCase(repository, new FakePaymentGateway());
+    const refreshUseCase = new RefreshGiftPaymentLinkUseCase(repository, () => new FakePaymentGateway());
 
     const result = await importGiftRows(
       [{ Nome: "Jogo de talheres", Descrição: "24 peças", Categoria: "cozinha", Valor: "200" }],
       repository,
       upsertUseCase,
-      refreshUseCase
+      refreshUseCase,
+      "mercado_pago"
     );
 
     expect(result.created).toBe(1);

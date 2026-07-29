@@ -211,3 +211,17 @@ describe("GiftDetailsModal", () => {
     expect(await screen.findByRole("button", { name: "Link copiado!" })).toBeInTheDocument();
   });
 });
+
+describe("GiftDetailsModal guest phone field", () => {
+  it("masks the phone number as the guest types, and the field is optional", async () => {
+    const user = userEvent.setup();
+    render(<GiftDetailsModal gift={gift} canReserveForLater onClose={vi.fn()} />);
+
+    await user.click(screen.getByRole("button", { name: "Presentear agora" }));
+    const phoneInput = screen.getByLabelText(/telefone/i);
+    expect(phoneInput).not.toBeRequired();
+
+    await user.type(phoneInput, "11987654321");
+    expect(phoneInput).toHaveValue("(11)98765-4321");
+  });
+});

@@ -2,6 +2,7 @@
 
 import { useActionState, useRef, useState } from "react";
 import { PhotoOrPlaceholder } from "@/components/ui/PhotoOrPlaceholder";
+import { formatBrazilianPhoneMask } from "@/shared/utils/phoneMask";
 import { formatCurrency } from "@/shared/utils/formatCurrency";
 import { GiftDto } from "@/components/gifts/GiftDto";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
@@ -194,6 +195,19 @@ export function GiftDetailsModal({ gift, canReserveForLater, onClose }: GiftDeta
                     required
                     className={fieldClassName}
                   />
+                  <label htmlFor={`guestPhone-now-${gift.id}`} className="font-sans text-xs text-forest/70">
+                    Telefone (opcional)
+                  </label>
+                  <input
+                    id={`guestPhone-now-${gift.id}`}
+                    name="guestPhone"
+                    type="tel"
+                    placeholder="(11) 91234-5678"
+                    className={fieldClassName}
+                    onChange={(event) => {
+                      event.target.value = formatBrazilianPhoneMask(event.target.value);
+                    }}
+                  />
                   <button type="submit" disabled={isNowPending} className={primaryButtonClassName}>
                     {isNowPending ? "Redirecionando..." : "Ir para pagamento"}
                   </button>
@@ -229,6 +243,19 @@ export function GiftDetailsModal({ gift, canReserveForLater, onClose }: GiftDeta
                     placeholder="Seu e-mail"
                     required
                     className={fieldClassName}
+                  />
+                  <label htmlFor={`guestPhone-later-${gift.id}`} className="font-sans text-xs text-forest/70">
+                    Telefone (opcional)
+                  </label>
+                  <input
+                    id={`guestPhone-later-${gift.id}`}
+                    name="guestPhone"
+                    type="tel"
+                    placeholder="(11) 91234-5678"
+                    className={fieldClassName}
+                    onChange={(event) => {
+                      event.target.value = formatBrazilianPhoneMask(event.target.value);
+                    }}
                   />
                   <label htmlFor={`expected-payment-date-${gift.id}`} className="font-sans text-xs text-forest/70">
                     Quando pretende pagar?

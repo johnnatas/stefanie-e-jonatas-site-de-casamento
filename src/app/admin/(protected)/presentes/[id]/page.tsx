@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createListGiftsUseCase } from "@/infrastructure/composition";
+import { createListGiftsUseCase, createGetAdminSecuritySettingsUseCase } from "@/infrastructure/composition";
 import { isBackendConfigured } from "@/infrastructure/config/env";
 import { ConfigurationNotice } from "@/components/ui/ConfigurationNotice";
 import { GiftForm } from "@/components/admin/GiftForm";
+import type { PaymentProvider } from "@/domain/entities/PaymentProvider";
 
 export const metadata: Metadata = {
   title: "Editar Presente | Painel Administrativo",
@@ -30,8 +31,10 @@ export default async function EditGiftPage({ params }: EditGiftPageProps) {
   }
 
   let gifts;
+  let activeProvider: PaymentProvider = "mercado_pago";
   try {
     gifts = await createListGiftsUseCase().execute();
+    activeProvider = (await createGetAdminSecuritySettingsUseCase().execute()).activePaymentProvider;
   } catch {
     return (
       <div>
@@ -69,7 +72,7 @@ export default async function EditGiftPage({ params }: EditGiftPageProps) {
             price: gift.price,
             category: gift.category,
           }}
-          checkoutUrl={gift.mercadoPagoCheckoutUrl}
+          checkoutUrl={gift.checkoutUrlFor(activeProvider)}
           existingCategories={existingCategories}
         />
       </div>

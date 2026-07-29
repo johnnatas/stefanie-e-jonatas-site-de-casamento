@@ -5,10 +5,12 @@ import {
   createListGiftsUseCase,
   createUpsertGiftUseCase,
   createRefreshGiftPaymentLinkUseCase,
+  createGetAdminSecuritySettingsUseCase,
 } from "@/infrastructure/composition";
 import { UpsertGiftUseCase } from "@/application/use-cases/admin/UpsertGiftUseCase";
 import { RefreshGiftPaymentLinkUseCase } from "@/application/use-cases/gifts/RefreshGiftPaymentLinkUseCase";
 import { GiftRepository } from "@/domain/repositories/GiftRepository";
+import { PaymentProvider } from "@/domain/entities/PaymentProvider";
 import { parseXlsx } from "@/shared/utils/parseXlsx";
 
 export interface ImportResult {
@@ -38,7 +40,8 @@ export async function importGiftRows(
   rows: { [column: string]: string }[],
   giftRepository: Pick<GiftRepository, "findAll">,
   upsertGiftUseCase: Pick<UpsertGiftUseCase, "execute">,
-  refreshGiftPaymentLinkUseCase: Pick<RefreshGiftPaymentLinkUseCase, "execute">
+  refreshGiftPaymentLinkUseCase: Pick<RefreshGiftPaymentLinkUseCase, "execute">,
+  provider: PaymentProvider
 ): Promise<ImportResult> {
   const existingNames = new Set((await giftRepository.findAll()).map((gift) => gift.name.toLowerCase()));
   const result: ImportResult = { created: 0, skipped: 0, withoutPaymentLink: 0, errors: [] };
@@ -71,7 +74,7 @@ export async function importGiftRows(
     result.created++;
 
     try {
-      await refreshGiftPaymentLinkUseCase.execute(gift);
+      await refreshGiftPaymentLinkUseCase.execute(gift, provider);
     } catch {
       result.withoutPaymentLink++;
     }
@@ -93,11 +96,13 @@ export async function importGiftsAction(
   const rows = await parseXlsx(fileBuffer);
 
   try {
+    const { activePaymentProvider } = await createGetAdminSecuritySettingsUseCase().execute();
     const result = await importGiftRows(
       rows,
       { findAll: () => createListGiftsUseCase().execute() },
       createUpsertGiftUseCase(),
-      createRefreshGiftPaymentLinkUseCase()
+      createRefreshGiftPaymentLinkUseCase(),
+      activePaymentProvider
     );
     revalidatePath("/presentes");
     revalidatePath("/admin/presentes");

@@ -3,6 +3,7 @@ import { createGetAdminSecuritySettingsUseCase } from "@/infrastructure/composit
 import { isBackendConfigured } from "@/infrastructure/config/env";
 import { ConfigurationNotice } from "@/components/ui/ConfigurationNotice";
 import { MercadoPagoTokenForm } from "@/components/admin/MercadoPagoTokenForm";
+import { PaymentProviderForm } from "@/components/admin/PaymentProviderForm";
 import { ResendApiKeyForm } from "@/components/admin/ResendApiKeyForm";
 import { SecretKeyForm } from "@/components/admin/SecretKeyForm";
 import { ResetSecretKeyWithTokenForm } from "@/components/admin/ResetSecretKeyWithTokenForm";
@@ -50,6 +51,7 @@ export default async function IntegracoesPage({ searchParams }: IntegracoesPageP
 
       <div className="mt-8 flex max-w-md flex-col gap-10">
         {resetToken && <ResetSecretKeyWithTokenForm token={resetToken} />}
+        <PaymentProviderForm activeProvider={summary.activePaymentProvider} infinitePayHandle={summary.infinitePayHandle} />
         <MercadoPagoTokenForm
           currentTokenLast4={summary.mercadoPagoAccessTokenLast4}
           hasSecretKey={summary.hasSecretKey}

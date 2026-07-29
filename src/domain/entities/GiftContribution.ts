@@ -1,4 +1,5 @@
 import { InvalidContributionDataError } from "@/domain/errors/DomainError";
+import { PaymentProvider } from "@/domain/entities/PaymentProvider";
 
 export type ContributionStatus = "pending" | "approved" | "rejected" | "expired";
 
@@ -7,10 +8,14 @@ export interface GiftContributionProps {
   giftId: string;
   guestName: string;
   guestEmail: string;
+  guestPhone?: string | null;
   amount: number;
   status?: ContributionStatus;
+  paymentProvider?: PaymentProvider;
   mercadoPagoPreferenceId?: string;
   mercadoPagoPaymentId?: string;
+  infinitePayOrderNsu?: string;
+  infinitePayTransactionNsu?: string;
   expectedPaymentDate?: Date | null;
   createdAt?: Date;
 }
@@ -20,10 +25,14 @@ export class GiftContribution {
   readonly giftId: string;
   readonly guestName: string;
   readonly guestEmail: string;
+  readonly guestPhone: string | null;
   readonly amount: number;
   readonly status: ContributionStatus;
+  readonly paymentProvider: PaymentProvider;
   readonly mercadoPagoPreferenceId?: string;
   readonly mercadoPagoPaymentId?: string;
+  readonly infinitePayOrderNsu?: string;
+  readonly infinitePayTransactionNsu?: string;
   readonly expectedPaymentDate: Date | null;
   readonly createdAt: Date;
 
@@ -32,10 +41,14 @@ export class GiftContribution {
     this.giftId = props.giftId;
     this.guestName = props.guestName.trim();
     this.guestEmail = props.guestEmail.trim().toLowerCase();
+    this.guestPhone = props.guestPhone ?? null;
     this.amount = props.amount;
     this.status = props.status ?? "pending";
+    this.paymentProvider = props.paymentProvider ?? "mercado_pago";
     this.mercadoPagoPreferenceId = props.mercadoPagoPreferenceId;
     this.mercadoPagoPaymentId = props.mercadoPagoPaymentId;
+    this.infinitePayOrderNsu = props.infinitePayOrderNsu;
+    this.infinitePayTransactionNsu = props.infinitePayTransactionNsu;
     this.expectedPaymentDate = props.expectedPaymentDate ?? null;
     this.createdAt = props.createdAt ?? new Date();
   }
@@ -56,16 +69,22 @@ export class GiftContribution {
     return new GiftContribution(props);
   }
 
-  withPreference(preferenceId: string): GiftContribution {
-    return new GiftContribution({ ...this, mercadoPagoPreferenceId: preferenceId });
+  withProviderReference(provider: PaymentProvider, referenceId: string): GiftContribution {
+    return provider === "mercado_pago"
+      ? new GiftContribution({ ...this, paymentProvider: provider, mercadoPagoPreferenceId: referenceId })
+      : new GiftContribution({ ...this, paymentProvider: provider, infinitePayOrderNsu: referenceId });
   }
 
-  approve(paymentId: string): GiftContribution {
-    return new GiftContribution({ ...this, status: "approved", mercadoPagoPaymentId: paymentId });
+  approve(paymentReference: string): GiftContribution {
+    return this.paymentProvider === "infinite_pay"
+      ? new GiftContribution({ ...this, status: "approved", infinitePayTransactionNsu: paymentReference })
+      : new GiftContribution({ ...this, status: "approved", mercadoPagoPaymentId: paymentReference });
   }
 
-  reject(paymentId: string): GiftContribution {
-    return new GiftContribution({ ...this, status: "rejected", mercadoPagoPaymentId: paymentId });
+  reject(paymentReference: string): GiftContribution {
+    return this.paymentProvider === "infinite_pay"
+      ? new GiftContribution({ ...this, status: "rejected", infinitePayTransactionNsu: paymentReference })
+      : new GiftContribution({ ...this, status: "rejected", mercadoPagoPaymentId: paymentReference });
   }
 
   expire(): GiftContribution {

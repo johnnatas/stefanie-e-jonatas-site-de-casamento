@@ -1,41 +1,51 @@
 import { GiftContribution } from "@/domain/entities/GiftContribution";
 import { GiftContributionRepository } from "@/domain/repositories/GiftContributionRepository";
 import { GiftRepository } from "@/domain/repositories/GiftRepository";
-import { PaymentGateway } from "@/application/ports/PaymentGateway";
 import { EmailGateway } from "@/application/ports/EmailGateway";
 import { NotificationLogRepository } from "@/domain/repositories/NotificationLogRepository";
 import { paymentThankYouEmail } from "@/infrastructure/email/templates";
 
+export interface ConfirmedPayment {
+  paymentReference: string;
+  status: "approved" | "rejected";
+  giftId: string;
+  paidAmount?: number;
+}
+
 export interface ConfirmGiftPaymentInput {
-  paymentId: string;
+  payment: ConfirmedPayment;
 }
 
 export class ConfirmGiftPaymentUseCase {
   constructor(
     private readonly giftRepository: GiftRepository,
     private readonly giftContributionRepository: GiftContributionRepository,
-    private readonly paymentGateway: PaymentGateway,
     private readonly emailGateway: EmailGateway,
     private readonly notificationLogRepository: NotificationLogRepository
   ) {}
 
   async execute(input: ConfirmGiftPaymentInput): Promise<GiftContribution | null> {
-    const payment = await this.paymentGateway.getPayment(input.paymentId);
-
-    const contribution = await this.giftContributionRepository.findPendingByGiftId(payment.externalReference);
+    const contribution = await this.giftContributionRepository.findPendingByGiftId(input.payment.giftId);
     if (!contribution) {
       return null;
     }
 
-    if (payment.status === "pending") {
+    if (
+      input.payment.status === "approved" &&
+      input.payment.paidAmount !== undefined &&
+      input.payment.paidAmount !== contribution.amount
+    ) {
+      console.error(
+        `Payment amount mismatch for contribution ${contribution.id}: expected ${contribution.amount}, got ${input.payment.paidAmount}`
+      );
       return contribution;
     }
 
     const gift = await this.giftRepository.findById(contribution.giftId);
 
-    if (payment.status === "approved") {
+    if (input.payment.status === "approved") {
       const updatedContribution = await this.giftContributionRepository.update(
-        contribution.approve(payment.paymentId)
+        contribution.approve(input.payment.paymentReference)
       );
       if (gift) {
         await this.giftRepository.update(gift.markAsPaid());
@@ -45,7 +55,7 @@ export class ConfirmGiftPaymentUseCase {
     }
 
     const updatedContribution = await this.giftContributionRepository.update(
-      contribution.reject(payment.paymentId)
+      contribution.reject(input.payment.paymentReference)
     );
     if (gift) {
       await this.giftRepository.update(gift.releaseToAvailable());

@@ -12,6 +12,9 @@ import { isBackendConfigured } from "@/infrastructure/config/env";
 import { SITE_CONTENT_SCHEMAS, SiteContentSlug } from "@/application/content/schemas";
 import { z } from "zod";
 import { MercadoPagoGateway } from "@/infrastructure/payments/MercadoPagoGateway";
+import { InfinitePayGateway } from "@/infrastructure/payments/InfinitePayGateway";
+import { PaymentGateway } from "@/application/ports/PaymentGateway";
+import { PaymentProvider } from "@/domain/entities/PaymentProvider";
 import { ConfirmRsvpUseCase } from "@/application/use-cases/rsvp/ConfirmRsvpUseCase";
 import { ListGiftsUseCase } from "@/application/use-cases/gifts/ListGiftsUseCase";
 import { CreateGiftContributionUseCase } from "@/application/use-cases/gifts/CreateGiftContributionUseCase";
@@ -25,6 +28,7 @@ import { DeleteGiftUseCase } from "@/application/use-cases/admin/DeleteGiftUseCa
 import { GetDashboardSummaryUseCase } from "@/application/use-cases/admin/GetDashboardSummaryUseCase";
 import { UpsertGiftUseCase } from "@/application/use-cases/admin/UpsertGiftUseCase";
 import { RefreshGiftPaymentLinkUseCase } from "@/application/use-cases/gifts/RefreshGiftPaymentLinkUseCase";
+import { GenerateMissingPaymentLinksUseCase } from "@/application/use-cases/gifts/GenerateMissingPaymentLinksUseCase";
 import { ListGiftContributionsUseCase } from "@/application/use-cases/gifts/ListGiftContributionsUseCase";
 import { SendReservationConfirmationUseCase } from "@/application/use-cases/notifications/SendReservationConfirmationUseCase";
 import { SendReservationRemindersUseCase } from "@/application/use-cases/notifications/SendReservationRemindersUseCase";
@@ -38,6 +42,7 @@ import { UpdateResendApiKeyUseCase } from "@/application/use-cases/security/Upda
 import { GetAdminSecuritySettingsUseCase } from "@/application/use-cases/security/GetAdminSecuritySettingsUseCase";
 import { RequestSecretKeyResetUseCase } from "@/application/use-cases/security/RequestSecretKeyResetUseCase";
 import { ResetSecretKeyWithTokenUseCase } from "@/application/use-cases/security/ResetSecretKeyWithTokenUseCase";
+import { UpdateActivePaymentProviderUseCase } from "@/application/use-cases/security/UpdateActivePaymentProviderUseCase";
 
 export {
   uploadSiteContentPhoto,
@@ -61,10 +66,20 @@ function repositories() {
     giftContributionRepository: new SupabaseGiftContributionRepository(client),
     siteContentRepository: new SupabaseSiteContentRepository(client),
     securitySettingsRepository,
-    paymentGateway: new MercadoPagoGateway(securitySettingsRepository),
+    mercadoPagoGateway: new MercadoPagoGateway(securitySettingsRepository),
+    infinitePayGateway: new InfinitePayGateway(securitySettingsRepository),
     notificationLogRepository: new SupabaseNotificationLogRepository(client),
     emailGateway: new ResendEmailGateway(securitySettingsRepository),
   };
+}
+
+function resolvePaymentGateway(provider: PaymentProvider): PaymentGateway {
+  const { mercadoPagoGateway, infinitePayGateway } = repositories();
+  return provider === "mercado_pago" ? mercadoPagoGateway : infinitePayGateway;
+}
+
+export function createMercadoPagoGateway(): MercadoPagoGateway {
+  return repositories().mercadoPagoGateway;
 }
 
 export function createConfirmRsvpUseCase(): ConfirmRsvpUseCase {
@@ -77,20 +92,13 @@ export function createListGiftsUseCase(): ListGiftsUseCase {
 }
 
 export function createGiftContributionUseCase(): CreateGiftContributionUseCase {
-  const { giftRepository, giftContributionRepository, paymentGateway } = repositories();
-  return new CreateGiftContributionUseCase(giftRepository, giftContributionRepository, paymentGateway);
+  const { giftRepository, giftContributionRepository, securitySettingsRepository } = repositories();
+  return new CreateGiftContributionUseCase(giftRepository, giftContributionRepository, securitySettingsRepository, resolvePaymentGateway);
 }
 
 export function createConfirmGiftPaymentUseCase(): ConfirmGiftPaymentUseCase {
-  const { giftRepository, giftContributionRepository, paymentGateway, emailGateway, notificationLogRepository } =
-    repositories();
-  return new ConfirmGiftPaymentUseCase(
-    giftRepository,
-    giftContributionRepository,
-    paymentGateway,
-    emailGateway,
-    notificationLogRepository
-  );
+  const { giftRepository, giftContributionRepository, emailGateway, notificationLogRepository } = repositories();
+  return new ConfirmGiftPaymentUseCase(giftRepository, giftContributionRepository, emailGateway, notificationLogRepository);
 }
 
 export function createListGuestsUseCase(): ListGuestsUseCase {
@@ -107,8 +115,13 @@ export function createUpsertGiftUseCase(): UpsertGiftUseCase {
 }
 
 export function createRefreshGiftPaymentLinkUseCase(): RefreshGiftPaymentLinkUseCase {
-  const { giftRepository, paymentGateway } = repositories();
-  return new RefreshGiftPaymentLinkUseCase(giftRepository, paymentGateway);
+  const { giftRepository } = repositories();
+  return new RefreshGiftPaymentLinkUseCase(giftRepository, resolvePaymentGateway);
+}
+
+export function createGenerateMissingPaymentLinksUseCase(): GenerateMissingPaymentLinksUseCase {
+  const { giftRepository } = repositories();
+  return new GenerateMissingPaymentLinksUseCase(giftRepository, createRefreshGiftPaymentLinkUseCase());
 }
 
 export function createListGiftContributionsUseCase(): ListGiftContributionsUseCase {
@@ -177,6 +190,11 @@ export function createRequestSecretKeyResetUseCase(): RequestSecretKeyResetUseCa
 
 export function createResetSecretKeyWithTokenUseCase(): ResetSecretKeyWithTokenUseCase {
   return new ResetSecretKeyWithTokenUseCase(repositories().securitySettingsRepository);
+}
+
+export function createUpdateActivePaymentProviderUseCase(): UpdateActivePaymentProviderUseCase {
+  const { securitySettingsRepository } = repositories();
+  return new UpdateActivePaymentProviderUseCase(securitySettingsRepository, createGenerateMissingPaymentLinksUseCase());
 }
 
 export function createSearchGuestsUseCase(): SearchGuestsUseCase {

@@ -61,3 +61,41 @@ describe("Gift", () => {
     expect(gift.reservedUntil).toBeNull();
   });
 });
+
+describe("Gift payment provider helpers", () => {
+  function makeGift(overrides = {}) {
+    return Gift.create({
+      name: "Jogo de panelas",
+      description: "desc",
+      imageUrl: null,
+      price: 200,
+      category: "cozinha",
+      ...overrides,
+    });
+  }
+
+  it("has no link for either provider by default", () => {
+    const gift = makeGift();
+    expect(gift.hasLinkFor("mercado_pago")).toBe(false);
+    expect(gift.hasLinkFor("infinite_pay")).toBe(false);
+    expect(gift.checkoutUrlFor("mercado_pago")).toBeNull();
+    expect(gift.checkoutUrlFor("infinite_pay")).toBeNull();
+    expect(gift.providerReferenceIdFor("mercado_pago")).toBeUndefined();
+    expect(gift.providerReferenceIdFor("infinite_pay")).toBeUndefined();
+  });
+
+  it("withProviderLink writes only the given provider's fields, leaving the other untouched", () => {
+    const withMp = makeGift().withProviderLink("mercado_pago", "pref-1", "https://mp.test/checkout/1");
+    expect(withMp.hasLinkFor("mercado_pago")).toBe(true);
+    expect(withMp.checkoutUrlFor("mercado_pago")).toBe("https://mp.test/checkout/1");
+    expect(withMp.providerReferenceIdFor("mercado_pago")).toBe("pref-1");
+    expect(withMp.hasLinkFor("infinite_pay")).toBe(false);
+
+    const withBoth = withMp.withProviderLink("infinite_pay", "order-1", "https://infinitepay.test/checkout/1");
+    expect(withBoth.hasLinkFor("mercado_pago")).toBe(true);
+    expect(withBoth.checkoutUrlFor("mercado_pago")).toBe("https://mp.test/checkout/1");
+    expect(withBoth.hasLinkFor("infinite_pay")).toBe(true);
+    expect(withBoth.checkoutUrlFor("infinite_pay")).toBe("https://infinitepay.test/checkout/1");
+    expect(withBoth.providerReferenceIdFor("infinite_pay")).toBe("order-1");
+  });
+});

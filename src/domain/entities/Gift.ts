@@ -1,4 +1,5 @@
 import { GiftNotAvailableError, InvalidGiftDataError } from "@/domain/errors/DomainError";
+import { PaymentProvider } from "@/domain/entities/PaymentProvider";
 
 export type GiftStatus = "available" | "reserved" | "paid";
 
@@ -13,6 +14,8 @@ export interface GiftProps {
   reservedUntil?: Date | null;
   mercadoPagoPreferenceId?: string;
   mercadoPagoCheckoutUrl?: string | null;
+  infinitePayOrderNsu?: string;
+  infinitePayCheckoutUrl?: string | null;
   createdAt?: Date;
 }
 
@@ -27,6 +30,8 @@ export class Gift {
   readonly reservedUntil: Date | null;
   readonly mercadoPagoPreferenceId?: string;
   readonly mercadoPagoCheckoutUrl: string | null;
+  readonly infinitePayOrderNsu?: string;
+  readonly infinitePayCheckoutUrl: string | null;
   readonly createdAt: Date;
 
   private constructor(props: GiftProps) {
@@ -40,6 +45,8 @@ export class Gift {
     this.reservedUntil = props.reservedUntil ?? null;
     this.mercadoPagoPreferenceId = props.mercadoPagoPreferenceId;
     this.mercadoPagoCheckoutUrl = props.mercadoPagoCheckoutUrl ?? null;
+    this.infinitePayOrderNsu = props.infinitePayOrderNsu;
+    this.infinitePayCheckoutUrl = props.infinitePayCheckoutUrl ?? null;
     this.createdAt = props.createdAt ?? new Date();
   }
 
@@ -81,5 +88,23 @@ export class Gift {
     }
 
     return new Gift({ ...this, status: "available", reservedUntil: null });
+  }
+
+  checkoutUrlFor(provider: PaymentProvider): string | null {
+    return provider === "mercado_pago" ? this.mercadoPagoCheckoutUrl : this.infinitePayCheckoutUrl;
+  }
+
+  providerReferenceIdFor(provider: PaymentProvider): string | undefined {
+    return provider === "mercado_pago" ? this.mercadoPagoPreferenceId : this.infinitePayOrderNsu;
+  }
+
+  hasLinkFor(provider: PaymentProvider): boolean {
+    return this.checkoutUrlFor(provider) !== null;
+  }
+
+  withProviderLink(provider: PaymentProvider, referenceId: string, checkoutUrl: string): Gift {
+    return provider === "mercado_pago"
+      ? new Gift({ ...this, mercadoPagoPreferenceId: referenceId, mercadoPagoCheckoutUrl: checkoutUrl })
+      : new Gift({ ...this, infinitePayOrderNsu: referenceId, infinitePayCheckoutUrl: checkoutUrl });
   }
 }

@@ -7,13 +7,9 @@ import { InMemoryNotificationLogRepository } from "@/application/testing/InMemor
 import { Gift } from "@/domain/entities/Gift";
 import { GiftContribution } from "@/domain/entities/GiftContribution";
 
-// NOTE: CreateGiftContributionUseCase.execute() currently throws
-// (`contribution.withPreference is not a function`) because an earlier task
-// renamed that domain method to `withProviderReference` without updating
-// this call site — that update is Task 12's job, not this one. Rather than
-// route these fixtures through the broken use case, we seed the reserved
-// gift + pending contribution directly via the repositories, which is all
-// ConfirmGiftPaymentUseCase actually depends on.
+// These fixtures seed the reserved gift + pending contribution directly via
+// the repositories rather than through CreateGiftContributionUseCase, which
+// is all ConfirmGiftPaymentUseCase actually depends on.
 describe("ConfirmGiftPaymentUseCase", () => {
   let giftRepository: InMemoryGiftRepository;
   let contributionRepository: InMemoryGiftContributionRepository;

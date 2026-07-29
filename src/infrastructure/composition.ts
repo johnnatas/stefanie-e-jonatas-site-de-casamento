@@ -92,8 +92,8 @@ export function createListGiftsUseCase(): ListGiftsUseCase {
 }
 
 export function createGiftContributionUseCase(): CreateGiftContributionUseCase {
-  const { giftRepository, giftContributionRepository, mercadoPagoGateway } = repositories();
-  return new CreateGiftContributionUseCase(giftRepository, giftContributionRepository, mercadoPagoGateway);
+  const { giftRepository, giftContributionRepository, securitySettingsRepository } = repositories();
+  return new CreateGiftContributionUseCase(giftRepository, giftContributionRepository, securitySettingsRepository, resolvePaymentGateway);
 }
 
 export function createConfirmGiftPaymentUseCase(): ConfirmGiftPaymentUseCase {

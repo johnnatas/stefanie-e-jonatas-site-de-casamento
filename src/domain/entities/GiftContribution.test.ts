@@ -21,7 +21,7 @@ describe("GiftContribution", () => {
   });
 
   it("attaches a Mercado Pago preference id", () => {
-    const contribution = GiftContribution.create(validProps).withPreference("pref-123");
+    const contribution = GiftContribution.create(validProps).withProviderReference("mercado_pago", "pref-123");
 
     expect(contribution.mercadoPagoPreferenceId).toBe("pref-123");
   });
@@ -56,5 +56,58 @@ describe("GiftContribution", () => {
     const contribution = GiftContribution.create(validProps).expire();
 
     expect(contribution.status).toBe("expired");
+  });
+});
+
+describe("GiftContribution payment provider handling", () => {
+  function makeContribution(overrides = {}) {
+    return GiftContribution.create({
+      giftId: "gift-1",
+      guestName: "Ana Souza",
+      guestEmail: "ana@example.com",
+      amount: 200,
+      ...overrides,
+    });
+  }
+
+  it("defaults to the mercado_pago provider and no phone", () => {
+    const contribution = makeContribution();
+    expect(contribution.paymentProvider).toBe("mercado_pago");
+    expect(contribution.guestPhone).toBeNull();
+  });
+
+  it("stores the guest phone when provided", () => {
+    const contribution = makeContribution({ guestPhone: "+5511987654321" });
+    expect(contribution.guestPhone).toBe("+5511987654321");
+  });
+
+  it("withProviderReference writes only the given provider's reference field", () => {
+    const withMp = makeContribution().withProviderReference("mercado_pago", "pref-1");
+    expect(withMp.paymentProvider).toBe("mercado_pago");
+    expect(withMp.mercadoPagoPreferenceId).toBe("pref-1");
+    expect(withMp.infinitePayOrderNsu).toBeUndefined();
+
+    const withIp = makeContribution().withProviderReference("infinite_pay", "order-1");
+    expect(withIp.paymentProvider).toBe("infinite_pay");
+    expect(withIp.infinitePayOrderNsu).toBe("order-1");
+    expect(withIp.mercadoPagoPreferenceId).toBeUndefined();
+  });
+
+  it("approve writes the payment reference into the field matching the contribution's provider", () => {
+    const mpApproved = makeContribution({ paymentProvider: "mercado_pago" }).approve("payment-1");
+    expect(mpApproved.status).toBe("approved");
+    expect(mpApproved.mercadoPagoPaymentId).toBe("payment-1");
+    expect(mpApproved.infinitePayTransactionNsu).toBeUndefined();
+
+    const ipApproved = makeContribution({ paymentProvider: "infinite_pay" }).approve("transaction-1");
+    expect(ipApproved.status).toBe("approved");
+    expect(ipApproved.infinitePayTransactionNsu).toBe("transaction-1");
+    expect(ipApproved.mercadoPagoPaymentId).toBeUndefined();
+  });
+
+  it("reject writes the payment reference into the field matching the contribution's provider", () => {
+    const ipRejected = makeContribution({ paymentProvider: "infinite_pay" }).reject("transaction-2");
+    expect(ipRejected.status).toBe("rejected");
+    expect(ipRejected.infinitePayTransactionNsu).toBe("transaction-2");
   });
 });

@@ -2,6 +2,7 @@ export interface CreatePreferenceInput {
   title: string;
   amount: number;
   externalReference: string;
+  payerName?: string;
   payerEmail?: string;
   payerPhone?: string;
 }

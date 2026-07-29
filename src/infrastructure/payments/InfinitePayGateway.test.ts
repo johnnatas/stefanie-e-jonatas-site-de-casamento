@@ -48,6 +48,7 @@ describe("InfinitePayGateway", () => {
       title: "Jogo de panelas",
       amount: 199.9,
       externalReference: "gift-1",
+      payerName: "Ana Souza",
       payerEmail: "ana@example.com",
       payerPhone: "+5511987654321",
     });
@@ -63,7 +64,11 @@ describe("InfinitePayGateway", () => {
     expect(body.order_nsu).toBe("gift-1");
     expect(body.webhook_url).toBe("https://example.test/api/webhooks/infinitepay");
     expect(body.items).toEqual([{ quantity: 1, price: 19990, description: "Jogo de panelas" }]);
-    expect(body.customer).toEqual({ email: "ana@example.com", phone_number: "+5511987654321" });
+    expect(body.customer).toEqual({
+      name: "Ana Souza",
+      email: "ana@example.com",
+      phone_number: "+5511987654321",
+    });
   });
 
   it("throws when the API responds with a non-2xx status", async () => {

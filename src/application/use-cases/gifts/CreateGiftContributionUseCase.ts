@@ -65,6 +65,7 @@ export class CreateGiftContributionUseCase {
         title: gift.name,
         amount: gift.price,
         externalReference: gift.id!,
+        payerName: input.guestName,
         payerEmail: input.guestEmail,
         payerPhone: input.guestPhone ?? undefined,
       });

@@ -43,7 +43,11 @@ export class MercadoPagoGateway implements PaymentGateway {
           },
         ],
         payer: input.payerEmail
-          ? { email: input.payerEmail, phone: input.payerPhone ? { number: input.payerPhone } : undefined }
+          ? {
+              name: input.payerName,
+              email: input.payerEmail,
+              phone: input.payerPhone ? { number: input.payerPhone } : undefined,
+            }
           : undefined,
         external_reference: input.externalReference,
         back_urls: {

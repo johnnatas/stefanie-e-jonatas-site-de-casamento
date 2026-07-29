@@ -27,7 +27,7 @@ export class InfinitePayGateway implements PaymentGateway {
         webhook_url: `${siteUrl}/api/webhooks/infinitepay`,
         items: [{ quantity: 1, price: Math.round(input.amount * 100), description: input.title }],
         customer: input.payerEmail
-          ? { email: input.payerEmail, phone_number: input.payerPhone }
+          ? { name: input.payerName, email: input.payerEmail, phone_number: input.payerPhone }
           : undefined,
       }),
     });

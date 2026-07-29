@@ -73,6 +73,21 @@ describe("CreateGiftContributionUseCase", () => {
     expect(result.contribution.mercadoPagoPreferenceId).toBeUndefined();
   });
 
+  it("forwards the guest name to the gateway so the checkout can skip asking for it again", async () => {
+    let receivedName: string | undefined;
+    const capturingGateway = {
+      createPreference: async (input: { payerName?: string }) => {
+        receivedName = input.payerName;
+        return { preferenceId: "pref-1", checkoutUrl: "https://mercadopago.test/1" };
+      },
+    };
+    useCase = new CreateGiftContributionUseCase(giftRepository, contributionRepository, securitySettingsRepository, () => capturingGateway);
+
+    await useCase.execute({ giftId: "gift-1", guestName: "Carla Nunes", guestEmail: "carla@example.com" });
+
+    expect(receivedName).toBe("Carla Nunes");
+  });
+
   it("stores the guest phone on the contribution and forwards it to the gateway", async () => {
     let receivedPhone: string | undefined;
     const capturingGateway = {

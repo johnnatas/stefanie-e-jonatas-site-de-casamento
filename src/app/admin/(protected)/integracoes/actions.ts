@@ -6,7 +6,9 @@ import {
   createUpdateSecretKeyUseCase,
   createRequestSecretKeyResetUseCase,
   createResetSecretKeyWithTokenUseCase,
+  createUpdateActivePaymentProviderUseCase,
 } from "@/infrastructure/composition";
+import { PaymentProvider } from "@/domain/entities/PaymentProvider";
 import { InvalidSecurityCredentialError } from "@/domain/errors/DomainError";
 import { createSupabaseServerAuthClient } from "@/infrastructure/supabase/serverAuthClient";
 import { getEnv } from "@/infrastructure/config/env";
@@ -121,6 +123,42 @@ export async function resetSecretKeyWithTokenAction(
   }
 
   return { status: "success", message: "Chave secreta redefinida com sucesso." };
+}
+
+export interface UpdatePaymentProviderActionState {
+  status: "idle" | "success" | "error";
+  message?: string;
+}
+
+export async function updatePaymentProviderAction(
+  _prevState: UpdatePaymentProviderActionState,
+  formData: FormData
+): Promise<UpdatePaymentProviderActionState> {
+  const provider = (formData.get("provider") as string) as PaymentProvider;
+  const infinitePayHandle = (formData.get("infinitePayHandle") as string) || undefined;
+
+  try {
+    const result = await createUpdateActivePaymentProviderUseCase().execute({ provider, infinitePayHandle });
+
+    const providerLabel = provider === "infinite_pay" ? "Infinite Pay" : "Mercado Pago";
+    if (result.generated === 0 && result.failed.length === 0) {
+      return { status: "success", message: `Provedor atualizado para ${providerLabel}. Todos os presentes já tinham link — nada a gerar.` };
+    }
+
+    const failedSuffix =
+      result.failed.length > 0
+        ? ` Falharam: ${result.failed.map((item) => item.giftName).join(", ")}.`
+        : "";
+    return {
+      status: "success",
+      message: `Provedor atualizado para ${providerLabel}. ${result.generated} link(s) gerado(s), ${result.failed.length} falharam.${failedSuffix}`,
+    };
+  } catch (error) {
+    if (error instanceof InvalidSecurityCredentialError) {
+      return { status: "error", message: error.message };
+    }
+    return { status: "error", message: "Não foi possível atualizar o provedor de pagamento agora." };
+  }
 }
 
 export interface UpdateResendApiKeyActionState {

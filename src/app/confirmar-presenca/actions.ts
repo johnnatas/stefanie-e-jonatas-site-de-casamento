@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createConfirmRsvpUseCase, createSendRsvpConfirmationUseCase } from "@/infrastructure/composition";
 import { DomainError } from "@/domain/errors/DomainError";
 
@@ -36,6 +37,10 @@ export async function confirmRsvpAction(
         console.error("Failed to send RSVP confirmation email", emailError);
       }
     }
+
+    revalidatePath("/admin/convidados");
+    revalidatePath("/admin/dashboard");
+    revalidatePath("/admin/mensagens");
 
     return {
       success: true,

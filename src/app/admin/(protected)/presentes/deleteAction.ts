@@ -22,5 +22,6 @@ export async function deleteGiftAction(giftId: string): Promise<DeleteGiftResult
   revalidatePath("/presentes");
   revalidatePath("/admin/presentes");
   revalidatePath("/admin/presentes/novo");
+  revalidatePath("/admin/dashboard");
   return { status: "ok" };
 }

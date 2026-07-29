@@ -75,5 +75,6 @@ export async function upsertGiftAction(
   revalidatePath("/presentes");
   revalidatePath("/admin/presentes");
   revalidatePath("/admin/presentes/novo");
+  revalidatePath("/admin/dashboard");
   redirect("/admin/presentes");
 }

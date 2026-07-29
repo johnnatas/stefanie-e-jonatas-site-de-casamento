@@ -66,6 +66,7 @@ export async function importGuestsAction(
     const result = await importGuestRows(rows, { findAll: () => createListGuestsUseCase().execute() }, createCreateGuestUseCase());
     revalidatePath("/admin/convidados");
     revalidatePath("/confirmar-presenca");
+    revalidatePath("/admin/dashboard");
     return { status: "done", result };
   } catch {
     return { status: "error", message: "Não foi possível importar os convidados agora." };

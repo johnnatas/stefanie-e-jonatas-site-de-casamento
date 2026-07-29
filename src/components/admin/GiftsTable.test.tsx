@@ -8,6 +8,10 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
+vi.mock("@/app/admin/(protected)/presentes/generateLinksAction", () => ({
+  generateMissingPaymentLinksAction: vi.fn(),
+}));
+
 function makeGift(overrides: Partial<GiftListItem>): GiftListItem {
   return {
     id: "1",
@@ -16,6 +20,7 @@ function makeGift(overrides: Partial<GiftListItem>): GiftListItem {
     category: "cozinha",
     status: "available",
     createdAt: new Date("2026-01-01T00:00:00-03:00"),
+    hasPaymentLink: true,
     ...overrides,
   };
 }
@@ -131,5 +136,28 @@ describe("GiftsTable", () => {
     expect(screen.getByText("Presente 0")).toBeInTheDocument();
     expect(screen.queryByText("Presente 24")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Próxima" })).toBeDisabled();
+  });
+
+  it("shows a Gerado badge when the gift has a payment link, and Sem link otherwise", () => {
+    render(
+      <GiftsTable
+        gifts={[
+          makeGift({ id: "1", name: "Com link", hasPaymentLink: true }),
+          makeGift({ id: "2", name: "Sem link", hasPaymentLink: false }),
+        ]}
+      />
+    );
+
+    const rows = screen.getAllByRole("row");
+    expect(rows[1]).toHaveTextContent("Gerado");
+    expect(rows[2]).toHaveTextContent("Sem link");
+  });
+
+  it("shows the bulk generation button only when some gift is missing a link", () => {
+    const { rerender } = render(<GiftsTable gifts={[makeGift({ hasPaymentLink: true })]} />);
+    expect(screen.queryByRole("button", { name: "Gerar links pendentes" })).not.toBeInTheDocument();
+
+    rerender(<GiftsTable gifts={[makeGift({ hasPaymentLink: false })]} />);
+    expect(screen.getByRole("button", { name: "Gerar links pendentes" })).toBeInTheDocument();
   });
 });

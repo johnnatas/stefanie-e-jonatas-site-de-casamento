@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { createListGiftsUseCase } from "@/infrastructure/composition";
+import { createListGiftsUseCase, createGetAdminSecuritySettingsUseCase } from "@/infrastructure/composition";
 import { isBackendConfigured } from "@/infrastructure/config/env";
 import { ConfigurationNotice } from "@/components/ui/ConfigurationNotice";
 import { GiftsTable } from "@/components/admin/GiftsTable";
 import { formatCurrency } from "@/shared/utils/formatCurrency";
 import type { Gift } from "@/domain/entities/Gift";
+import type { PaymentProvider } from "@/domain/entities/PaymentProvider";
 
 export const metadata: Metadata = {
   title: "Presentes | Painel Administrativo",
@@ -15,10 +16,12 @@ export const metadata: Metadata = {
 export default async function AdminGiftsPage() {
   const backendConfigured = isBackendConfigured();
   let gifts: Gift[] | null = null;
+  let activeProvider: PaymentProvider = "mercado_pago";
 
   if (backendConfigured) {
     try {
       gifts = await createListGiftsUseCase().execute();
+      activeProvider = (await createGetAdminSecuritySettingsUseCase().execute()).activePaymentProvider;
     } catch {
       gifts = null;
     }
@@ -73,6 +76,7 @@ export default async function AdminGiftsPage() {
                 price: gift.price,
                 status: gift.status,
                 createdAt: gift.createdAt,
+                hasPaymentLink: gift.hasLinkFor(activeProvider),
               }))}
             />
           </Suspense>

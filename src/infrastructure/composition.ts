@@ -42,6 +42,7 @@ import { UpdateResendApiKeyUseCase } from "@/application/use-cases/security/Upda
 import { GetAdminSecuritySettingsUseCase } from "@/application/use-cases/security/GetAdminSecuritySettingsUseCase";
 import { RequestSecretKeyResetUseCase } from "@/application/use-cases/security/RequestSecretKeyResetUseCase";
 import { ResetSecretKeyWithTokenUseCase } from "@/application/use-cases/security/ResetSecretKeyWithTokenUseCase";
+import { UpdateActivePaymentProviderUseCase } from "@/application/use-cases/security/UpdateActivePaymentProviderUseCase";
 
 export {
   uploadSiteContentPhoto,
@@ -196,6 +197,11 @@ export function createRequestSecretKeyResetUseCase(): RequestSecretKeyResetUseCa
 
 export function createResetSecretKeyWithTokenUseCase(): ResetSecretKeyWithTokenUseCase {
   return new ResetSecretKeyWithTokenUseCase(repositories().securitySettingsRepository);
+}
+
+export function createUpdateActivePaymentProviderUseCase(): UpdateActivePaymentProviderUseCase {
+  const { securitySettingsRepository } = repositories();
+  return new UpdateActivePaymentProviderUseCase(securitySettingsRepository, createGenerateMissingPaymentLinksUseCase());
 }
 
 export function createSearchGuestsUseCase(): SearchGuestsUseCase {

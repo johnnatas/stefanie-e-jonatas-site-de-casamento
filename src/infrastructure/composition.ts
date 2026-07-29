@@ -97,15 +97,8 @@ export function createGiftContributionUseCase(): CreateGiftContributionUseCase {
 }
 
 export function createConfirmGiftPaymentUseCase(): ConfirmGiftPaymentUseCase {
-  const { giftRepository, giftContributionRepository, mercadoPagoGateway, emailGateway, notificationLogRepository } =
-    repositories();
-  return new ConfirmGiftPaymentUseCase(
-    giftRepository,
-    giftContributionRepository,
-    mercadoPagoGateway,
-    emailGateway,
-    notificationLogRepository
-  );
+  const { giftRepository, giftContributionRepository, emailGateway, notificationLogRepository } = repositories();
+  return new ConfirmGiftPaymentUseCase(giftRepository, giftContributionRepository, emailGateway, notificationLogRepository);
 }
 
 export function createListGuestsUseCase(): ListGuestsUseCase {

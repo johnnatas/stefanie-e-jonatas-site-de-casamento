@@ -14,6 +14,8 @@ interface GiftRow {
   reserved_until: string | null;
   mercado_pago_preference_id: string | null;
   mercado_pago_checkout_url: string | null;
+  infinite_pay_order_nsu: string | null;
+  infinite_pay_checkout_url: string | null;
   created_at: string;
 }
 
@@ -29,6 +31,8 @@ function toEntity(row: GiftRow): Gift {
     reservedUntil: row.reserved_until ? new Date(row.reserved_until) : null,
     mercadoPagoPreferenceId: row.mercado_pago_preference_id ?? undefined,
     mercadoPagoCheckoutUrl: row.mercado_pago_checkout_url,
+    infinitePayOrderNsu: row.infinite_pay_order_nsu ?? undefined,
+    infinitePayCheckoutUrl: row.infinite_pay_checkout_url,
     createdAt: new Date(row.created_at),
   });
 }
@@ -49,6 +53,8 @@ export class SupabaseGiftRepository implements GiftRepository {
         reserved_until: gift.reservedUntil ? gift.reservedUntil.toISOString() : null,
         mercado_pago_preference_id: gift.mercadoPagoPreferenceId ?? null,
         mercado_pago_checkout_url: gift.mercadoPagoCheckoutUrl,
+        infinite_pay_order_nsu: gift.infinitePayOrderNsu ?? null,
+        infinite_pay_checkout_url: gift.infinitePayCheckoutUrl,
       })
       .select()
       .single();
@@ -73,6 +79,8 @@ export class SupabaseGiftRepository implements GiftRepository {
         reserved_until: gift.reservedUntil ? gift.reservedUntil.toISOString() : null,
         mercado_pago_preference_id: gift.mercadoPagoPreferenceId ?? null,
         mercado_pago_checkout_url: gift.mercadoPagoCheckoutUrl,
+        infinite_pay_order_nsu: gift.infinitePayOrderNsu ?? null,
+        infinite_pay_checkout_url: gift.infinitePayCheckoutUrl,
       })
       .eq("id", gift.id)
       .select()

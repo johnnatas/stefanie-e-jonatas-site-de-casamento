@@ -7,6 +7,10 @@ import {
   type UpsertGiftActionState,
 } from "@/app/admin/(protected)/presentes/actions";
 import { fetchGiftLinkMetadataAction } from "@/app/admin/(protected)/presentes/linkAutofillAction";
+import {
+  generateSingleLinkAction,
+  type GenerateSingleLinkActionState,
+} from "@/app/admin/(protected)/presentes/generateSingleLinkAction";
 import { GiftFormValues } from "@/components/admin/giftFormSchema";
 import { PhotoUploadField } from "@/components/admin/PhotoUploadField";
 import { cn } from "@/shared/utils/cn";
@@ -23,6 +27,7 @@ const inputClassName =
 const NEW_CATEGORY_OPTION = "__new__";
 
 const initialUpsertGiftActionState: UpsertGiftActionState = { status: "idle" };
+const initialGenerateLinkState: GenerateSingleLinkActionState = { status: "idle" };
 
 interface LinkFetchState {
   status: "idle" | "pending" | "success" | "error";
@@ -33,6 +38,10 @@ const initialLinkFetchState: LinkFetchState = { status: "idle" };
 
 export function GiftForm({ defaultValues, checkoutUrl, existingCategories = [] }: GiftFormProps) {
   const [state, formAction, isPending] = useActionState(upsertGiftAction, initialUpsertGiftActionState);
+  const [generateLinkState, generateLinkAction, isGeneratingLink] = useActionState(
+    generateSingleLinkAction,
+    initialGenerateLinkState
+  );
   const [imageUrl, setImageUrl] = useState<string | null>(defaultValues?.imageUrl ?? null);
   const [linkFetchState, setLinkFetchState] = useState<LinkFetchState>(initialLinkFetchState);
   const categoryIsKnown = !!defaultValues?.category && existingCategories.includes(defaultValues.category);
@@ -244,28 +253,48 @@ export function GiftForm({ defaultValues, checkoutUrl, existingCategories = [] }
             />
           </div>
 
-          {checkoutUrl && (
+          {defaultValues?.id && (
             <div>
-              <label htmlFor="checkoutUrl" className="block font-sans text-sm text-forest">
-                Link de pagamento
-              </label>
-              <div className="mt-1 flex items-center gap-2">
-                <input
-                  id="checkoutUrl"
-                  type="text"
-                  readOnly
-                  value={checkoutUrl}
-                  onFocus={(event) => event.target.select()}
-                  className={cn(inputClassName, "min-w-0")}
-                />
+              <label className="block font-sans text-sm text-forest">Link de pagamento</label>
+              {checkoutUrl ? (
+                <div className="mt-1 flex items-center gap-2">
+                  <input
+                    id="checkoutUrl"
+                    type="text"
+                    readOnly
+                    value={checkoutUrl}
+                    onFocus={(event) => event.target.select()}
+                    className={cn(inputClassName, "min-w-0")}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => navigator.clipboard.writeText(checkoutUrl)}
+                    className="shrink-0 rounded-full border border-line px-4 py-2 font-sans text-xs uppercase tracking-widest text-forest transition-colors hover:border-moss"
+                  >
+                    Copiar link
+                  </button>
+                </div>
+              ) : (
+                <p className="mt-1 font-sans text-xs text-forest/70">Nenhum link gerado para o provedor ativo ainda.</p>
+              )}
+              <form action={generateLinkAction} className="mt-2">
+                <input type="hidden" name="giftId" value={defaultValues.id} />
                 <button
-                  type="button"
-                  onClick={() => navigator.clipboard.writeText(checkoutUrl)}
-                  className="shrink-0 rounded-full border border-line px-4 py-2 font-sans text-xs uppercase tracking-widest text-forest transition-colors hover:border-moss"
+                  type="submit"
+                  disabled={isGeneratingLink}
+                  className="rounded-full border border-moss px-4 py-2 font-sans text-xs uppercase tracking-widest text-moss transition-colors hover:bg-moss/10 disabled:opacity-60"
                 >
-                  Copiar link
+                  {isGeneratingLink ? "Gerando..." : "Gerar link de pagamento"}
                 </button>
-              </div>
+                {generateLinkState.status === "success" && (
+                  <p className="mt-1 font-sans text-xs text-moss">{generateLinkState.message}</p>
+                )}
+                {generateLinkState.status === "error" && (
+                  <p role="alert" className="mt-1 font-sans text-xs text-danger">
+                    {generateLinkState.message}
+                  </p>
+                )}
+              </form>
             </div>
           )}
         </div>

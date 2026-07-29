@@ -7,6 +7,7 @@ import {
   createRefreshGiftPaymentLinkUseCase,
   createVerifyPriceChangeSecretUseCase,
   createListGiftsUseCase,
+  createGetAdminSecuritySettingsUseCase,
   resolvePhotoField,
 } from "@/infrastructure/composition";
 import { giftFormSchema } from "@/components/admin/giftFormSchema";
@@ -62,7 +63,8 @@ export async function upsertGiftAction(
 
   if (upsertResult.nameOrPriceChanged) {
     try {
-      await createRefreshGiftPaymentLinkUseCase().execute(upsertResult.gift);
+      const { activePaymentProvider } = await createGetAdminSecuritySettingsUseCase().execute();
+      await createRefreshGiftPaymentLinkUseCase().execute(upsertResult.gift, activePaymentProvider);
     } catch {
       return {
         status: "error",

@@ -12,6 +12,9 @@ import { isBackendConfigured } from "@/infrastructure/config/env";
 import { SITE_CONTENT_SCHEMAS, SiteContentSlug } from "@/application/content/schemas";
 import { z } from "zod";
 import { MercadoPagoGateway } from "@/infrastructure/payments/MercadoPagoGateway";
+import { InfinitePayGateway } from "@/infrastructure/payments/InfinitePayGateway";
+import { PaymentGateway } from "@/application/ports/PaymentGateway";
+import { PaymentProvider } from "@/domain/entities/PaymentProvider";
 import { ConfirmRsvpUseCase } from "@/application/use-cases/rsvp/ConfirmRsvpUseCase";
 import { ListGiftsUseCase } from "@/application/use-cases/gifts/ListGiftsUseCase";
 import { CreateGiftContributionUseCase } from "@/application/use-cases/gifts/CreateGiftContributionUseCase";
@@ -61,10 +64,20 @@ function repositories() {
     giftContributionRepository: new SupabaseGiftContributionRepository(client),
     siteContentRepository: new SupabaseSiteContentRepository(client),
     securitySettingsRepository,
-    paymentGateway: new MercadoPagoGateway(securitySettingsRepository),
+    mercadoPagoGateway: new MercadoPagoGateway(securitySettingsRepository),
+    infinitePayGateway: new InfinitePayGateway(securitySettingsRepository),
     notificationLogRepository: new SupabaseNotificationLogRepository(client),
     emailGateway: new ResendEmailGateway(securitySettingsRepository),
   };
+}
+
+function resolvePaymentGateway(provider: PaymentProvider): PaymentGateway {
+  const { mercadoPagoGateway, infinitePayGateway } = repositories();
+  return provider === "mercado_pago" ? mercadoPagoGateway : infinitePayGateway;
+}
+
+export function createMercadoPagoGateway(): MercadoPagoGateway {
+  return repositories().mercadoPagoGateway;
 }
 
 export function createConfirmRsvpUseCase(): ConfirmRsvpUseCase {
@@ -77,17 +90,17 @@ export function createListGiftsUseCase(): ListGiftsUseCase {
 }
 
 export function createGiftContributionUseCase(): CreateGiftContributionUseCase {
-  const { giftRepository, giftContributionRepository, paymentGateway } = repositories();
-  return new CreateGiftContributionUseCase(giftRepository, giftContributionRepository, paymentGateway);
+  const { giftRepository, giftContributionRepository, mercadoPagoGateway } = repositories();
+  return new CreateGiftContributionUseCase(giftRepository, giftContributionRepository, mercadoPagoGateway);
 }
 
 export function createConfirmGiftPaymentUseCase(): ConfirmGiftPaymentUseCase {
-  const { giftRepository, giftContributionRepository, paymentGateway, emailGateway, notificationLogRepository } =
+  const { giftRepository, giftContributionRepository, mercadoPagoGateway, emailGateway, notificationLogRepository } =
     repositories();
   return new ConfirmGiftPaymentUseCase(
     giftRepository,
     giftContributionRepository,
-    paymentGateway,
+    mercadoPagoGateway,
     emailGateway,
     notificationLogRepository
   );
@@ -107,8 +120,8 @@ export function createUpsertGiftUseCase(): UpsertGiftUseCase {
 }
 
 export function createRefreshGiftPaymentLinkUseCase(): RefreshGiftPaymentLinkUseCase {
-  const { giftRepository, paymentGateway } = repositories();
-  return new RefreshGiftPaymentLinkUseCase(giftRepository, paymentGateway);
+  const { giftRepository } = repositories();
+  return new RefreshGiftPaymentLinkUseCase(giftRepository, resolvePaymentGateway);
 }
 
 export function createListGiftContributionsUseCase(): ListGiftContributionsUseCase {

@@ -1,9 +1,12 @@
 import { AdminSecuritySettingsRepository } from "@/domain/repositories/AdminSecuritySettingsRepository";
+import { PaymentProvider } from "@/domain/entities/PaymentProvider";
 
 export interface AdminSecuritySettingsSummary {
   mercadoPagoAccessTokenLast4: string | null;
   resendApiKeyLast4: string | null;
   hasSecretKey: boolean;
+  activePaymentProvider: PaymentProvider;
+  infinitePayHandle: string | null;
 }
 
 export class GetAdminSecuritySettingsUseCase {
@@ -17,6 +20,8 @@ export class GetAdminSecuritySettingsUseCase {
         : null,
       resendApiKeyLast4: settings.resendApiKey ? settings.resendApiKey.slice(-4) : null,
       hasSecretKey: Boolean(settings.priceChangeSecretHash),
+      activePaymentProvider: settings.activePaymentProvider,
+      infinitePayHandle: settings.infinitePayHandle,
     };
   }
 }

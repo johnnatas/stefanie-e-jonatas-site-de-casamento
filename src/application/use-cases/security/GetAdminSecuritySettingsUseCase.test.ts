@@ -13,6 +13,8 @@ describe("GetAdminSecuritySettingsUseCase", () => {
       mercadoPagoAccessTokenLast4: null,
       resendApiKeyLast4: null,
       hasSecretKey: false,
+      activePaymentProvider: "mercado_pago",
+      infinitePayHandle: null,
     });
   });
 
@@ -28,6 +30,8 @@ describe("GetAdminSecuritySettingsUseCase", () => {
       mercadoPagoAccessTokenLast4: "0beb",
       resendApiKeyLast4: null,
       hasSecretKey: true,
+      activePaymentProvider: "mercado_pago",
+      infinitePayHandle: null,
     });
   });
 
@@ -38,5 +42,24 @@ describe("GetAdminSecuritySettingsUseCase", () => {
     const summary = await new GetAdminSecuritySettingsUseCase(repository).execute();
 
     expect(summary.resendApiKeyLast4).toBe("abcd");
+  });
+
+  it("defaults to mercado_pago with no Infinite Pay handle configured", async () => {
+    const repository = new InMemoryAdminSecuritySettingsRepository();
+    const summary = await new GetAdminSecuritySettingsUseCase(repository).execute();
+
+    expect(summary.activePaymentProvider).toBe("mercado_pago");
+    expect(summary.infinitePayHandle).toBeNull();
+  });
+
+  it("reflects a stored active provider and handle", async () => {
+    const repository = new InMemoryAdminSecuritySettingsRepository();
+    await repository.updateActivePaymentProvider("infinite_pay");
+    await repository.updateInfinitePayHandle("meu_handle");
+
+    const summary = await new GetAdminSecuritySettingsUseCase(repository).execute();
+
+    expect(summary.activePaymentProvider).toBe("infinite_pay");
+    expect(summary.infinitePayHandle).toBe("meu_handle");
   });
 });

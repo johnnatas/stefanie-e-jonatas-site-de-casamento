@@ -4,12 +4,15 @@ import {
   AdminSecuritySettingsRepository,
   SecretResetToken,
 } from "@/domain/repositories/AdminSecuritySettingsRepository";
+import { PaymentProvider } from "@/domain/entities/PaymentProvider";
 
 interface SettingsRow {
   mercadopago_access_token: string | null;
   price_change_secret_hash: string | null;
   price_change_secret_salt: string | null;
   resend_api_key: string | null;
+  active_payment_provider: PaymentProvider;
+  infinitepay_handle: string | null;
 }
 
 export class SupabaseAdminSecuritySettingsRepository implements AdminSecuritySettingsRepository {
@@ -18,7 +21,9 @@ export class SupabaseAdminSecuritySettingsRepository implements AdminSecuritySet
   async getSettings(): Promise<AdminSecuritySettings> {
     const { data, error } = await this.client
       .from("admin_security_settings")
-      .select("mercadopago_access_token, price_change_secret_hash, price_change_secret_salt, resend_api_key")
+      .select(
+        "mercadopago_access_token, price_change_secret_hash, price_change_secret_salt, resend_api_key, active_payment_provider, infinitepay_handle"
+      )
       .eq("id", 1)
       .single();
 
@@ -32,6 +37,8 @@ export class SupabaseAdminSecuritySettingsRepository implements AdminSecuritySet
       priceChangeSecretHash: row.price_change_secret_hash,
       priceChangeSecretSalt: row.price_change_secret_salt,
       resendApiKey: row.resend_api_key,
+      activePaymentProvider: row.active_payment_provider,
+      infinitePayHandle: row.infinitepay_handle,
     };
   }
 
@@ -69,6 +76,28 @@ export class SupabaseAdminSecuritySettingsRepository implements AdminSecuritySet
 
     if (error) {
       throw new Error(`Failed to update Resend API key: ${error.message}`);
+    }
+  }
+
+  async updateActivePaymentProvider(provider: PaymentProvider): Promise<void> {
+    const { error } = await this.client
+      .from("admin_security_settings")
+      .update({ active_payment_provider: provider, updated_at: new Date().toISOString() })
+      .eq("id", 1);
+
+    if (error) {
+      throw new Error(`Failed to update active payment provider: ${error.message}`);
+    }
+  }
+
+  async updateInfinitePayHandle(handle: string): Promise<void> {
+    const { error } = await this.client
+      .from("admin_security_settings")
+      .update({ infinitepay_handle: handle, updated_at: new Date().toISOString() })
+      .eq("id", 1);
+
+    if (error) {
+      throw new Error(`Failed to update Infinite Pay handle: ${error.message}`);
     }
   }
 

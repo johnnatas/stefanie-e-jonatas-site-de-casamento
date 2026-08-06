@@ -13,9 +13,10 @@ interface AdminMobileNavProps {
   groups: AdminNavGroup[];
   isOpen: boolean;
   onClose: () => void;
+  userEmail?: string | null;
 }
 
-export function AdminMobileNav({ groups, isOpen, onClose }: AdminMobileNavProps) {
+export function AdminMobileNav({ groups, isOpen, onClose, userEmail }: AdminMobileNavProps) {
   const pathname = usePathname();
   const containerRef = useRef<HTMLDivElement>(null);
   useFocusTrap(containerRef, isOpen, onClose);
@@ -78,7 +79,9 @@ export function AdminMobileNav({ groups, isOpen, onClose }: AdminMobileNavProps)
             ))}
           </nav>
 
-          <form action={logoutAction} className="mt-8">
+          {userEmail && <p className="mt-8 font-sans text-xs text-forest/70">{userEmail}</p>}
+
+          <form action={logoutAction} className={userEmail ? "mt-2" : "mt-8"}>
             <button
               type="submit"
               className="flex min-h-11 items-center font-sans text-sm uppercase tracking-widest text-forest/70 hover:text-moss"

@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { createUpdateSiteContentUseCase, resolvePhotoField } from "@/infrastructure/composition";
 import { identidadeVisualContentSchema } from "@/application/content/schemas";
 import type { SiteContentActionState } from "@/application/content/actionState";
@@ -44,5 +44,6 @@ export async function updateIdentidadeVisualAction(
 
   revalidatePath("/");
   revalidatePath("/admin/conteudo/identidade-visual");
+  updateTag("identidade-visual");
   redirect("/admin/conteudo");
 }

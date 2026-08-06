@@ -5,6 +5,13 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { PageLoader } from "@/components/ui/PageLoader";
 import { getSiteContentOrDefault } from "@/infrastructure/composition";
+import { unstable_cache } from "next/cache";
+
+const getCachedIdentidadeVisual = unstable_cache(
+  () => getSiteContentOrDefault("identidade-visual"),
+  ["identidade-visual"],
+  { tags: ["identidade-visual"] }
+);
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -51,7 +58,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const identidadeVisual = await getSiteContentOrDefault("identidade-visual");
+  const identidadeVisual = await getCachedIdentidadeVisual();
 
   return (
     <html

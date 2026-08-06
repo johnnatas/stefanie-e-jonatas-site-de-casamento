@@ -99,14 +99,6 @@ export function AdminShell({ userEmail, children }: AdminShellProps) {
               </div>
             ))}
           </nav>
-          <form action={logoutAction}>
-            <button
-              type="submit"
-              className="font-sans text-sm uppercase tracking-widest text-forest/70 hover:text-moss"
-            >
-              Sair
-            </button>
-          </form>
         </aside>
 
         <div className="min-w-0 flex-1">
@@ -114,7 +106,17 @@ export function AdminShell({ userEmail, children }: AdminShellProps) {
             <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/70">
               Início / {currentSectionLabel}
             </span>
-            {userEmail && <span className="font-sans text-xs text-forest/70">{userEmail}</span>}
+            <div className="flex items-center gap-4">
+              {userEmail && <span className="font-sans text-xs text-forest/70">{userEmail}</span>}
+              <form action={logoutAction}>
+                <button
+                  type="submit"
+                  className="font-sans text-xs uppercase tracking-widest text-forest/70 hover:text-moss"
+                >
+                  Sair
+                </button>
+              </form>
+            </div>
           </div>
 
           <div className="mt-6 rounded-lg border border-line bg-paper p-6 md:mt-8">{children}</div>
@@ -125,6 +127,7 @@ export function AdminShell({ userEmail, children }: AdminShellProps) {
         groups={ADMIN_NAV_GROUPS}
         isOpen={isMobileNavOpen}
         onClose={() => setIsMobileNavOpen(false)}
+        userEmail={userEmail}
       />
     </div>
   );

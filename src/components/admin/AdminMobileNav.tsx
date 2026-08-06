@@ -6,17 +6,8 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { logoutAction } from "@/app/admin/actions";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
+import type { AdminNavGroup } from "@/components/admin/adminNav";
 import { cn } from "@/shared/utils/cn";
-
-interface AdminNavItem {
-  label: string;
-  href: string;
-}
-
-interface AdminNavGroup {
-  label: string;
-  items: AdminNavItem[];
-}
 
 interface AdminMobileNavProps {
   groups: AdminNavGroup[];
@@ -60,7 +51,10 @@ export function AdminMobileNav({ groups, isOpen, onClose }: AdminMobileNavProps)
           <nav className="mt-8 flex flex-col gap-6">
             {groups.map((group) => (
               <div key={group.label} className="flex flex-col gap-2">
-                <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/70">{group.label}</span>
+                <div className="flex items-center gap-2">
+                  <group.icon className="h-4 w-4 text-forest/70" />
+                  <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/70">{group.label}</span>
+                </div>
                 <div className="flex flex-col gap-3">
                   {group.items.map((item) => {
                     const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);

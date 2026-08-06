@@ -277,10 +277,11 @@ export function GiftForm({ defaultValues, checkoutUrl, existingCategories = [] }
               ) : (
                 <p className="mt-1 font-sans text-xs text-forest/70">Nenhum link gerado para o provedor ativo ainda.</p>
               )}
-              <form action={generateLinkAction} className="mt-2">
+              <div className="mt-2">
                 <input type="hidden" name="giftId" value={defaultValues.id} />
                 <button
                   type="submit"
+                  formAction={generateLinkAction}
                   disabled={isGeneratingLink}
                   className="rounded-full border border-moss px-4 py-2 font-sans text-xs uppercase tracking-widest text-moss transition-colors hover:bg-moss/10 disabled:opacity-60"
                 >
@@ -294,7 +295,7 @@ export function GiftForm({ defaultValues, checkoutUrl, existingCategories = [] }
                     {generateLinkState.message}
                   </p>
                 )}
-              </form>
+              </div>
             </div>
           )}
         </div>

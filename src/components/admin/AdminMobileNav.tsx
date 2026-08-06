@@ -6,25 +6,17 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { logoutAction } from "@/app/admin/actions";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
+import type { AdminNavGroup } from "@/components/admin/adminNav";
 import { cn } from "@/shared/utils/cn";
-
-interface AdminNavItem {
-  label: string;
-  href: string;
-}
-
-interface AdminNavGroup {
-  label: string;
-  items: AdminNavItem[];
-}
 
 interface AdminMobileNavProps {
   groups: AdminNavGroup[];
   isOpen: boolean;
   onClose: () => void;
+  userEmail?: string | null;
 }
 
-export function AdminMobileNav({ groups, isOpen, onClose }: AdminMobileNavProps) {
+export function AdminMobileNav({ groups, isOpen, onClose, userEmail }: AdminMobileNavProps) {
   const pathname = usePathname();
   const containerRef = useRef<HTMLDivElement>(null);
   useFocusTrap(containerRef, isOpen, onClose);
@@ -60,7 +52,10 @@ export function AdminMobileNav({ groups, isOpen, onClose }: AdminMobileNavProps)
           <nav className="mt-8 flex flex-col gap-6">
             {groups.map((group) => (
               <div key={group.label} className="flex flex-col gap-2">
-                <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/70">{group.label}</span>
+                <div className="flex items-center gap-2">
+                  <group.icon className="h-4 w-4 text-forest/70" />
+                  <span className="font-sans text-xs uppercase tracking-[0.2em] text-forest/70">{group.label}</span>
+                </div>
                 <div className="flex flex-col gap-3">
                   {group.items.map((item) => {
                     const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -84,7 +79,9 @@ export function AdminMobileNav({ groups, isOpen, onClose }: AdminMobileNavProps)
             ))}
           </nav>
 
-          <form action={logoutAction} className="mt-8">
+          {userEmail && <p className="mt-8 font-sans text-xs text-forest/70">{userEmail}</p>}
+
+          <form action={logoutAction} className={userEmail ? "mt-2" : "mt-8"}>
             <button
               type="submit"
               className="flex min-h-11 items-center font-sans text-sm uppercase tracking-widest text-forest/70 hover:text-moss"

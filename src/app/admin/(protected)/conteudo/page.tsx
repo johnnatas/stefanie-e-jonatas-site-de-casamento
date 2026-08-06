@@ -25,6 +25,11 @@ const CONTENT_GROUPS: ContentGroup[] = [
         description: "Data e horário exibidos no contador da Home.",
         href: "/admin/conteudo/configuracoes",
       },
+      {
+        label: "Identidade Visual",
+        description: "Logo do site (versões clara e escura).",
+        href: "/admin/conteudo/identidade-visual",
+      },
     ],
   },
   {

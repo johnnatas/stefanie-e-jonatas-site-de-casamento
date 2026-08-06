@@ -2,11 +2,7 @@ import type { Metadata } from "next";
 import { createGetAdminSecuritySettingsUseCase } from "@/infrastructure/composition";
 import { isBackendConfigured } from "@/infrastructure/config/env";
 import { ConfigurationNotice } from "@/components/ui/ConfigurationNotice";
-import { MercadoPagoTokenForm } from "@/components/admin/MercadoPagoTokenForm";
-import { PaymentProviderForm } from "@/components/admin/PaymentProviderForm";
-import { ResendApiKeyForm } from "@/components/admin/ResendApiKeyForm";
-import { SecretKeyForm } from "@/components/admin/SecretKeyForm";
-import { ResetSecretKeyWithTokenForm } from "@/components/admin/ResetSecretKeyWithTokenForm";
+import { IntegracoesTabs } from "@/components/admin/IntegracoesTabs";
 
 export const metadata: Metadata = {
   title: "Integrações | Painel Administrativo",
@@ -48,16 +44,15 @@ export default async function IntegracoesPage({ searchParams }: IntegracoesPageP
   return (
     <div>
       <h1 className="font-serif text-3xl text-forest">Integrações</h1>
-
-      <div className="mt-8 flex max-w-md flex-col gap-10">
-        {resetToken && <ResetSecretKeyWithTokenForm token={resetToken} />}
-        <PaymentProviderForm activeProvider={summary.activePaymentProvider} infinitePayHandle={summary.infinitePayHandle} />
-        <MercadoPagoTokenForm
-          currentTokenLast4={summary.mercadoPagoAccessTokenLast4}
+      <div className="mt-8">
+        <IntegracoesTabs
+          activePaymentProvider={summary.activePaymentProvider}
+          infinitePayHandle={summary.infinitePayHandle}
+          mercadoPagoAccessTokenLast4={summary.mercadoPagoAccessTokenLast4}
+          resendApiKeyLast4={summary.resendApiKeyLast4}
           hasSecretKey={summary.hasSecretKey}
+          resetToken={resetToken}
         />
-        <ResendApiKeyForm currentApiKeyLast4={summary.resendApiKeyLast4} hasSecretKey={summary.hasSecretKey} />
-        <SecretKeyForm hasSecretKey={summary.hasSecretKey} />
       </div>
     </div>
   );

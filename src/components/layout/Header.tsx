@@ -10,7 +10,12 @@ import { cn } from "@/shared/utils/cn";
 
 const TRANSPARENT_SCROLL_THRESHOLD_PX = 80;
 
-export function Header() {
+interface HeaderProps {
+  logoDark?: string | null;
+  logoLight?: string | null;
+}
+
+export function Header({ logoDark, logoLight }: HeaderProps = {}) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
@@ -38,7 +43,12 @@ export function Header() {
     >
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6">
         <Link href="/" aria-label="Início" className="text-current">
-          <Monogram light={isTransparent} className={isTransparent ? "h-[65px] w-auto" : "h-10 w-auto"} />
+          <Monogram
+            light={isTransparent}
+            srcDark={logoDark}
+            srcLight={logoLight}
+            className={isTransparent ? "h-[65px] w-auto" : "h-10 w-auto"}
+          />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
@@ -74,7 +84,7 @@ export function Header() {
         </button>
       </div>
 
-      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
+      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} logoDark={logoDark} />
     </header>
   );
 }

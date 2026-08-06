@@ -133,6 +133,12 @@ export const presentesContentSchema = z.object({
 });
 export type PresentesContent = z.output<typeof presentesContentSchema>;
 
+export const identidadeVisualContentSchema = z.object({
+  logoDark: z.string().min(1).nullable().default(null),
+  logoLight: z.string().min(1).nullable().default(null),
+});
+export type IdentidadeVisualContent = z.output<typeof identidadeVisualContentSchema>;
+
 export const SITE_CONTENT_SLUGS = [
   "settings",
   "home-hero",
@@ -142,6 +148,7 @@ export const SITE_CONTENT_SLUGS = [
   "tips-traje",
   "tips-hospedagem",
   "presentes",
+  "identidade-visual",
 ] as const;
 export type SiteContentSlug = (typeof SITE_CONTENT_SLUGS)[number];
 
@@ -154,4 +161,5 @@ export const SITE_CONTENT_SCHEMAS = {
   "tips-traje": tipsTrajeContentSchema,
   "tips-hospedagem": tipsHospedagemContentSchema,
   presentes: presentesContentSchema,
+  "identidade-visual": identidadeVisualContentSchema,
 } satisfies Record<SiteContentSlug, z.ZodTypeAny>;

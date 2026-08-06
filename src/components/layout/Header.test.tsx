@@ -114,4 +114,13 @@ describe("Header", () => {
 
     expect(screen.getByRole("link", { name: "dicas e instruções" })).toHaveAttribute("aria-current", "page");
   });
+
+  it("forwards the admin-uploaded logo overrides to Monogram", () => {
+    render(<Header logoDark="https://example.com/logo-dark.png" logoLight="https://example.com/logo-light.png" />);
+
+    expect(screen.getByAltText("Stéfanie & Jonatas")).toHaveAttribute(
+      "src",
+      "https://example.com/logo-light.png"
+    );
+  });
 });

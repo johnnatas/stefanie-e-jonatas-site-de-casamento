@@ -2,14 +2,15 @@ import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AdminMobileNav } from "@/components/admin/AdminMobileNav";
+import { HomeIcon, GiftIcon } from "@/components/admin/icons";
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/admin/presentes",
 }));
 
 const GROUPS = [
-  { label: "Visão geral", items: [{ label: "Dashboard", href: "/admin/dashboard" }] },
-  { label: "Presentes", items: [{ label: "Presentes", href: "/admin/presentes" }] },
+  { label: "Visão geral", icon: HomeIcon, items: [{ label: "Dashboard", href: "/admin/dashboard" }] },
+  { label: "Presentes", icon: GiftIcon, items: [{ label: "Presentes", href: "/admin/presentes" }] },
 ];
 
 describe("AdminMobileNav", () => {
@@ -50,5 +51,12 @@ describe("AdminMobileNav", () => {
     render(<AdminMobileNav groups={GROUPS} isOpen={false} onClose={vi.fn()} />);
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("renders an icon next to each group label", () => {
+    render(<AdminMobileNav groups={GROUPS} isOpen onClose={vi.fn()} />);
+
+    const dialog = screen.getByRole("dialog");
+    expect(dialog.querySelectorAll("svg[aria-hidden='true']").length).toBeGreaterThanOrEqual(GROUPS.length);
   });
 });

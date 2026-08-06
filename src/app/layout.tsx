@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { PageLoader } from "@/components/ui/PageLoader";
+import { getSiteContentOrDefault } from "@/infrastructure/composition";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -45,11 +46,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const identidadeVisual = await getSiteContentOrDefault("identidade-visual");
+
   return (
     <html
       lang="pt-BR"
@@ -57,7 +60,7 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col font-sans">
         <PageLoader />
-        <Header />
+        <Header logoDark={identidadeVisual.logoDark} logoLight={identidadeVisual.logoLight} />
         <main className="flex-1 pt-[72px]">{children}</main>
         <Footer />
       </body>

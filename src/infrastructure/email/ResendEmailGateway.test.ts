@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { htmlToPlainText } from "@/infrastructure/email/ResendEmailGateway";
+import { htmlToPlainText, resolveEmailLogoUrl } from "@/infrastructure/email/ResendEmailGateway";
 
 describe("htmlToPlainText", () => {
   it("converts paragraphs into blank-line-separated text", () => {
@@ -25,6 +25,20 @@ describe("htmlToPlainText", () => {
   it("decodes &amp; and &nbsp;", () => {
     expect(htmlToPlainText("<p>Stéfanie &amp; Jonatas&nbsp;te agradecem</p>")).toBe(
       "Stéfanie & Jonatas te agradecem"
+    );
+  });
+});
+
+describe("resolveEmailLogoUrl", () => {
+  it("uses the admin-uploaded logo when one is set", () => {
+    expect(resolveEmailLogoUrl("https://storage.example.com/logo-dark.png", "https://sjcasamento.site")).toBe(
+      "https://storage.example.com/logo-dark.png"
+    );
+  });
+
+  it("falls back to the static asset under the site URL when no logo was uploaded", () => {
+    expect(resolveEmailLogoUrl(null, "https://sjcasamento.site")).toBe(
+      "https://sjcasamento.site/images/logo.png"
     );
   });
 });

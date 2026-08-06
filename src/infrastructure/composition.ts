@@ -60,16 +60,17 @@ export { resolveMediaField, type MediaKind } from "@/infrastructure/supabase/res
 function repositories() {
   const client = getSupabaseServiceRoleClient();
   const securitySettingsRepository = new SupabaseAdminSecuritySettingsRepository(client);
+  const siteContentRepository = new SupabaseSiteContentRepository(client);
   return {
     guestRepository: new SupabaseGuestRepository(client),
     giftRepository: new SupabaseGiftRepository(client),
     giftContributionRepository: new SupabaseGiftContributionRepository(client),
-    siteContentRepository: new SupabaseSiteContentRepository(client),
+    siteContentRepository,
     securitySettingsRepository,
     mercadoPagoGateway: new MercadoPagoGateway(securitySettingsRepository),
     infinitePayGateway: new InfinitePayGateway(securitySettingsRepository),
     notificationLogRepository: new SupabaseNotificationLogRepository(client),
-    emailGateway: new ResendEmailGateway(securitySettingsRepository),
+    emailGateway: new ResendEmailGateway(securitySettingsRepository, siteContentRepository),
   };
 }
 

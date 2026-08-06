@@ -11,9 +11,10 @@ import { useFocusTrap } from "@/hooks/useFocusTrap";
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
+  logoDark?: string | null;
 }
 
-export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
+export function MobileMenu({ isOpen, onClose, logoDark }: MobileMenuProps) {
   const pathname = usePathname();
   const containerRef = useRef<HTMLDivElement>(null);
   useFocusTrap(containerRef, isOpen, onClose);
@@ -33,7 +34,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           className="fixed inset-0 z-50 bg-mist md:hidden"
         >
           <div className="flex items-center justify-between px-6 py-5">
-            <Monogram className="h-12 w-auto" />
+            <Monogram className="h-12 w-auto" srcDark={logoDark} />
             <button
               type="button"
               onClick={onClose}

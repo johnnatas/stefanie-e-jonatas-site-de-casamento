@@ -1,6 +1,8 @@
 import { Resend } from "resend";
 import { EmailGateway, SendEmailInput } from "@/application/ports/EmailGateway";
 import { AdminSecuritySettingsRepository } from "@/domain/repositories/AdminSecuritySettingsRepository";
+import { SiteContentRepository } from "@/domain/repositories/SiteContentRepository";
+import { identidadeVisualContentSchema } from "@/application/content/schemas";
 import { getEnv } from "@/infrastructure/config/env";
 
 const FROM_ADDRESS = "Stéfanie & Jonatas <lembretes@sjcasamento.site>";
@@ -23,6 +25,16 @@ export function htmlToPlainText(html: string): string {
 }
 
 /**
+ * Resolves which logo image an outgoing e-mail should embed: the
+ * admin-uploaded dark-variant logo (src/app/admin/(protected)/conteudo/
+ * identidade-visual) when one exists, otherwise the static asset shipped
+ * with the site.
+ */
+export function resolveEmailLogoUrl(logoDark: string | null, siteUrl: string): string {
+  return logoDark ?? `${siteUrl}/images/logo.png`;
+}
+
+/**
  * Wraps every outgoing notification in the site's own visual identity
  * (centered logo, light-green card on a light-green page background, the
  * same Playfair Display / Inter fonts as the site) so emails read as an
@@ -30,9 +42,7 @@ export function htmlToPlainText(html: string): string {
  * clients strip <style> blocks and most external fonts, so everything is
  * inlined and font stacks fall back to system serif/sans-serif.
  */
-function renderEmailShell(bodyHtml: string): string {
-  const logoUrl = `${getEnv().NEXT_PUBLIC_SITE_URL}/images/logo.png`;
-
+function renderEmailShell(bodyHtml: string, logoUrl: string): string {
   return `<!doctype html>
 <html lang="pt-BR">
   <body style="margin: 0; padding: 0; background-color: #e3e8c8;">
@@ -59,7 +69,10 @@ function renderEmailShell(bodyHtml: string): string {
 }
 
 export class ResendEmailGateway implements EmailGateway {
-  constructor(private readonly securitySettingsRepository: AdminSecuritySettingsRepository) {}
+  constructor(
+    private readonly securitySettingsRepository: AdminSecuritySettingsRepository,
+    private readonly siteContentRepository: SiteContentRepository
+  ) {}
 
   async sendEmail(input: SendEmailInput): Promise<void> {
     const settings = await this.securitySettingsRepository.getSettings();
@@ -67,12 +80,16 @@ export class ResendEmailGateway implements EmailGateway {
       throw new Error("Resend não está configurado. Configure a API Key em Integrações.");
     }
 
+    const identitySection = await this.siteContentRepository.findBySlug("identidade-visual");
+    const { logoDark } = identidadeVisualContentSchema.parse(identitySection?.content ?? {});
+    const logoUrl = resolveEmailLogoUrl(logoDark, getEnv().NEXT_PUBLIC_SITE_URL);
+
     const client = new Resend(settings.resendApiKey);
     const result = await client.emails.send({
       from: FROM_ADDRESS,
       to: input.to,
       subject: input.subject,
-      html: renderEmailShell(input.html),
+      html: renderEmailShell(input.html, logoUrl),
       text: htmlToPlainText(input.html),
     });
 

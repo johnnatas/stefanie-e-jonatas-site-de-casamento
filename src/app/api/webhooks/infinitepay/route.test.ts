@@ -128,4 +128,17 @@ describe("POST /api/webhooks/infinitepay", () => {
       })
     );
   });
+
+  it("still returns 200 when record() rejects on the success path, without affecting the response", async () => {
+    recordMock.mockRejectedValueOnce(new Error("log insert failed"));
+    const { POST } = await import("@/app/api/webhooks/infinitepay/route");
+    const response = await POST(
+      makeRequest({ order_nsu: "gift-1", transaction_nsu: "txn-1", paid_amount: 20000 })
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({ received: true });
+    expect(executeMock).toHaveBeenCalledTimes(1);
+    expect(recordMock).toHaveBeenCalledTimes(1);
+  });
 });

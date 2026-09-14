@@ -12,6 +12,19 @@ interface InfinitePayWebhookBody {
   paid_amount?: number;
 }
 
+async function safeRecord(
+  webhookLogRepository: ReturnType<typeof createInfinitePayWebhookLogRepository>,
+  event: Parameters<ReturnType<typeof createInfinitePayWebhookLogRepository>["record"]>[0]
+): Promise<void> {
+  try {
+    await webhookLogRepository.record(event);
+  } catch (error) {
+    // A failure to write the durable log must never change the HTTP
+    // response or double-invoke payment processing — log and swallow.
+    console.error("Failed to log Infinite Pay webhook event", error);
+  }
+}
+
 export async function POST(request: Request) {
   let body: InfinitePayWebhookBody;
   try {
@@ -24,7 +37,7 @@ export async function POST(request: Request) {
   const webhookLogRepository = createInfinitePayWebhookLogRepository();
 
   if (!order_nsu || !transaction_nsu || typeof paid_amount !== "number") {
-    await webhookLogRepository.record({
+    await safeRecord(webhookLogRepository, {
       orderNsu: order_nsu,
       transactionNsu: transaction_nsu,
       invoiceSlug: invoice_slug,
@@ -47,7 +60,7 @@ export async function POST(request: Request) {
       },
     });
 
-    await webhookLogRepository.record({
+    await safeRecord(webhookLogRepository, {
       orderNsu: order_nsu,
       transactionNsu: transaction_nsu,
       invoiceSlug: invoice_slug,
@@ -64,7 +77,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ received: true });
   } catch (error) {
     console.error("Failed to process Infinite Pay webhook", error);
-    await webhookLogRepository.record({
+    await safeRecord(webhookLogRepository, {
       orderNsu: order_nsu,
       transactionNsu: transaction_nsu,
       invoiceSlug: invoice_slug,

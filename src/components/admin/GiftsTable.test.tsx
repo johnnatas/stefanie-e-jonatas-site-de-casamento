@@ -46,6 +46,8 @@ const gifts: GiftListItem[] = [
     category: "cozinha",
     status: "paid",
     createdAt: new Date("2026-01-02T00:00:00-03:00"),
+    purchasedBy: "Ana Silva",
+    purchasedAt: new Date("2026-02-10T00:00:00-03:00"),
   }),
 ];
 
@@ -107,6 +109,22 @@ describe("GiftsTable", () => {
     expect(rows[0]).toHaveTextContent("Aspirador robô");
     expect(rows[1]).toHaveTextContent("Jogo de taças");
     expect(rows[2]).toHaveTextContent("Jogo de panelas");
+  });
+
+  it("shows who purchased a gift and when", () => {
+    render(<GiftsTable gifts={gifts} />);
+
+    expect(screen.getByText("Ana Silva")).toBeInTheDocument();
+  });
+
+  it("sorts by purchase date when 'Data do presente recebido' is selected", async () => {
+    const user = userEvent.setup();
+    render(<GiftsTable gifts={gifts} />);
+
+    await user.selectOptions(screen.getByLabelText(/ordenar por/i), "purchasedAt");
+
+    const rows = screen.getAllByRole("row").slice(1);
+    expect(rows[0]).toHaveTextContent("Ana Silva");
   });
 
   it("links the gift name to its edit page", () => {

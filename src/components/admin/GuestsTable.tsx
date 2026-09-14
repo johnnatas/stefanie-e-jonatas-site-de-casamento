@@ -104,18 +104,18 @@ function CompanionsCountCell({ guest }: CompanionsCountCellProps) {
           onClick={save}
           disabled={isSaving}
           aria-label="Salvar acompanhantes"
-          className="text-moss hover:text-moss/80 disabled:opacity-60"
+          className="flex h-7 w-7 items-center justify-center rounded-full border border-moss/40 text-moss transition-colors hover:bg-moss/10 disabled:opacity-60"
         >
-          <CheckIcon className="h-5 w-5" />
+          <CheckIcon className="h-4 w-4" />
         </button>
         <button
           type="button"
           onClick={cancelEditing}
           disabled={isSaving}
           aria-label="Cancelar edição de acompanhantes"
-          className="text-danger hover:text-danger/80 disabled:opacity-60"
+          className="flex h-7 w-7 items-center justify-center rounded-full border border-danger/40 text-danger transition-colors hover:bg-danger/10 disabled:opacity-60"
         >
-          <XIcon className="h-5 w-5" />
+          <XIcon className="h-4 w-4" />
         </button>
       </div>
       {error && <p className="mt-1 font-sans text-xs text-danger">{error}</p>}

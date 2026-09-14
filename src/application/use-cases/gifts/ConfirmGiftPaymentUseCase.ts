@@ -10,6 +10,7 @@ export interface ConfirmedPayment {
   status: "approved" | "rejected";
   giftId: string;
   paidAmount?: number;
+  contributionId?: string;
 }
 
 export interface ConfirmGiftPaymentInput {
@@ -25,9 +26,15 @@ export class ConfirmGiftPaymentUseCase {
   ) {}
 
   async execute(input: ConfirmGiftPaymentInput): Promise<GiftContribution | null> {
-    const contribution = await this.giftContributionRepository.findPendingByGiftId(input.payment.giftId);
+    const contribution = input.payment.contributionId
+      ? await this.giftContributionRepository.findById(input.payment.contributionId)
+      : await this.giftContributionRepository.findPendingByGiftId(input.payment.giftId);
     if (!contribution) {
       return null;
+    }
+
+    if (contribution.status !== "pending" && contribution.status !== "expired") {
+      return contribution;
     }
 
     if (

@@ -103,6 +103,59 @@ describe("SyncInfinitePayPaymentsUseCase", () => {
     expect(checkPaymentStatus).not.toHaveBeenCalled();
   });
 
+  it("confirms an expired Infinite Pay contribution when the gateway reports it as paid", async () => {
+    await contributionRepository.save(
+      GiftContribution.create({
+        giftId: "gift-1",
+        guestName: "Ana Silva",
+        guestEmail: "ana@example.com",
+        amount: 450,
+        status: "expired",
+        paymentProvider: "infinite_pay",
+      })
+    );
+    checkPaymentStatus.mockResolvedValue({ paid: true, paidAmount: 450 });
+
+    const result = await useCase.execute();
+
+    expect(result).toEqual({ checked: 1, updated: 1, errors: [] });
+    const updatedGift = await giftRepository.findById("gift-1");
+    expect(updatedGift!.status).toBe("paid");
+  });
+
+  it("dedupes multiple candidate contributions for the same gift, confirming only once", async () => {
+    await contributionRepository.save(
+      GiftContribution.create({
+        giftId: "gift-1",
+        guestName: "Ana Silva",
+        guestEmail: "ana@example.com",
+        amount: 450,
+        status: "expired",
+        paymentProvider: "infinite_pay",
+        createdAt: new Date("2026-01-01T00:00:00Z"),
+      })
+    );
+    await contributionRepository.save(
+      GiftContribution.create({
+        giftId: "gift-1",
+        guestName: "Ana Silva",
+        guestEmail: "ana@example.com",
+        amount: 450,
+        status: "pending",
+        paymentProvider: "infinite_pay",
+        createdAt: new Date("2026-01-02T00:00:00Z"),
+      })
+    );
+    checkPaymentStatus.mockResolvedValue({ paid: true, paidAmount: 450 });
+
+    const result = await useCase.execute();
+
+    expect(result.checked).toBe(1);
+    expect(result.updated).toBe(1);
+    expect(result.errors).toHaveLength(0);
+    expect(checkPaymentStatus).toHaveBeenCalledTimes(1);
+  });
+
   it("records an error for one contribution without stopping the others", async () => {
     await contributionRepository.save(
       GiftContribution.create({

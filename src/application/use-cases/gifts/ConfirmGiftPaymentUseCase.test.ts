@@ -141,4 +141,65 @@ describe("ConfirmGiftPaymentUseCase", () => {
 
     expect(result?.status).toBe("approved");
   });
+
+  it("confirms the exact expired contribution referenced by contributionId, even when another contribution for the same gift exists", async () => {
+    const gift = await giftRepository.findById("gift-1");
+    await giftRepository.update(gift!.reserve(new Date(Date.now() + 30 * 60 * 1000)));
+
+    const targetContribution = await contributionRepository.save(
+      GiftContribution.create({
+        giftId: "gift-1",
+        guestName: "Carla Souza",
+        guestEmail: "carla@example.com",
+        amount: 200,
+        status: "expired",
+        paymentProvider: "infinite_pay",
+      })
+    );
+    const otherContribution = await contributionRepository.save(
+      GiftContribution.create({
+        giftId: "gift-1",
+        guestName: "Diego Alves",
+        guestEmail: "diego@example.com",
+        amount: 200,
+        status: "expired",
+        paymentProvider: "infinite_pay",
+      })
+    );
+
+    const result = await confirmPayment.execute({
+      payment: {
+        paymentReference: "transaction-2",
+        status: "approved",
+        giftId: "gift-1",
+        contributionId: targetContribution.id,
+      },
+    });
+
+    expect(result?.id).toBe(targetContribution.id);
+    expect(result?.status).toBe("approved");
+
+    const untouchedOther = await contributionRepository.findById(otherContribution.id!);
+    expect(untouchedOther?.status).toBe("expired");
+  });
+
+  it("does not reprocess a contribution referenced by contributionId that is already approved", async () => {
+    await reserveGiftAndCreatePendingContribution();
+    const initialResult = await confirmPayment.execute({
+      payment: { paymentReference: "payment-1", status: "approved", giftId: "gift-1" },
+    });
+    expect(emailGateway.sentEmails).toHaveLength(1);
+
+    const result = await confirmPayment.execute({
+      payment: {
+        paymentReference: "payment-1-retry",
+        status: "approved",
+        giftId: "gift-1",
+        contributionId: initialResult!.id,
+      },
+    });
+
+    expect(result?.status).toBe("approved");
+    expect(emailGateway.sentEmails).toHaveLength(1);
+  });
 });

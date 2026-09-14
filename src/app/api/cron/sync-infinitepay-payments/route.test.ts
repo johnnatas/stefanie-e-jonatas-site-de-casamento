@@ -45,4 +45,22 @@ describe("GET /api/cron/sync-infinitepay-payments", () => {
     expect(body).toEqual({ checked: 2, updated: 1, errors: [] });
     expect(executeMock).toHaveBeenCalled();
   });
+
+  it("returns a 500 error when the sync use case throws", async () => {
+    executeMock.mockRejectedValueOnce(new Error("boom"));
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const { GET } = await import("@/app/api/cron/sync-infinitepay-payments/route");
+    const request = new NextRequest("http://localhost/api/cron/sync-infinitepay-payments", {
+      headers: { authorization: "Bearer test-secret" },
+    });
+
+    const response = await GET(request);
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body).toEqual({ error: "Internal error" });
+
+    consoleErrorSpy.mockRestore();
+  });
 });

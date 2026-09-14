@@ -7,6 +7,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const result = await createSyncInfinitePayPaymentsUseCase().execute();
-  return NextResponse.json(result);
+  try {
+    const result = await createSyncInfinitePayPaymentsUseCase().execute();
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error("Failed to sync Infinite Pay payments", error);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+  }
 }

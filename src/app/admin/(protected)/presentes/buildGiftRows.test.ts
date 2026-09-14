@@ -46,4 +46,42 @@ describe("buildGiftRows", () => {
     expect(rows[0].purchasedBy).toBeUndefined();
     expect(rows[0].purchasedAt).toBeUndefined();
   });
+
+  it("picks the most recent approved contribution when a gift has more than one, regardless of input order", () => {
+    const gift = Gift.create({
+      id: "gift-3",
+      name: "Liquidificador",
+      description: "Liquidificador 900W",
+      imageUrl: null,
+      price: 250,
+      category: "cozinha",
+      status: "paid",
+    });
+    const earlierContribution = GiftContribution.create({
+      id: "c1",
+      giftId: "gift-3",
+      guestName: "Bruno Costa",
+      guestEmail: "bruno@example.com",
+      amount: 250,
+      status: "approved",
+      createdAt: new Date("2026-01-05"),
+    });
+    const laterContribution = GiftContribution.create({
+      id: "c2",
+      giftId: "gift-3",
+      guestName: "Carla Souza",
+      guestEmail: "carla@example.com",
+      amount: 250,
+      status: "approved",
+      createdAt: new Date("2026-03-01"),
+    });
+
+    const rowsEarlierFirst = buildGiftRows([gift], [earlierContribution, laterContribution]);
+    expect(rowsEarlierFirst[0].purchasedBy).toBe("Carla Souza");
+    expect(rowsEarlierFirst[0].purchasedAt).toEqual(new Date("2026-03-01"));
+
+    const rowsLaterFirst = buildGiftRows([gift], [laterContribution, earlierContribution]);
+    expect(rowsLaterFirst[0].purchasedBy).toBe("Carla Souza");
+    expect(rowsLaterFirst[0].purchasedAt).toEqual(new Date("2026-03-01"));
+  });
 });

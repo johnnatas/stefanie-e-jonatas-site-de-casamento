@@ -150,7 +150,15 @@ export class SupabaseGuestRepository implements GuestRepository {
       patch.email = update.email;
     }
     if (update.attendanceStatus === "confirmed") {
-      patch.confirmed_at = new Date().toISOString();
+      const { data: current } = await this.client
+        .from("guests")
+        .select("attendance_status")
+        .eq("id", id)
+        .maybeSingle();
+
+      if (current && (current as Pick<GuestRow, "attendance_status">).attendance_status !== "confirmed") {
+        patch.confirmed_at = new Date().toISOString();
+      }
     }
 
     const { data, error } = await this.client

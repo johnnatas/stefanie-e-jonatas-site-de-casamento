@@ -46,6 +46,59 @@ describe("ConfirmRsvpUseCase", () => {
     expect(updated.confirmedAt!.getTime()).toBeGreaterThanOrEqual(before);
   });
 
+  it("does not change confirmedAt when an already-confirmed guest resubmits", async () => {
+    const repository = new InMemoryGuestRepository();
+    const guest = await seedPendingGuest(repository);
+    const useCase = new ConfirmRsvpUseCase(repository);
+
+    const firstConfirmation = await useCase.execute({
+      guestId: guest.id!,
+      attendanceStatus: "confirmed",
+      companionsCount: 1,
+      email: "ana@example.com",
+    });
+    const originalConfirmedAt = firstConfirmation.confirmedAt;
+
+    const resubmitted = await useCase.execute({
+      guestId: guest.id!,
+      attendanceStatus: "confirmed",
+      companionsCount: 2,
+      email: "ana@example.com",
+      message: "Trocando os acompanhantes",
+    });
+
+    expect(resubmitted.confirmedAt).toEqual(originalConfirmedAt);
+  });
+
+  it("does not reset a companion's confirmedAt when the RSVP is resubmitted", async () => {
+    const repository = new InMemoryGuestRepository();
+    const guest = await seedPendingGuest(repository);
+    const companion = await repository.save(
+      Guest.create({ fullName: "Bruno Lima", companionsCount: 0, attendanceStatus: "pending" })
+    );
+    const useCase = new ConfirmRsvpUseCase(repository);
+
+    await useCase.execute({
+      guestId: guest.id!,
+      attendanceStatus: "confirmed",
+      companionsCount: 1,
+      companionGuestIds: [companion.id!],
+      email: "ana@example.com",
+    });
+    const originalCompanionConfirmedAt = (await repository.findById(companion.id!))?.confirmedAt;
+
+    await useCase.execute({
+      guestId: guest.id!,
+      attendanceStatus: "confirmed",
+      companionsCount: 1,
+      companionGuestIds: [companion.id!],
+      email: "ana@example.com",
+    });
+    const companionAfterResubmit = await repository.findById(companion.id!);
+
+    expect(companionAfterResubmit?.confirmedAt).toEqual(originalCompanionConfirmedAt);
+  });
+
   it("declines a pending guest and forces companions to zero", async () => {
     const repository = new InMemoryGuestRepository();
     const guest = await seedPendingGuest(repository);

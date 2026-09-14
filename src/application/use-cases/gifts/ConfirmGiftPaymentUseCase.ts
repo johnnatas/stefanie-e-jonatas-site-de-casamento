@@ -11,6 +11,7 @@ export interface ConfirmedPayment {
   giftId: string;
   paidAmount?: number;
   contributionId?: string;
+  invoiceSlug?: string;
 }
 
 export interface ConfirmGiftPaymentInput {
@@ -52,7 +53,7 @@ export class ConfirmGiftPaymentUseCase {
 
     if (input.payment.status === "approved") {
       const updatedContribution = await this.giftContributionRepository.update(
-        contribution.approve(input.payment.paymentReference)
+        contribution.approve(input.payment.paymentReference, input.payment.invoiceSlug)
       );
       if (gift) {
         await this.giftRepository.update(gift.markAsPaid());

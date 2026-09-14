@@ -110,4 +110,17 @@ describe("GiftContribution payment provider handling", () => {
     expect(ipRejected.status).toBe("rejected");
     expect(ipRejected.infinitePayTransactionNsu).toBe("transaction-2");
   });
+
+  it("approve stores the invoice slug when provided for infinite_pay", () => {
+    const approved = makeContribution({ paymentProvider: "infinite_pay" }).approve("transaction-1", "slug-1");
+    expect(approved.infinitePayTransactionNsu).toBe("transaction-1");
+    expect(approved.infinitePayInvoiceSlug).toBe("slug-1");
+  });
+
+  it("approve preserves a previously stored invoice slug when called again without one", () => {
+    const firstApproval = makeContribution({ paymentProvider: "infinite_pay" }).approve("transaction-1", "slug-1");
+    const secondApproval = firstApproval.approve("transaction-1-retry");
+
+    expect(secondApproval.infinitePayInvoiceSlug).toBe("slug-1");
+  });
 });

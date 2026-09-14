@@ -202,4 +202,29 @@ describe("ConfirmGiftPaymentUseCase", () => {
     expect(result?.status).toBe("approved");
     expect(emailGateway.sentEmails).toHaveLength(1);
   });
+
+  it("stores the invoice slug on the contribution when provided", async () => {
+    const gift = await giftRepository.findById("gift-1");
+    await giftRepository.update(gift!.reserve(new Date(Date.now() + 30 * 60 * 1000)));
+    await contributionRepository.save(
+      GiftContribution.create({
+        giftId: "gift-1",
+        guestName: "Elis Regina",
+        guestEmail: "elis@example.com",
+        amount: 200,
+        paymentProvider: "infinite_pay",
+      })
+    );
+
+    const result = await confirmPayment.execute({
+      payment: {
+        paymentReference: "transaction-3",
+        status: "approved",
+        giftId: "gift-1",
+        invoiceSlug: "slug-abc",
+      },
+    });
+
+    expect(result?.infinitePayInvoiceSlug).toBe("slug-abc");
+  });
 });

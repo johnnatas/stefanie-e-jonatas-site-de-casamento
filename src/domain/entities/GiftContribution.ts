@@ -16,6 +16,7 @@ export interface GiftContributionProps {
   mercadoPagoPaymentId?: string;
   infinitePayOrderNsu?: string;
   infinitePayTransactionNsu?: string;
+  infinitePayInvoiceSlug?: string;
   expectedPaymentDate?: Date | null;
   createdAt?: Date;
 }
@@ -33,6 +34,7 @@ export class GiftContribution {
   readonly mercadoPagoPaymentId?: string;
   readonly infinitePayOrderNsu?: string;
   readonly infinitePayTransactionNsu?: string;
+  readonly infinitePayInvoiceSlug?: string;
   readonly expectedPaymentDate: Date | null;
   readonly createdAt: Date;
 
@@ -49,6 +51,7 @@ export class GiftContribution {
     this.mercadoPagoPaymentId = props.mercadoPagoPaymentId;
     this.infinitePayOrderNsu = props.infinitePayOrderNsu;
     this.infinitePayTransactionNsu = props.infinitePayTransactionNsu;
+    this.infinitePayInvoiceSlug = props.infinitePayInvoiceSlug;
     this.expectedPaymentDate = props.expectedPaymentDate ?? null;
     this.createdAt = props.createdAt ?? new Date();
   }
@@ -75,9 +78,14 @@ export class GiftContribution {
       : new GiftContribution({ ...this, paymentProvider: provider, infinitePayOrderNsu: referenceId });
   }
 
-  approve(paymentReference: string): GiftContribution {
+  approve(paymentReference: string, invoiceSlug?: string): GiftContribution {
     return this.paymentProvider === "infinite_pay"
-      ? new GiftContribution({ ...this, status: "approved", infinitePayTransactionNsu: paymentReference })
+      ? new GiftContribution({
+          ...this,
+          status: "approved",
+          infinitePayTransactionNsu: paymentReference,
+          infinitePayInvoiceSlug: invoiceSlug ?? this.infinitePayInvoiceSlug,
+        })
       : new GiftContribution({ ...this, status: "approved", mercadoPagoPaymentId: paymentReference });
   }
 

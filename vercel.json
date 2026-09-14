@@ -1,3 +1,6 @@
 {
-  "crons": [{ "path": "/api/cron/daily-notifications", "schedule": "30 11 * * *" }]
+  "crons": [
+    { "path": "/api/cron/daily-notifications", "schedule": "30 11 * * *" },
+    { "path": "/api/cron/sync-infinitepay-payments", "schedule": "0 * * * *" }
+  ]
 }

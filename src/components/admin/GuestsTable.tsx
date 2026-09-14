@@ -182,6 +182,9 @@ export function GuestsTable({ guests }: GuestsTableProps) {
 
   function sortIndicator(column: SortColumn) {
     if (sortColumn !== column) return null;
+    if (column === "confirmedAt") {
+      return sortDirection === "asc" ? " ▼" : " ▲";
+    }
     return sortDirection === "asc" ? " ▲" : " ▼";
   }
 

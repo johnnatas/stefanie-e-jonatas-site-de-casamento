@@ -107,6 +107,23 @@ describe("GuestsTable", () => {
     expect(rows[0]).toHaveTextContent("Ana Silva");
   });
 
+  it("shows a sort arrow on the Confirmado em header that matches the displayed order", async () => {
+    const user = userEvent.setup();
+    const guestsWithDates: GuestListItem[] = [
+      makeGuest({ id: "1", fullName: "Ana Silva", attendanceStatus: "confirmed", confirmedAt: new Date("2026-01-10") }),
+      makeGuest({ id: "2", fullName: "Bruno Costa", attendanceStatus: "confirmed", confirmedAt: new Date("2026-02-01") }),
+    ];
+    render(<GuestsTable guests={guestsWithDates} />);
+
+    const header = screen.getByRole("button", { name: /confirmado em/i });
+
+    await user.click(header);
+    expect(header.textContent).toContain("▼");
+
+    await user.click(header);
+    expect(header.textContent).toContain("▲");
+  });
+
   it("edits the companions count inline via double click, showing confirm and cancel controls", async () => {
     const user = userEvent.setup();
     render(<GuestsTable guests={guests} />);

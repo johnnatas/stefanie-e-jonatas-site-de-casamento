@@ -8,6 +8,7 @@ import type { GiftStatus } from "@/domain/entities/Gift";
 import { formatCurrency } from "@/shared/utils/formatCurrency";
 import { DeleteGiftButton } from "@/components/admin/DeleteGiftButton";
 import { generateMissingPaymentLinksAction } from "@/app/admin/(protected)/presentes/generateLinksAction";
+import { SyncInfinitePayPaymentsButton } from "@/components/admin/SyncInfinitePayPaymentsButton";
 
 export interface GiftListItem {
   id: string;
@@ -115,25 +116,28 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
 
   return (
     <div>
-      {hasMissingLinks && (
-        <form action={generateAction} className="mt-4">
-          <button
-            type="submit"
-            disabled={isGenerating}
-            className="rounded-full border border-moss px-5 py-2 font-sans text-xs uppercase tracking-widest text-moss transition-colors hover:bg-moss/10 disabled:opacity-60"
-          >
-            {isGenerating ? "Gerando..." : "Gerar links pendentes"}
-          </button>
-          {generateState.status === "success" && (
-            <p className="mt-2 font-sans text-xs text-moss">{generateState.message}</p>
-          )}
-          {generateState.status === "error" && (
-            <p role="alert" className="mt-2 font-sans text-xs text-danger">
-              {generateState.message}
-            </p>
-          )}
-        </form>
-      )}
+      <div className="mt-4 flex flex-wrap items-start gap-4">
+        {hasMissingLinks && (
+          <form action={generateAction}>
+            <button
+              type="submit"
+              disabled={isGenerating}
+              className="rounded-full border border-moss px-5 py-2 font-sans text-xs uppercase tracking-widest text-moss transition-colors hover:bg-moss/10 disabled:opacity-60"
+            >
+              {isGenerating ? "Gerando..." : "Gerar links pendentes"}
+            </button>
+            {generateState.status === "success" && (
+              <p className="mt-2 font-sans text-xs text-moss">{generateState.message}</p>
+            )}
+            {generateState.status === "error" && (
+              <p role="alert" className="mt-2 font-sans text-xs text-danger">
+                {generateState.message}
+              </p>
+            )}
+          </form>
+        )}
+        <SyncInfinitePayPaymentsButton />
+      </div>
       <div className="mt-6 flex flex-wrap gap-4">
         <div className="flex-1 min-w-[160px]">
           <label htmlFor="gift-search" className="block font-sans text-sm text-forest">

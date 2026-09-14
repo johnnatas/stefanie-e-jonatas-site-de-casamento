@@ -19,6 +19,7 @@ import { ConfirmRsvpUseCase } from "@/application/use-cases/rsvp/ConfirmRsvpUseC
 import { ListGiftsUseCase } from "@/application/use-cases/gifts/ListGiftsUseCase";
 import { CreateGiftContributionUseCase } from "@/application/use-cases/gifts/CreateGiftContributionUseCase";
 import { ConfirmGiftPaymentUseCase } from "@/application/use-cases/gifts/ConfirmGiftPaymentUseCase";
+import { SyncInfinitePayPaymentsUseCase } from "@/application/use-cases/gifts/SyncInfinitePayPaymentsUseCase";
 import { ListGuestsUseCase } from "@/application/use-cases/admin/ListGuestsUseCase";
 import { SearchGuestsUseCase } from "@/application/use-cases/rsvp/SearchGuestsUseCase";
 import { CreateGuestUseCase } from "@/application/use-cases/admin/CreateGuestUseCase";
@@ -101,6 +102,15 @@ export function createGiftContributionUseCase(): CreateGiftContributionUseCase {
 export function createConfirmGiftPaymentUseCase(): ConfirmGiftPaymentUseCase {
   const { giftRepository, giftContributionRepository, emailGateway, notificationLogRepository } = repositories();
   return new ConfirmGiftPaymentUseCase(giftRepository, giftContributionRepository, emailGateway, notificationLogRepository);
+}
+
+export function createSyncInfinitePayPaymentsUseCase(): SyncInfinitePayPaymentsUseCase {
+  const { giftContributionRepository, infinitePayGateway } = repositories();
+  return new SyncInfinitePayPaymentsUseCase(
+    giftContributionRepository,
+    infinitePayGateway,
+    createConfirmGiftPaymentUseCase()
+  );
 }
 
 export function createListGuestsUseCase(): ListGuestsUseCase {

@@ -19,10 +19,12 @@ import { ConfirmRsvpUseCase } from "@/application/use-cases/rsvp/ConfirmRsvpUseC
 import { ListGiftsUseCase } from "@/application/use-cases/gifts/ListGiftsUseCase";
 import { CreateGiftContributionUseCase } from "@/application/use-cases/gifts/CreateGiftContributionUseCase";
 import { ConfirmGiftPaymentUseCase } from "@/application/use-cases/gifts/ConfirmGiftPaymentUseCase";
+import { SyncInfinitePayPaymentsUseCase } from "@/application/use-cases/gifts/SyncInfinitePayPaymentsUseCase";
 import { ListGuestsUseCase } from "@/application/use-cases/admin/ListGuestsUseCase";
 import { SearchGuestsUseCase } from "@/application/use-cases/rsvp/SearchGuestsUseCase";
 import { CreateGuestUseCase } from "@/application/use-cases/admin/CreateGuestUseCase";
 import { UpdateGuestUseCase } from "@/application/use-cases/admin/UpdateGuestUseCase";
+import { UpdateGuestCompanionsCountUseCase } from "@/application/use-cases/admin/UpdateGuestCompanionsCountUseCase";
 import { DeleteGuestUseCase } from "@/application/use-cases/admin/DeleteGuestUseCase";
 import { DeleteGiftUseCase } from "@/application/use-cases/admin/DeleteGiftUseCase";
 import { GetDashboardSummaryUseCase } from "@/application/use-cases/admin/GetDashboardSummaryUseCase";
@@ -100,6 +102,15 @@ export function createGiftContributionUseCase(): CreateGiftContributionUseCase {
 export function createConfirmGiftPaymentUseCase(): ConfirmGiftPaymentUseCase {
   const { giftRepository, giftContributionRepository, emailGateway, notificationLogRepository } = repositories();
   return new ConfirmGiftPaymentUseCase(giftRepository, giftContributionRepository, emailGateway, notificationLogRepository);
+}
+
+export function createSyncInfinitePayPaymentsUseCase(): SyncInfinitePayPaymentsUseCase {
+  const { giftContributionRepository, infinitePayGateway } = repositories();
+  return new SyncInfinitePayPaymentsUseCase(
+    giftContributionRepository,
+    infinitePayGateway,
+    createConfirmGiftPaymentUseCase()
+  );
 }
 
 export function createListGuestsUseCase(): ListGuestsUseCase {
@@ -208,6 +219,10 @@ export function createCreateGuestUseCase(): CreateGuestUseCase {
 
 export function createUpdateGuestUseCase(): UpdateGuestUseCase {
   return new UpdateGuestUseCase(repositories().guestRepository);
+}
+
+export function createUpdateGuestCompanionsCountUseCase(): UpdateGuestCompanionsCountUseCase {
+  return new UpdateGuestCompanionsCountUseCase(repositories().guestRepository);
 }
 
 export function createDeleteGuestUseCase(): DeleteGuestUseCase {

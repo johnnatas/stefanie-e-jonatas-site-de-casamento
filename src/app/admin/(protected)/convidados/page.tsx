@@ -66,6 +66,7 @@ export default async function AdminGuestsPage() {
               phone: guest.phone,
               companionsCount: guest.companionsCount,
               attendanceStatus: guest.attendanceStatus,
+              confirmedAt: guest.confirmedAt,
             }))}
           />
         </Suspense>

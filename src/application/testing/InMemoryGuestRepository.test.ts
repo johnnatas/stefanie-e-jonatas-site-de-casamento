@@ -43,4 +43,34 @@ describe("InMemoryGuestRepository", () => {
 
     await expect(repository.delete("missing")).rejects.toThrow(GuestNotFoundError);
   });
+
+  it("sets confirmedAt when updateAttendance transitions a guest from pending to confirmed", async () => {
+    const repository = new InMemoryGuestRepository();
+    const created = await repository.save(
+      Guest.create({ fullName: "Carla Nunes", companionsCount: 0, attendanceStatus: "pending" })
+    );
+
+    const before = Date.now();
+    const updated = await repository.updateAttendance(created.id!, { attendanceStatus: "confirmed" });
+
+    expect(updated.confirmedAt).toBeInstanceOf(Date);
+    expect(updated.confirmedAt!.getTime()).toBeGreaterThanOrEqual(before);
+  });
+
+  it("preserves confirmedAt when updateAttendance is called again on an already-confirmed guest", async () => {
+    const repository = new InMemoryGuestRepository();
+    const created = await repository.save(
+      Guest.create({ fullName: "Carla Nunes", companionsCount: 0, attendanceStatus: "pending" })
+    );
+
+    const firstUpdate = await repository.updateAttendance(created.id!, { attendanceStatus: "confirmed" });
+    const originalConfirmedAt = firstUpdate.confirmedAt;
+
+    const secondUpdate = await repository.updateAttendance(created.id!, {
+      attendanceStatus: "confirmed",
+      companionsCount: 3,
+    });
+
+    expect(secondUpdate.confirmedAt).toEqual(originalConfirmedAt);
+  });
 });

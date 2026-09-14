@@ -33,6 +33,46 @@ describe("UpdateGuestUseCase", () => {
     expect(updated.attendanceStatus).toBe("confirmed");
   });
 
+  it("preserves the existing confirmedAt when the guest is already confirmed", async () => {
+    const repository = new InMemoryGuestRepository();
+    const originalConfirmedAt = new Date("2026-01-01T10:00:00Z");
+    const created = await repository.save(
+      Guest.create({
+        fullName: "Ana Souza",
+        companionsCount: 0,
+        attendanceStatus: "confirmed",
+        confirmedAt: originalConfirmedAt,
+      })
+    );
+
+    const updated = await new UpdateGuestUseCase(repository).execute({
+      id: created.id!,
+      fullName: "Ana Souza Lima",
+      companionsCount: 1,
+      attendanceStatus: "confirmed",
+    });
+
+    expect(updated.confirmedAt).toEqual(originalConfirmedAt);
+  });
+
+  it("sets confirmedAt when an admin edit changes the status to confirmed", async () => {
+    const repository = new InMemoryGuestRepository();
+    const created = await repository.save(
+      Guest.create({ fullName: "Bruno Lima", companionsCount: 0, attendanceStatus: "pending" })
+    );
+
+    const before = Date.now();
+    const updated = await new UpdateGuestUseCase(repository).execute({
+      id: created.id!,
+      fullName: "Bruno Lima",
+      companionsCount: 0,
+      attendanceStatus: "confirmed",
+    });
+
+    expect(updated.confirmedAt).toBeInstanceOf(Date);
+    expect(updated.confirmedAt!.getTime()).toBeGreaterThanOrEqual(before);
+  });
+
   it("throws GuestNotFoundError when the guest does not exist", async () => {
     const repository = new InMemoryGuestRepository();
 

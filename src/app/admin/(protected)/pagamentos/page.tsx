@@ -3,6 +3,7 @@ import { createListGiftContributionsUseCase, createListGiftsUseCase } from "@/in
 import { isBackendConfigured } from "@/infrastructure/config/env";
 import { ConfigurationNotice } from "@/components/ui/ConfigurationNotice";
 import { formatCurrency } from "@/shared/utils/formatCurrency";
+import { SyncInfinitePayPaymentsButton } from "@/components/admin/SyncInfinitePayPaymentsButton";
 import { buildContributionRows, type ContributionRow } from "./buildContributionRows";
 
 export const metadata: Metadata = {
@@ -35,6 +36,9 @@ export default async function AdminPagamentosPage() {
   return (
     <div>
       <h1 className="font-serif text-3xl text-forest">Pagamentos</h1>
+      <div className="mt-4">
+        <SyncInfinitePayPaymentsButton />
+      </div>
 
       {!rows ? (
         <div className="mt-6">

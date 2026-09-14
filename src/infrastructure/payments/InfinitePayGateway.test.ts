@@ -90,4 +90,54 @@ describe("InfinitePayGateway", () => {
       gateway.createPreference({ title: "Jogo de panelas", amount: 200, externalReference: "gift-1" })
     ).rejects.toThrow("não retornou uma URL");
   });
+
+  it("checkPaymentStatus posts to the payment_check endpoint and reports paid=true", async () => {
+    const repository = await makeRepository("meu_handle");
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ success: true, paid: true, paid_amount: 45000 }),
+    });
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    const gateway = new InfinitePayGateway(repository);
+    const result = await gateway.checkPaymentStatus("gift-1");
+
+    expect(result).toEqual({ paid: true, paidAmount: 450 });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.checkout.infinitepay.io/payment_check",
+      expect.objectContaining({ method: "POST" })
+    );
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(body).toEqual({ handle: "meu_handle", order_nsu: "gift-1" });
+  });
+
+  it("checkPaymentStatus reports paid=false when the order isn't paid yet", async () => {
+    const repository = await makeRepository("meu_handle");
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ success: true, paid: false }),
+    }) as unknown as typeof fetch;
+
+    const gateway = new InfinitePayGateway(repository);
+    const result = await gateway.checkPaymentStatus("gift-1");
+
+    expect(result).toEqual({ paid: false, paidAmount: undefined });
+  });
+
+  it("checkPaymentStatus throws when the handle isn't configured", async () => {
+    const repository = await makeRepository(null);
+    const gateway = new InfinitePayGateway(repository);
+
+    await expect(gateway.checkPaymentStatus("gift-1")).rejects.toThrow("Infinite Pay não está configurado");
+  });
+
+  it("checkPaymentStatus throws when the API responds with a non-2xx status", async () => {
+    const repository = await makeRepository("meu_handle");
+    global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500 }) as unknown as typeof fetch;
+    const gateway = new InfinitePayGateway(repository);
+
+    await expect(gateway.checkPaymentStatus("gift-1")).rejects.toThrow("500");
+  });
 });

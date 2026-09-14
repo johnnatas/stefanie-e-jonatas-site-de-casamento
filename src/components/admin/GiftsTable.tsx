@@ -8,6 +8,7 @@ import type { GiftStatus } from "@/domain/entities/Gift";
 import { formatCurrency } from "@/shared/utils/formatCurrency";
 import { DeleteGiftButton } from "@/components/admin/DeleteGiftButton";
 import { generateMissingPaymentLinksAction } from "@/app/admin/(protected)/presentes/generateLinksAction";
+import { SyncInfinitePayPaymentsButton } from "@/components/admin/SyncInfinitePayPaymentsButton";
 
 export interface GiftListItem {
   id: string;
@@ -17,6 +18,8 @@ export interface GiftListItem {
   status: GiftStatus;
   createdAt: Date;
   hasPaymentLink: boolean;
+  purchasedBy?: string;
+  purchasedAt?: Date;
 }
 
 interface GiftsTableProps {
@@ -53,6 +56,7 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
     const parsed = Number(searchParams.get("page"));
     return Number.isInteger(parsed) && parsed > 0 ? parsed : 1;
   });
+  const [sortBy, setSortBy] = useState<"createdAt" | "purchasedAt">("createdAt");
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -91,8 +95,15 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
         const matchesStatus = status === "all" || gift.status === status;
         return matchesText && matchesCategory && matchesStatus;
       })
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-  }, [gifts, search, category, status]);
+      .sort((a, b) => {
+        if (sortBy === "purchasedAt") {
+          const aTime = a.purchasedAt?.getTime() ?? 0;
+          const bTime = b.purchasedAt?.getTime() ?? 0;
+          return bTime - aTime;
+        }
+        return b.createdAt.getTime() - a.createdAt.getTime();
+      });
+  }, [gifts, search, category, status, sortBy]);
 
   const totalPages = Math.max(1, Math.ceil(filteredGifts.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -105,25 +116,28 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
 
   return (
     <div>
-      {hasMissingLinks && (
-        <form action={generateAction} className="mt-4">
-          <button
-            type="submit"
-            disabled={isGenerating}
-            className="rounded-full border border-moss px-5 py-2 font-sans text-xs uppercase tracking-widest text-moss transition-colors hover:bg-moss/10 disabled:opacity-60"
-          >
-            {isGenerating ? "Gerando..." : "Gerar links pendentes"}
-          </button>
-          {generateState.status === "success" && (
-            <p className="mt-2 font-sans text-xs text-moss">{generateState.message}</p>
-          )}
-          {generateState.status === "error" && (
-            <p role="alert" className="mt-2 font-sans text-xs text-danger">
-              {generateState.message}
-            </p>
-          )}
-        </form>
-      )}
+      <div className="mt-4 flex flex-wrap items-start gap-4">
+        {hasMissingLinks && (
+          <form action={generateAction}>
+            <button
+              type="submit"
+              disabled={isGenerating}
+              className="rounded-full border border-moss px-5 py-2 font-sans text-xs uppercase tracking-widest text-moss transition-colors hover:bg-moss/10 disabled:opacity-60"
+            >
+              {isGenerating ? "Gerando..." : "Gerar links pendentes"}
+            </button>
+            {generateState.status === "success" && (
+              <p className="mt-2 font-sans text-xs text-moss">{generateState.message}</p>
+            )}
+            {generateState.status === "error" && (
+              <p role="alert" className="mt-2 font-sans text-xs text-danger">
+                {generateState.message}
+              </p>
+            )}
+          </form>
+        )}
+        <SyncInfinitePayPaymentsButton />
+      </div>
       <div className="mt-6 flex flex-wrap gap-4">
         <div className="flex-1 min-w-[160px]">
           <label htmlFor="gift-search" className="block font-sans text-sm text-forest">
@@ -170,6 +184,20 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
             <option value="paid">Presenteado</option>
           </select>
         </div>
+        <div className="min-w-[200px]">
+          <label htmlFor="gift-sort" className="block font-sans text-sm text-forest">
+            Ordenar por
+          </label>
+          <select
+            id="gift-sort"
+            value={sortBy}
+            onChange={(event) => setSortBy(event.target.value as "createdAt" | "purchasedAt")}
+            className={inputClassName}
+          >
+            <option value="createdAt">Data de cadastro</option>
+            <option value="purchasedAt">Data do presente recebido</option>
+          </select>
+        </div>
       </div>
 
       {filteredGifts.length === 0 ? (
@@ -188,6 +216,8 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
                   <th className="py-2 pr-4">Valor</th>
                   <th className="py-2 pr-4">Status</th>
                   <th className="py-2 pr-4">Link</th>
+                  <th className="py-2 pr-4">Comprado por</th>
+                  <th className="py-2 pr-4">Data da compra</th>
                   <th className="py-2 pr-4" />
                 </tr>
               </thead>
@@ -210,6 +240,10 @@ export function GiftsTable({ gifts }: GiftsTableProps) {
                           Sem link
                         </span>
                       )}
+                    </td>
+                    <td className="py-3 pr-4 text-forest/70">{gift.purchasedBy ?? "—"}</td>
+                    <td className="py-3 pr-4 text-forest/70">
+                      {gift.purchasedAt ? gift.purchasedAt.toLocaleDateString("pt-BR") : "—"}
                     </td>
                     <td className="py-3 pr-4">
                       <DeleteGiftButton giftId={gift.id} giftName={gift.name} />

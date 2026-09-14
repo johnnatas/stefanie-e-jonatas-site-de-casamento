@@ -47,4 +47,15 @@ describe("DashboardStats", () => {
       "/admin/presentes"
     );
   });
+
+  it("stacks stat cards in a single column on mobile instead of breaking into an odd half-width card", () => {
+    render(<DashboardStats summary={summary} />);
+
+    const confirmedLink = screen.getByRole("link", { name: /confirmados/i });
+    const grid = confirmedLink.parentElement;
+
+    expect(grid).toHaveClass("grid-cols-1");
+    expect(grid).not.toHaveClass("grid-cols-2");
+    expect(grid).toHaveClass("sm:grid-cols-3");
+  });
 });

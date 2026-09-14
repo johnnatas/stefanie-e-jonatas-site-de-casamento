@@ -13,6 +13,7 @@ export interface GuestProps {
   companionsCount: number;
   message?: string;
   attendanceStatus: AttendanceStatus;
+  confirmedAt?: Date;
   createdAt?: Date;
 }
 
@@ -27,6 +28,7 @@ export class Guest {
   readonly companionsCount: number;
   readonly message?: string;
   readonly attendanceStatus: AttendanceStatus;
+  readonly confirmedAt?: Date;
   readonly createdAt: Date;
 
   private constructor(props: GuestProps) {
@@ -38,6 +40,7 @@ export class Guest {
     this.companionsCount = props.companionsCount;
     this.message = props.message?.trim() || undefined;
     this.attendanceStatus = props.attendanceStatus;
+    this.confirmedAt = props.confirmedAt;
     this.createdAt = props.createdAt ?? new Date();
   }
 

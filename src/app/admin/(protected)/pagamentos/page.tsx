@@ -36,7 +36,9 @@ export default async function AdminPagamentosPage() {
   return (
     <div>
       <h1 className="font-serif text-3xl text-forest">Pagamentos</h1>
-      <SyncInfinitePayPaymentsButton />
+      <div className="mt-4">
+        <SyncInfinitePayPaymentsButton />
+      </div>
 
       {!rows ? (
         <div className="mt-6">

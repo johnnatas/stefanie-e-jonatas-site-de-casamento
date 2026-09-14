@@ -178,4 +178,14 @@ describe("GiftsTable", () => {
     rerender(<GiftsTable gifts={[makeGift({ hasPaymentLink: false })]} />);
     expect(screen.getByRole("button", { name: "Gerar links pendentes" })).toBeInTheDocument();
   });
+
+  it("aligns the generate-links and sync buttons flush, with no per-form top margin", () => {
+    render(<GiftsTable gifts={[makeGift({ hasPaymentLink: false })]} />);
+
+    const generateButton = screen.getByRole("button", { name: "Gerar links pendentes" });
+    const syncButton = screen.getByRole("button", { name: "Atualizar status de pagamento" });
+
+    expect(generateButton.closest("form")?.className ?? "").not.toMatch(/\bmt-\d/);
+    expect(syncButton.closest("form")?.className ?? "").not.toMatch(/\bmt-\d/);
+  });
 });

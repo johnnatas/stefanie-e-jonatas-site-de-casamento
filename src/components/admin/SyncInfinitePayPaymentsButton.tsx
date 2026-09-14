@@ -12,7 +12,7 @@ export function SyncInfinitePayPaymentsButton() {
   const [state, action, isPending] = useActionState(syncInfinitePayPaymentsAction, initialState);
 
   return (
-    <form action={action} className="mt-4">
+    <form action={action}>
       <button
         type="submit"
         disabled={isPending}

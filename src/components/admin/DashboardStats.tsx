@@ -26,7 +26,7 @@ function StatCard({ item }: { item: StatItem }) {
 
 function StatGrid({ items }: { items: StatItem[] }) {
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
       {items.map((item) => (
         <StatCard key={item.label} item={item} />
       ))}

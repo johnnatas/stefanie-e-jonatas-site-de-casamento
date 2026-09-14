@@ -23,6 +23,7 @@ import { ListGuestsUseCase } from "@/application/use-cases/admin/ListGuestsUseCa
 import { SearchGuestsUseCase } from "@/application/use-cases/rsvp/SearchGuestsUseCase";
 import { CreateGuestUseCase } from "@/application/use-cases/admin/CreateGuestUseCase";
 import { UpdateGuestUseCase } from "@/application/use-cases/admin/UpdateGuestUseCase";
+import { UpdateGuestCompanionsCountUseCase } from "@/application/use-cases/admin/UpdateGuestCompanionsCountUseCase";
 import { DeleteGuestUseCase } from "@/application/use-cases/admin/DeleteGuestUseCase";
 import { DeleteGiftUseCase } from "@/application/use-cases/admin/DeleteGiftUseCase";
 import { GetDashboardSummaryUseCase } from "@/application/use-cases/admin/GetDashboardSummaryUseCase";
@@ -208,6 +209,10 @@ export function createCreateGuestUseCase(): CreateGuestUseCase {
 
 export function createUpdateGuestUseCase(): UpdateGuestUseCase {
   return new UpdateGuestUseCase(repositories().guestRepository);
+}
+
+export function createUpdateGuestCompanionsCountUseCase(): UpdateGuestCompanionsCountUseCase {
+  return new UpdateGuestCompanionsCountUseCase(repositories().guestRepository);
 }
 
 export function createDeleteGuestUseCase(): DeleteGuestUseCase {

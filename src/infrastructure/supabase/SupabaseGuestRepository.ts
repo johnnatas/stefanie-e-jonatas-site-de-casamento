@@ -16,6 +16,7 @@ interface GuestRow {
   companions_count: number;
   message: string | null;
   attendance_status: AttendanceStatus;
+  confirmed_at: string | null;
   created_at: string;
 }
 
@@ -29,6 +30,7 @@ function toEntity(row: GuestRow): Guest {
     companionsCount: row.companions_count,
     message: row.message ?? undefined,
     attendanceStatus: row.attendance_status,
+    confirmedAt: row.confirmed_at ? new Date(row.confirmed_at) : undefined,
     createdAt: new Date(row.created_at),
   });
 }
@@ -47,6 +49,7 @@ export class SupabaseGuestRepository implements GuestRepository {
         companions_count: guest.companionsCount,
         message: guest.message ?? null,
         attendance_status: guest.attendanceStatus,
+        confirmed_at: guest.confirmedAt ? guest.confirmedAt.toISOString() : null,
       })
       .select()
       .single();
@@ -69,6 +72,7 @@ export class SupabaseGuestRepository implements GuestRepository {
         companions_count: guest.companionsCount,
         message: guest.message ?? null,
         attendance_status: guest.attendanceStatus,
+        confirmed_at: guest.confirmedAt ? guest.confirmedAt.toISOString() : null,
       })
       .eq("id", guest.id)
       .select()
@@ -144,6 +148,9 @@ export class SupabaseGuestRepository implements GuestRepository {
     }
     if (update.email !== undefined) {
       patch.email = update.email;
+    }
+    if (update.attendanceStatus === "confirmed") {
+      patch.confirmed_at = new Date().toISOString();
     }
 
     const { data, error } = await this.client

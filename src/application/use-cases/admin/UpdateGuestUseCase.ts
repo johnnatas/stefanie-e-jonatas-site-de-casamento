@@ -22,6 +22,8 @@ export class UpdateGuestUseCase {
       throw new GuestNotFoundError(`Guest with id ${input.id} was not found.`);
     }
 
+    const isNewlyConfirmed = input.attendanceStatus === "confirmed" && existingGuest.attendanceStatus !== "confirmed";
+
     const updatedGuest = Guest.create({
       id: input.id,
       fullName: input.fullName,
@@ -31,6 +33,7 @@ export class UpdateGuestUseCase {
       companionsCount: input.companionsCount,
       attendanceStatus: input.attendanceStatus,
       message: input.message,
+      confirmedAt: isNewlyConfirmed ? new Date() : existingGuest.confirmedAt,
       createdAt: existingGuest.createdAt,
     });
 

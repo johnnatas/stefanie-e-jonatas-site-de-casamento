@@ -58,6 +58,7 @@ export class InMemoryGuestRepository implements GuestRepository {
       companionsCount: update.companionsCount ?? existing.companionsCount,
       message: update.message ?? existing.message,
       email: update.email ?? existing.email,
+      confirmedAt: update.attendanceStatus === "confirmed" ? new Date() : existing.confirmedAt,
     });
 
     this.guests[index] = updated;

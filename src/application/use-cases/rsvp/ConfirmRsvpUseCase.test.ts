@@ -30,6 +30,22 @@ describe("ConfirmRsvpUseCase", () => {
     expect(updated.email).toBe("ana@example.com");
   });
 
+  it("records the confirmation date when a guest confirms attendance", async () => {
+    const repository = new InMemoryGuestRepository();
+    const guest = await seedPendingGuest(repository);
+    const useCase = new ConfirmRsvpUseCase(repository);
+    const before = Date.now();
+
+    const updated = await useCase.execute({
+      guestId: guest.id!,
+      attendanceStatus: "confirmed",
+      email: "ana@example.com",
+    });
+
+    expect(updated.confirmedAt).toBeInstanceOf(Date);
+    expect(updated.confirmedAt!.getTime()).toBeGreaterThanOrEqual(before);
+  });
+
   it("declines a pending guest and forces companions to zero", async () => {
     const repository = new InMemoryGuestRepository();
     const guest = await seedPendingGuest(repository);

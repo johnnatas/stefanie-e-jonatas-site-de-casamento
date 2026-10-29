@@ -36,7 +36,12 @@ export class InfinitePayGateway implements PaymentGateway {
 
     const response = await fetch("https://api.checkout.infinitepay.io/links", {
       method: "POST",
-      headers: this.headers(settings.infinitePayApiKey),
+      // Sending X-Api-Key here caused Infinite Pay to stop honoring our
+      // order_nsu in two live tests (2026-10-29), even after reverting the
+      // webhook field — the API key is documented as optional for /links
+      // (only needed for "advanced options"), so omit it and keep the
+      // plain handle-based request that reliably preserved order_nsu.
+      headers: this.headers(null),
       body: JSON.stringify({
         handle: settings.infinitePayHandle,
         order_nsu: input.externalReference,

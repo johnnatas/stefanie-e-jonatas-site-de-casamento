@@ -60,11 +60,9 @@ describe("InfinitePayGateway", () => {
 
     expect(fetchMock).toHaveBeenCalledWith(
       "https://api.checkout.infinitepay.io/links",
-      expect.objectContaining({
-        method: "POST",
-        headers: expect.objectContaining({ "X-Api-Key": "test-api-key" }),
-      })
+      expect.objectContaining({ method: "POST" })
     );
+    expect(fetchMock.mock.calls[0][1].headers).not.toHaveProperty("X-Api-Key");
     const body = JSON.parse(fetchMock.mock.calls[0][1].body);
     expect(body.handle).toBe("meu_handle");
     expect(body.order_nsu).toBe("gift-1");

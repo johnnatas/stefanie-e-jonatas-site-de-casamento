@@ -68,10 +68,7 @@ describe("InfinitePayGateway", () => {
     const body = JSON.parse(fetchMock.mock.calls[0][1].body);
     expect(body.handle).toBe("meu_handle");
     expect(body.order_nsu).toBe("gift-1");
-    expect(body.webhook).toEqual({
-      url: "https://example.test/api/webhooks/infinitepay",
-      events: ["paid"],
-    });
+    expect(body.webhook_url).toBe("https://example.test/api/webhooks/infinitepay");
     expect(body.items).toEqual([{ quantity: 1, price: 19990, description: "Jogo de panelas" }]);
     expect(body.customer).toEqual({
       name: "Ana Souza",

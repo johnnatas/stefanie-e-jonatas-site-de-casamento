@@ -10,6 +10,7 @@ interface InfinitePayWebhookBody {
   transaction_nsu?: string;
   invoice_slug?: string;
   paid_amount?: number;
+  event_type?: string;
 }
 
 async function safeRecord(
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ received: false }, { status: 400 });
   }
 
-  const { order_nsu, transaction_nsu, invoice_slug, paid_amount } = body;
+  const { order_nsu, transaction_nsu, invoice_slug, paid_amount, event_type } = body;
   const webhookLogRepository = createInfinitePayWebhookLogRepository();
 
   if (!order_nsu || !transaction_nsu || typeof paid_amount !== "number") {
@@ -47,6 +48,23 @@ export async function POST(request: Request) {
       errorMessage: "Missing required fields: order_nsu, transaction_nsu, or paid_amount",
     });
     return NextResponse.json({ received: false }, { status: 400 });
+  }
+
+  // Defense in depth: only the "paid" event means the gift should be
+  // approved. Infinite Pay's webhook registration only subscribes us to
+  // "paid" today, but a payload this shape could in principle arrive for
+  // another event too — never approve on anything but a confirmed "paid".
+  if (event_type && event_type !== "paid") {
+    await safeRecord(webhookLogRepository, {
+      orderNsu: order_nsu,
+      transactionNsu: transaction_nsu,
+      invoiceSlug: invoice_slug,
+      paidAmount: paid_amount,
+      rawPayload: body,
+      processed: false,
+      errorMessage: `Ignored non-"paid" event_type: ${event_type}`,
+    });
+    return NextResponse.json({ received: true });
   }
 
   try {

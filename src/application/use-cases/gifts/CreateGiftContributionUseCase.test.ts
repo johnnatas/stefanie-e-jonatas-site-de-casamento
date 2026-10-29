@@ -6,6 +6,13 @@ import { InMemoryAdminSecuritySettingsRepository } from "@/application/testing/I
 import { FakePaymentGateway } from "@/application/testing/FakePaymentGateway";
 import { Gift } from "@/domain/entities/Gift";
 import { GiftNotAvailableError, InvalidGiftDataError } from "@/domain/errors/DomainError";
+import { PaymentGateway } from "@/application/ports/PaymentGateway";
+
+class FailingPaymentGateway implements PaymentGateway {
+  async createPreference(): Promise<never> {
+    throw new Error("Infinite Pay retornou 422 ao criar o link de pagamento.");
+  }
+}
 
 describe("CreateGiftContributionUseCase", () => {
   let giftRepository: InMemoryGiftRepository;
@@ -225,5 +232,25 @@ describe("CreateGiftContributionUseCase", () => {
     expect(result.contribution.expectedPaymentDate).toEqual(expectedPaymentDate);
     const gift = await giftRepository.findById("gift-1");
     expect(gift?.reservedUntil).toEqual(expectedPaymentDate);
+  });
+
+  it("releases the gift back to available and rejects the contribution when the checkout link can't be generated", async () => {
+    const failingUseCase = new CreateGiftContributionUseCase(
+      giftRepository,
+      contributionRepository,
+      securitySettingsRepository,
+      () => new FailingPaymentGateway()
+    );
+
+    await expect(
+      failingUseCase.execute({ giftId: "gift-1", guestName: "Carla Nunes", guestEmail: "carla@example.com" })
+    ).rejects.toThrow();
+
+    const gift = await giftRepository.findById("gift-1");
+    expect(gift?.status).toBe("available");
+
+    const contributions = await contributionRepository.findAll();
+    expect(contributions).toHaveLength(1);
+    expect(contributions[0].status).toBe("rejected");
   });
 });

@@ -56,30 +56,41 @@ export class CreateGiftContributionUseCase {
     let referenceId: string;
     let checkoutUrl: string;
 
-    if (activePaymentProvider === "infinite_pay") {
-      // Infinite Pay's checkout only skips asking the guest for their contact
-      // details again when that data is embedded at link-creation time — so,
-      // unlike Mercado Pago, always generate a fresh link here instead of
-      // reusing whatever was pre-generated. Only fall back to a pre-existing
-      // link if fresh generation fails, so the guest is never left stuck.
-      try {
+    try {
+      if (activePaymentProvider === "infinite_pay") {
+        // Infinite Pay's checkout only skips asking the guest for their contact
+        // details again when that data is embedded at link-creation time — so,
+        // unlike Mercado Pago, always generate a fresh link here instead of
+        // reusing whatever was pre-generated. Only fall back to a pre-existing
+        // link if fresh generation fails, so the guest is never left stuck.
+        try {
+          const preference = await this.generatePreference(reservedGift, activePaymentProvider, input);
+          referenceId = preference.referenceId;
+          checkoutUrl = preference.checkoutUrl;
+        } catch (error) {
+          if (!reservedGift.hasLinkFor(activePaymentProvider)) {
+            throw error;
+          }
+          referenceId = reservedGift.providerReferenceIdFor(activePaymentProvider)!;
+          checkoutUrl = reservedGift.checkoutUrlFor(activePaymentProvider)!;
+        }
+      } else if (reservedGift.hasLinkFor(activePaymentProvider)) {
+        referenceId = reservedGift.providerReferenceIdFor(activePaymentProvider)!;
+        checkoutUrl = reservedGift.checkoutUrlFor(activePaymentProvider)!;
+      } else {
         const preference = await this.generatePreference(reservedGift, activePaymentProvider, input);
         referenceId = preference.referenceId;
         checkoutUrl = preference.checkoutUrl;
-      } catch (error) {
-        if (!reservedGift.hasLinkFor(activePaymentProvider)) {
-          throw error;
-        }
-        referenceId = reservedGift.providerReferenceIdFor(activePaymentProvider)!;
-        checkoutUrl = reservedGift.checkoutUrlFor(activePaymentProvider)!;
       }
-    } else if (reservedGift.hasLinkFor(activePaymentProvider)) {
-      referenceId = reservedGift.providerReferenceIdFor(activePaymentProvider)!;
-      checkoutUrl = reservedGift.checkoutUrlFor(activePaymentProvider)!;
-    } else {
-      const preference = await this.generatePreference(reservedGift, activePaymentProvider, input);
-      referenceId = preference.referenceId;
-      checkoutUrl = preference.checkoutUrl;
+    } catch (error) {
+      // The gift was reserved and the contribution row created before we
+      // knew whether a checkout link could actually be generated — if it
+      // can't, undo both so the guest (or someone else) can try again
+      // immediately instead of the gift sitting "reserved" until the
+      // 30-minute window expires on its own.
+      await this.giftRepository.update(reservedGift.releaseToAvailable());
+      await this.giftContributionRepository.update(contribution.reject("checkout-link-generation-failed"));
+      throw error;
     }
 
     const contributionWithReference = await this.giftContributionRepository.update(

@@ -20,6 +20,7 @@ const TABS: { id: IntegracoesTab; label: string }[] = [
 interface IntegracoesTabsProps {
   activePaymentProvider: PaymentProvider;
   infinitePayHandle: string | null;
+  infinitePayApiKeyLast4: string | null;
   mercadoPagoAccessTokenLast4: string | null;
   resendApiKeyLast4: string | null;
   hasSecretKey: boolean;
@@ -29,6 +30,7 @@ interface IntegracoesTabsProps {
 export function IntegracoesTabs({
   activePaymentProvider,
   infinitePayHandle,
+  infinitePayApiKeyLast4,
   mercadoPagoAccessTokenLast4,
   resendApiKeyLast4,
   hasSecretKey,
@@ -59,7 +61,11 @@ export function IntegracoesTabs({
       <div className="mt-8 flex max-w-md flex-col gap-10">
         {activeTab === "pagamento" && (
           <>
-            <PaymentProviderForm activeProvider={activePaymentProvider} infinitePayHandle={infinitePayHandle} />
+            <PaymentProviderForm
+              activeProvider={activePaymentProvider}
+              infinitePayHandle={infinitePayHandle}
+              infinitePayApiKeyLast4={infinitePayApiKeyLast4}
+            />
             {activePaymentProvider === "mercado_pago" && (
               <MercadoPagoTokenForm currentTokenLast4={mercadoPagoAccessTokenLast4} hasSecretKey={hasSecretKey} />
             )}

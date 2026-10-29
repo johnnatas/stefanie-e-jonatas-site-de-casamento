@@ -5,6 +5,8 @@ import { SupabaseGiftContributionRepository } from "@/infrastructure/supabase/Su
 import { SupabaseSiteContentRepository } from "@/infrastructure/supabase/SupabaseSiteContentRepository";
 import { SupabaseAdminSecuritySettingsRepository } from "@/infrastructure/supabase/SupabaseAdminSecuritySettingsRepository";
 import { SupabaseNotificationLogRepository } from "@/infrastructure/supabase/SupabaseNotificationLogRepository";
+import { SupabaseInfinitePayWebhookLogRepository } from "@/infrastructure/supabase/SupabaseInfinitePayWebhookLogRepository";
+import { InfinitePayWebhookLogRepository } from "@/domain/repositories/InfinitePayWebhookLogRepository";
 import { ResendEmailGateway } from "@/infrastructure/email/ResendEmailGateway";
 import { GetSiteContentUseCase } from "@/application/use-cases/content/GetSiteContentUseCase";
 import { UpdateSiteContentUseCase } from "@/application/use-cases/content/UpdateSiteContentUseCase";
@@ -20,6 +22,7 @@ import { ListGiftsUseCase } from "@/application/use-cases/gifts/ListGiftsUseCase
 import { CreateGiftContributionUseCase } from "@/application/use-cases/gifts/CreateGiftContributionUseCase";
 import { ConfirmGiftPaymentUseCase } from "@/application/use-cases/gifts/ConfirmGiftPaymentUseCase";
 import { SyncInfinitePayPaymentsUseCase } from "@/application/use-cases/gifts/SyncInfinitePayPaymentsUseCase";
+import { ConfirmInfinitePayRedirectUseCase } from "@/application/use-cases/gifts/ConfirmInfinitePayRedirectUseCase";
 import { ListGuestsUseCase } from "@/application/use-cases/admin/ListGuestsUseCase";
 import { SearchGuestsUseCase } from "@/application/use-cases/rsvp/SearchGuestsUseCase";
 import { CreateGuestUseCase } from "@/application/use-cases/admin/CreateGuestUseCase";
@@ -72,6 +75,7 @@ function repositories() {
     mercadoPagoGateway: new MercadoPagoGateway(securitySettingsRepository),
     infinitePayGateway: new InfinitePayGateway(securitySettingsRepository),
     notificationLogRepository: new SupabaseNotificationLogRepository(client),
+    infinitePayWebhookLogRepository: new SupabaseInfinitePayWebhookLogRepository(client),
     emailGateway: new ResendEmailGateway(securitySettingsRepository, siteContentRepository),
   };
 }
@@ -104,9 +108,22 @@ export function createConfirmGiftPaymentUseCase(): ConfirmGiftPaymentUseCase {
   return new ConfirmGiftPaymentUseCase(giftRepository, giftContributionRepository, emailGateway, notificationLogRepository);
 }
 
+export function createInfinitePayWebhookLogRepository(): InfinitePayWebhookLogRepository {
+  return repositories().infinitePayWebhookLogRepository;
+}
+
 export function createSyncInfinitePayPaymentsUseCase(): SyncInfinitePayPaymentsUseCase {
   const { giftContributionRepository, infinitePayGateway } = repositories();
   return new SyncInfinitePayPaymentsUseCase(
+    giftContributionRepository,
+    infinitePayGateway,
+    createConfirmGiftPaymentUseCase()
+  );
+}
+
+export function createConfirmInfinitePayRedirectUseCase(): ConfirmInfinitePayRedirectUseCase {
+  const { giftContributionRepository, infinitePayGateway } = repositories();
+  return new ConfirmInfinitePayRedirectUseCase(
     giftContributionRepository,
     infinitePayGateway,
     createConfirmGiftPaymentUseCase()

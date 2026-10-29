@@ -37,13 +37,41 @@ describe("UpdateActivePaymentProviderUseCase", () => {
     await expect(useCase.execute({ provider: "infinite_pay" })).rejects.toThrow(InvalidSecurityCredentialError);
   });
 
-  it("stores the handle and switches to infinite_pay when a handle is provided", async () => {
+  it("rejects switching to infinite_pay without an API key", async () => {
+    const { useCase } = makeUseCase();
+
+    await expect(
+      useCase.execute({ provider: "infinite_pay", infinitePayHandle: "meu_handle" })
+    ).rejects.toThrow(InvalidSecurityCredentialError);
+  });
+
+  it("stores the handle and API key and switches to infinite_pay when both are provided", async () => {
     const { useCase, securitySettingsRepository } = makeUseCase();
 
-    await useCase.execute({ provider: "infinite_pay", infinitePayHandle: "meu_handle" });
+    await useCase.execute({
+      provider: "infinite_pay",
+      infinitePayHandle: "meu_handle",
+      infinitePayApiKey: "inchk_abc",
+    });
 
     const settings = await securitySettingsRepository.getSettings();
     expect(settings.activePaymentProvider).toBe("infinite_pay");
     expect(settings.infinitePayHandle).toBe("meu_handle");
+    expect(settings.infinitePayApiKey).toBe("inchk_abc");
+  });
+
+  it("keeps the existing API key when switching providers again without retyping it", async () => {
+    const { useCase, securitySettingsRepository } = makeUseCase();
+    await useCase.execute({
+      provider: "infinite_pay",
+      infinitePayHandle: "meu_handle",
+      infinitePayApiKey: "inchk_abc",
+    });
+
+    await useCase.execute({ provider: "infinite_pay", infinitePayHandle: "outro_handle" });
+
+    const settings = await securitySettingsRepository.getSettings();
+    expect(settings.infinitePayHandle).toBe("outro_handle");
+    expect(settings.infinitePayApiKey).toBe("inchk_abc");
   });
 });

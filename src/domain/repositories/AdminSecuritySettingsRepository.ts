@@ -7,6 +7,7 @@ export interface AdminSecuritySettings {
   resendApiKey: string | null;
   activePaymentProvider: PaymentProvider;
   infinitePayHandle: string | null;
+  infinitePayApiKey: string | null;
 }
 
 export interface SecretResetToken {
@@ -22,6 +23,7 @@ export interface AdminSecuritySettingsRepository {
   updateResendApiKey(key: string): Promise<void>;
   updateActivePaymentProvider(provider: PaymentProvider): Promise<void>;
   updateInfinitePayHandle(handle: string): Promise<void>;
+  updateInfinitePayApiKey(apiKey: string): Promise<void>;
   setSecretResetToken(hash: string, salt: string, expiresAt: Date): Promise<void>;
   getSecretResetToken(): Promise<SecretResetToken | null>;
   clearSecretResetToken(): Promise<void>;

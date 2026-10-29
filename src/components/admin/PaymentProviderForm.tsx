@@ -10,6 +10,7 @@ import type { PaymentProvider } from "@/domain/entities/PaymentProvider";
 interface PaymentProviderFormProps {
   activeProvider: PaymentProvider;
   infinitePayHandle: string | null;
+  infinitePayApiKeyLast4: string | null;
 }
 
 const inputClassName =
@@ -17,7 +18,11 @@ const inputClassName =
 
 const initialState: UpdatePaymentProviderActionState = { status: "idle" };
 
-export function PaymentProviderForm({ activeProvider, infinitePayHandle }: PaymentProviderFormProps) {
+export function PaymentProviderForm({
+  activeProvider,
+  infinitePayHandle,
+  infinitePayApiKeyLast4,
+}: PaymentProviderFormProps) {
   const [state, formAction, isPending] = useActionState(updatePaymentProviderAction, initialState);
   const [provider, setProvider] = useState<PaymentProvider>(activeProvider);
 
@@ -63,6 +68,27 @@ export function PaymentProviderForm({ activeProvider, infinitePayHandle }: Payme
             required
             className={inputClassName}
           />
+        </div>
+      )}
+
+      {provider === "infinite_pay" && (
+        <div>
+          <label htmlFor="infinitePayApiKey" className="block font-sans text-sm text-forest">
+            API Key
+          </label>
+          <input
+            id="infinitePayApiKey"
+            name="infinitePayApiKey"
+            type="password"
+            placeholder={infinitePayApiKeyLast4 ? `•••• ${infinitePayApiKeyLast4}` : "inchk_..."}
+            required={!infinitePayApiKeyLast4}
+            className={inputClassName}
+          />
+          <p className="mt-1 font-sans text-xs text-forest/60">
+            {infinitePayApiKeyLast4
+              ? "Deixe em branco para manter a API Key atual."
+              : "Necessária para consultar o status dos pagamentos (sem ela, a Infinite Pay rejeita a consulta)."}
+          </p>
         </div>
       )}
 

@@ -3,7 +3,11 @@ import { ConfirmGiftPaymentUseCase } from "@/application/use-cases/gifts/Confirm
 import { GiftContribution } from "@/domain/entities/GiftContribution";
 
 export interface InfinitePayStatusChecker {
-  checkPaymentStatus(orderNsu: string): Promise<{ paid: boolean; paidAmount?: number }>;
+  checkPaymentStatus(input: {
+    orderNsu: string;
+    transactionNsu?: string;
+    slug?: string;
+  }): Promise<{ paid: boolean; paidAmount?: number }>;
 }
 
 export interface SyncInfinitePayPaymentsResult {
@@ -41,7 +45,11 @@ export class SyncInfinitePayPaymentsUseCase {
     for (const contribution of deduped) {
       result.checked += 1;
       try {
-        const status = await this.infinitePayGateway.checkPaymentStatus(contribution.giftId);
+        const status = await this.infinitePayGateway.checkPaymentStatus({
+          orderNsu: contribution.giftId,
+          transactionNsu: contribution.infinitePayTransactionNsu,
+          slug: contribution.infinitePayInvoiceSlug,
+        });
         if (status.paid) {
           // The Infinite Pay payment_check response doesn't return a
           // transaction_nsu, so we fall back to the existing one (set by a

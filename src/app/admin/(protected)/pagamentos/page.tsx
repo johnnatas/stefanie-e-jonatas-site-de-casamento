@@ -4,6 +4,7 @@ import { isBackendConfigured } from "@/infrastructure/config/env";
 import { ConfigurationNotice } from "@/components/ui/ConfigurationNotice";
 import { formatCurrency } from "@/shared/utils/formatCurrency";
 import { SyncInfinitePayPaymentsButton } from "@/components/admin/SyncInfinitePayPaymentsButton";
+import { ReconcilePaymentForm } from "@/components/admin/ReconcilePaymentForm";
 import { buildContributionRows, type ContributionRow } from "./buildContributionRows";
 
 export const metadata: Metadata = {
@@ -63,6 +64,7 @@ export default async function AdminPagamentosPage() {
                 <th className="py-2 pr-4">Status</th>
                 <th className="py-2 pr-4">Data prevista de pagamento</th>
                 <th className="py-2 pr-4">Data</th>
+                <th className="py-2 pr-4">Reconciliação</th>
               </tr>
             </thead>
             <tbody>
@@ -76,6 +78,11 @@ export default async function AdminPagamentosPage() {
                     {row.expectedPaymentDate ? row.expectedPaymentDate.toLocaleDateString("pt-BR") : "—"}
                   </td>
                   <td className="py-3 pr-4 text-forest/70">{row.createdAt.toLocaleDateString("pt-BR")}</td>
+                  <td className="py-3 pr-4">
+                    {(row.status === "pending" || row.status === "expired") && (
+                      <ReconcilePaymentForm contributionId={row.id} giftId={row.giftId} />
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>

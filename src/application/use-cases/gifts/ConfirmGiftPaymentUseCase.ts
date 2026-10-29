@@ -11,6 +11,7 @@ export interface ConfirmedPayment {
   giftId: string;
   paidAmount?: number;
   contributionId?: string;
+  invoiceSlug?: string;
 }
 
 export interface ConfirmGiftPaymentInput {
@@ -37,13 +38,18 @@ export class ConfirmGiftPaymentUseCase {
       return contribution;
     }
 
+    // Only guard against underpayment. Infinite Pay's paid_amount reflects
+    // what the card network actually charged the guest, which can be a few
+    // cents higher than our nominal amount (installment/card surcharge) —
+    // requiring exact equality rejected every card payment silently (the
+    // webhook still returned 200, so nothing ever surfaced as an error).
     if (
       input.payment.status === "approved" &&
       input.payment.paidAmount !== undefined &&
-      input.payment.paidAmount !== contribution.amount
+      input.payment.paidAmount < contribution.amount - 0.01
     ) {
       console.error(
-        `Payment amount mismatch for contribution ${contribution.id}: expected ${contribution.amount}, got ${input.payment.paidAmount}`
+        `Payment amount too low for contribution ${contribution.id}: expected at least ${contribution.amount}, got ${input.payment.paidAmount}`
       );
       return contribution;
     }
@@ -52,7 +58,7 @@ export class ConfirmGiftPaymentUseCase {
 
     if (input.payment.status === "approved") {
       const updatedContribution = await this.giftContributionRepository.update(
-        contribution.approve(input.payment.paymentReference)
+        contribution.approve(input.payment.paymentReference, input.payment.invoiceSlug)
       );
       if (gift) {
         await this.giftRepository.update(gift.markAsPaid());

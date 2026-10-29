@@ -16,6 +16,7 @@ interface GiftContributionRow {
   mercado_pago_payment_id: string | null;
   infinite_pay_order_nsu: string | null;
   infinite_pay_transaction_nsu: string | null;
+  infinite_pay_invoice_slug: string | null;
   expected_payment_date: string | null;
   created_at: string;
 }
@@ -34,6 +35,7 @@ function toEntity(row: GiftContributionRow): GiftContribution {
     mercadoPagoPaymentId: row.mercado_pago_payment_id ?? undefined,
     infinitePayOrderNsu: row.infinite_pay_order_nsu ?? undefined,
     infinitePayTransactionNsu: row.infinite_pay_transaction_nsu ?? undefined,
+    infinitePayInvoiceSlug: row.infinite_pay_invoice_slug ?? undefined,
     expectedPaymentDate: row.expected_payment_date ? new Date(row.expected_payment_date) : null,
     createdAt: new Date(row.created_at),
   });
@@ -57,6 +59,7 @@ export class SupabaseGiftContributionRepository implements GiftContributionRepos
         mercado_pago_payment_id: contribution.mercadoPagoPaymentId ?? null,
         infinite_pay_order_nsu: contribution.infinitePayOrderNsu ?? null,
         infinite_pay_transaction_nsu: contribution.infinitePayTransactionNsu ?? null,
+        infinite_pay_invoice_slug: contribution.infinitePayInvoiceSlug ?? null,
         expected_payment_date: contribution.expectedPaymentDate
           ? contribution.expectedPaymentDate.toISOString()
           : null,
@@ -81,6 +84,7 @@ export class SupabaseGiftContributionRepository implements GiftContributionRepos
         mercado_pago_payment_id: contribution.mercadoPagoPaymentId ?? null,
         infinite_pay_order_nsu: contribution.infinitePayOrderNsu ?? null,
         infinite_pay_transaction_nsu: contribution.infinitePayTransactionNsu ?? null,
+        infinite_pay_invoice_slug: contribution.infinitePayInvoiceSlug ?? null,
       })
       .eq("id", contribution.id)
       .select()

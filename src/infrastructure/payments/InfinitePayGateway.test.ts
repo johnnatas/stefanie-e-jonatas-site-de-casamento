@@ -17,10 +17,13 @@ describe("InfinitePayGateway", () => {
     vi.unstubAllEnvs();
   });
 
-  async function makeRepository(handle: string | null) {
+  async function makeRepository(handle: string | null, apiKey: string | null = "test-api-key") {
     const repository = new InMemoryAdminSecuritySettingsRepository();
     if (handle) {
       await repository.updateInfinitePayHandle(handle);
+    }
+    if (apiKey) {
+      await repository.updateInfinitePayApiKey(apiKey);
     }
     return repository;
   }
@@ -59,6 +62,7 @@ describe("InfinitePayGateway", () => {
       "https://api.checkout.infinitepay.io/links",
       expect.objectContaining({ method: "POST" })
     );
+    expect(fetchMock.mock.calls[0][1].headers).not.toHaveProperty("X-Api-Key");
     const body = JSON.parse(fetchMock.mock.calls[0][1].body);
     expect(body.handle).toBe("meu_handle");
     expect(body.order_nsu).toBe("gift-1");
@@ -101,15 +105,27 @@ describe("InfinitePayGateway", () => {
     global.fetch = fetchMock as unknown as typeof fetch;
 
     const gateway = new InfinitePayGateway(repository);
-    const result = await gateway.checkPaymentStatus("gift-1");
+    const result = await gateway.checkPaymentStatus({
+      orderNsu: "gift-1",
+      transactionNsu: "txn-1",
+      slug: "slug-1",
+    });
 
     expect(result).toEqual({ paid: true, paidAmount: 450 });
     expect(fetchMock).toHaveBeenCalledWith(
       "https://api.checkout.infinitepay.io/payment_check",
-      expect.objectContaining({ method: "POST" })
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({ "X-Api-Key": "test-api-key" }),
+      })
     );
     const body = JSON.parse(fetchMock.mock.calls[0][1].body);
-    expect(body).toEqual({ handle: "meu_handle", order_nsu: "gift-1" });
+    expect(body).toEqual({
+      handle: "meu_handle",
+      order_nsu: "gift-1",
+      transaction_nsu: "txn-1",
+      slug: "slug-1",
+    });
   });
 
   it("checkPaymentStatus reports paid=false when the order isn't paid yet", async () => {
@@ -121,7 +137,21 @@ describe("InfinitePayGateway", () => {
     }) as unknown as typeof fetch;
 
     const gateway = new InfinitePayGateway(repository);
-    const result = await gateway.checkPaymentStatus("gift-1");
+    const result = await gateway.checkPaymentStatus({ orderNsu: "gift-1" });
+
+    expect(result).toEqual({ paid: false, paidAmount: undefined });
+  });
+
+  it("checkPaymentStatus reports paid=false when the API rejects the request (success=false)", async () => {
+    const repository = await makeRepository("meu_handle");
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ success: false }),
+    }) as unknown as typeof fetch;
+
+    const gateway = new InfinitePayGateway(repository);
+    const result = await gateway.checkPaymentStatus({ orderNsu: "gift-1" });
 
     expect(result).toEqual({ paid: false, paidAmount: undefined });
   });
@@ -130,7 +160,16 @@ describe("InfinitePayGateway", () => {
     const repository = await makeRepository(null);
     const gateway = new InfinitePayGateway(repository);
 
-    await expect(gateway.checkPaymentStatus("gift-1")).rejects.toThrow("Infinite Pay não está configurado");
+    await expect(gateway.checkPaymentStatus({ orderNsu: "gift-1" })).rejects.toThrow(
+      "Infinite Pay não está configurado"
+    );
+  });
+
+  it("checkPaymentStatus throws when the API key isn't configured", async () => {
+    const repository = await makeRepository("meu_handle", null);
+    const gateway = new InfinitePayGateway(repository);
+
+    await expect(gateway.checkPaymentStatus({ orderNsu: "gift-1" })).rejects.toThrow("API Key");
   });
 
   it("checkPaymentStatus throws when the API responds with a non-2xx status", async () => {
@@ -138,6 +177,6 @@ describe("InfinitePayGateway", () => {
     global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500 }) as unknown as typeof fetch;
     const gateway = new InfinitePayGateway(repository);
 
-    await expect(gateway.checkPaymentStatus("gift-1")).rejects.toThrow("500");
+    await expect(gateway.checkPaymentStatus({ orderNsu: "gift-1" })).rejects.toThrow("500");
   });
 });

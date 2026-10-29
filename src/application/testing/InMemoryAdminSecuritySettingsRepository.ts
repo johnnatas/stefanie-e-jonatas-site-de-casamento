@@ -13,6 +13,7 @@ export class InMemoryAdminSecuritySettingsRepository implements AdminSecuritySet
     resendApiKey: null,
     activePaymentProvider: "mercado_pago",
     infinitePayHandle: null,
+    infinitePayApiKey: null,
   };
   private secretResetToken: SecretResetToken | null = null;
 
@@ -39,6 +40,10 @@ export class InMemoryAdminSecuritySettingsRepository implements AdminSecuritySet
 
   async updateInfinitePayHandle(handle: string): Promise<void> {
     this.settings.infinitePayHandle = handle;
+  }
+
+  async updateInfinitePayApiKey(apiKey: string): Promise<void> {
+    this.settings.infinitePayApiKey = apiKey;
   }
 
   async setSecretResetToken(hash: string, salt: string, expiresAt: Date): Promise<void> {

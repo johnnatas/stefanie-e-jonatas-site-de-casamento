@@ -10,7 +10,7 @@ vi.mock("@/app/admin/(protected)/integracoes/actions", () => ({
 describe("PaymentProviderForm", () => {
   it("shows the Infinite Pay handle field only when Infinite Pay is selected", async () => {
     const user = userEvent.setup();
-    render(<PaymentProviderForm activeProvider="mercado_pago" infinitePayHandle={null} />);
+    render(<PaymentProviderForm activeProvider="mercado_pago" infinitePayHandle={null} infinitePayApiKeyLast4={null} />);
 
     expect(screen.queryByLabelText(/handle/i)).not.toBeInTheDocument();
 
@@ -20,7 +20,9 @@ describe("PaymentProviderForm", () => {
   });
 
   it("pre-fills the handle field when one is already stored", () => {
-    render(<PaymentProviderForm activeProvider="infinite_pay" infinitePayHandle="meu_handle" />);
+    render(
+      <PaymentProviderForm activeProvider="infinite_pay" infinitePayHandle="meu_handle" infinitePayApiKeyLast4="ab12" />
+    );
 
     expect(screen.getByLabelText(/handle/i)).toHaveValue("meu_handle");
   });

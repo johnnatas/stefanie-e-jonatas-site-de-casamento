@@ -119,7 +119,7 @@ describe("ConfirmGiftPaymentUseCase", () => {
     expect(gift?.status).toBe("paid");
   });
 
-  it("refuses to approve when paidAmount is provided and does not match the contribution amount", async () => {
+  it("refuses to approve when paidAmount is provided and is lower than the contribution amount", async () => {
     await reserveGiftAndCreatePendingContribution();
 
     const result = await confirmPayment.execute({
@@ -130,6 +130,18 @@ describe("ConfirmGiftPaymentUseCase", () => {
     const gift = await giftRepository.findById("gift-1");
     expect(gift?.status).toBe("reserved");
     expect(emailGateway.sentEmails).toHaveLength(0);
+  });
+
+  it("approves when paidAmount is a few cents higher than the contribution amount (card surcharge)", async () => {
+    await reserveGiftAndCreatePendingContribution();
+
+    const result = await confirmPayment.execute({
+      payment: { paymentReference: "payment-6", status: "approved", giftId: "gift-1", paidAmount: 201.5 },
+    });
+
+    expect(result?.status).toBe("approved");
+    const gift = await giftRepository.findById("gift-1");
+    expect(gift?.status).toBe("paid");
   });
 
   it("approves when paidAmount is provided and matches the contribution amount", async () => {
@@ -201,5 +213,30 @@ describe("ConfirmGiftPaymentUseCase", () => {
 
     expect(result?.status).toBe("approved");
     expect(emailGateway.sentEmails).toHaveLength(1);
+  });
+
+  it("stores the invoice slug on the contribution when provided", async () => {
+    const gift = await giftRepository.findById("gift-1");
+    await giftRepository.update(gift!.reserve(new Date(Date.now() + 30 * 60 * 1000)));
+    await contributionRepository.save(
+      GiftContribution.create({
+        giftId: "gift-1",
+        guestName: "Elis Regina",
+        guestEmail: "elis@example.com",
+        amount: 200,
+        paymentProvider: "infinite_pay",
+      })
+    );
+
+    const result = await confirmPayment.execute({
+      payment: {
+        paymentReference: "transaction-3",
+        status: "approved",
+        giftId: "gift-1",
+        invoiceSlug: "slug-abc",
+      },
+    });
+
+    expect(result?.infinitePayInvoiceSlug).toBe("slug-abc");
   });
 });

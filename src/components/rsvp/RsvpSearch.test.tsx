@@ -22,7 +22,7 @@ describe("RsvpSearch", () => {
 
     await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
 
-    expect(await screen.findByRole("button", { name: /JP/i })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: /joão pedro almeida/i })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /confirmar presença/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /não poderei ir/i })).not.toBeInTheDocument();
   });
@@ -33,7 +33,7 @@ describe("RsvpSearch", () => {
 
     await user.type(screen.getByLabelText(/digite seu nome/i), "JP");
 
-    expect(await screen.findByRole("button", { name: /JP/i })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: /joão pedro almeida/i })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /confirmar presença/i })).not.toBeInTheDocument();
   });
 
@@ -42,12 +42,12 @@ describe("RsvpSearch", () => {
     render(<RsvpSearch guests={GUESTS} />);
 
     await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
-    await user.click(await screen.findByRole("button", { name: /JP/i }));
+    await user.click(await screen.findByRole("button", { name: /joão pedro almeida/i }));
 
     expect(screen.getByLabelText(/digite seu nome/i)).toHaveValue("JP");
     expect(screen.getByRole("button", { name: /confirmar presença/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /não poderei ir/i })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "JP" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /joão pedro almeida/i })).not.toBeInTheDocument();
   });
 
   it("hides the action buttons again if the selected name is edited afterward", async () => {
@@ -55,7 +55,7 @@ describe("RsvpSearch", () => {
     render(<RsvpSearch guests={GUESTS} />);
 
     await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
-    await user.click(await screen.findByRole("button", { name: /JP/i }));
+    await user.click(await screen.findByRole("button", { name: /joão pedro almeida/i }));
     expect(screen.getByRole("button", { name: /confirmar presença/i })).toBeInTheDocument();
 
     await user.type(screen.getByLabelText(/digite seu nome/i), "x");
@@ -81,7 +81,7 @@ describe("RsvpSearch", () => {
     render(<RsvpSearch guests={GUESTS} />);
 
     await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
-    await user.click(await screen.findByRole("button", { name: /JP/i }));
+    await user.click(await screen.findByRole("button", { name: /joão pedro almeida/i }));
     await user.click(screen.getByRole("button", { name: /não poderei ir/i }));
 
     expect(await screen.findByText(/sentiremos sua falta/i)).toBeInTheDocument();
@@ -100,7 +100,7 @@ describe("RsvpSearch", () => {
     render(<RsvpSearch guests={GUESTS} />);
 
     await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
-    await user.click(await screen.findByRole("button", { name: /JP/i }));
+    await user.click(await screen.findByRole("button", { name: /joão pedro almeida/i }));
     await user.click(screen.getByRole("button", { name: /não poderei ir/i }));
 
     await screen.findByText(/sentiremos sua falta/i);
@@ -117,7 +117,7 @@ describe("RsvpSearch", () => {
     render(<RsvpSearch guests={GUESTS} />);
 
     await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
-    await user.click(await screen.findByRole("button", { name: /JP/i }));
+    await user.click(await screen.findByRole("button", { name: /joão pedro almeida/i }));
     await user.click(screen.getByRole("button", { name: /confirmar presença/i }));
 
     const companionsInput = await screen.findByLabelText(/número de acompanhantes/i);
@@ -145,7 +145,7 @@ describe("RsvpSearch", () => {
     render(<RsvpSearch guests={GUESTS} />);
 
     await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
-    await user.click(await screen.findByRole("button", { name: /JP/i }));
+    await user.click(await screen.findByRole("button", { name: /joão pedro almeida/i }));
     await user.click(screen.getByRole("button", { name: /confirmar presença/i }));
 
     const companionsInput = await screen.findByLabelText(/número de acompanhantes/i);
@@ -174,7 +174,7 @@ describe("RsvpSearch", () => {
     render(<RsvpSearch guests={GUESTS} />);
 
     await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
-    await user.click(await screen.findByRole("button", { name: /JP/i }));
+    await user.click(await screen.findByRole("button", { name: /joão pedro almeida/i }));
     await user.click(screen.getByRole("button", { name: /confirmar presença/i }));
 
     await screen.findByLabelText(/número de acompanhantes/i);
@@ -190,7 +190,7 @@ describe("RsvpSearch", () => {
     render(<RsvpSearch guests={GUESTS} />);
 
     await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
-    await user.click(await screen.findByRole("button", { name: /JP/i }));
+    await user.click(await screen.findByRole("button", { name: /joão pedro almeida/i }));
     await user.click(screen.getByRole("button", { name: /confirmar presença/i }));
 
     const companionsInput = await screen.findByLabelText(/número de acompanhantes/i);
@@ -206,5 +206,27 @@ describe("RsvpSearch", () => {
 
     await user.type(screen.getByLabelText(/nome do acompanhante 2/i), "maria");
     expect(screen.queryByRole("button", { name: /maria da silva/i })).not.toBeInTheDocument();
+  });
+
+  it("shows the full name first and the nickname small in suggestions, not the other way around", async () => {
+    const user = userEvent.setup();
+    render(<RsvpSearch guests={GUESTS} />);
+
+    await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
+
+    const suggestion = await screen.findByRole("button", { name: /joão pedro almeida/i });
+    const text = suggestion.textContent ?? "";
+    expect(text.indexOf("João Pedro Almeida")).toBeLessThan(text.indexOf("JP"));
+  });
+
+  it("greets the guest by full name, not nickname, after selecting a suggestion", async () => {
+    const user = userEvent.setup();
+    render(<RsvpSearch guests={GUESTS} />);
+
+    await user.type(screen.getByLabelText(/digite seu nome/i), "joao");
+    await user.click(await screen.findByRole("button", { name: /joão pedro almeida/i }));
+
+    expect(screen.getByText(/João\? Que bom que você apareceu!/i)).toBeInTheDocument();
+    expect(screen.queryByText(/^JP$/)).not.toBeInTheDocument();
   });
 });

@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { createListGiftsUseCase, createGetAdminSecuritySettingsUseCase } from "@/infrastructure/composition";
+import {
+  createListGiftsUseCase,
+  createGetAdminSecuritySettingsUseCase,
+  createListGiftContributionsUseCase,
+} from "@/infrastructure/composition";
 import { isBackendConfigured } from "@/infrastructure/config/env";
 import { ConfigurationNotice } from "@/components/ui/ConfigurationNotice";
 import { GiftsTable } from "@/components/admin/GiftsTable";
 import { formatCurrency } from "@/shared/utils/formatCurrency";
 import type { Gift } from "@/domain/entities/Gift";
 import type { PaymentProvider } from "@/domain/entities/PaymentProvider";
+import { buildGiftRows } from "./buildGiftRows";
 
 export const metadata: Metadata = {
   title: "Presentes | Painel Administrativo",
@@ -17,11 +22,18 @@ export default async function AdminGiftsPage() {
   const backendConfigured = isBackendConfigured();
   let gifts: Gift[] | null = null;
   let activeProvider: PaymentProvider = "mercado_pago";
+  let approvedContributions: Awaited<ReturnType<ReturnType<typeof createListGiftContributionsUseCase>["execute"]>> = [];
 
   if (backendConfigured) {
     try {
-      gifts = await createListGiftsUseCase().execute();
-      activeProvider = (await createGetAdminSecuritySettingsUseCase().execute()).activePaymentProvider;
+      const [allGifts, settings, allContributions] = await Promise.all([
+        createListGiftsUseCase().execute(),
+        createGetAdminSecuritySettingsUseCase().execute(),
+        createListGiftContributionsUseCase().execute(),
+      ]);
+      gifts = allGifts;
+      activeProvider = settings.activePaymentProvider;
+      approvedContributions = allContributions.filter((contribution) => contribution.status === "approved");
     } catch {
       gifts = null;
     }
@@ -68,17 +80,7 @@ export default async function AdminGiftsPage() {
             </span>
           </p>
           <Suspense fallback={<p className="mt-6 font-sans text-forest/70">Carregando...</p>}>
-            <GiftsTable
-              gifts={gifts.map((gift) => ({
-                id: gift.id!,
-                name: gift.name,
-                category: gift.category,
-                price: gift.price,
-                status: gift.status,
-                createdAt: gift.createdAt,
-                hasPaymentLink: gift.hasLinkFor(activeProvider),
-              }))}
-            />
+            <GiftsTable gifts={buildGiftRows(gifts, approvedContributions, activeProvider)} />
           </Suspense>
         </>
       )}

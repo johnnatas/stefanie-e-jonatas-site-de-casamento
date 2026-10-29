@@ -52,12 +52,14 @@ export class InMemoryGuestRepository implements GuestRepository {
     }
 
     const existing = this.guests[index];
+    const isNewlyConfirmed = update.attendanceStatus === "confirmed" && existing.attendanceStatus !== "confirmed";
     const updated = Guest.create({
       ...existing,
       attendanceStatus: update.attendanceStatus,
       companionsCount: update.companionsCount ?? existing.companionsCount,
       message: update.message ?? existing.message,
       email: update.email ?? existing.email,
+      confirmedAt: isNewlyConfirmed ? new Date() : existing.confirmedAt,
     });
 
     this.guests[index] = updated;

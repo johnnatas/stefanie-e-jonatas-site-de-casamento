@@ -5,6 +5,8 @@ import { SupabaseGiftContributionRepository } from "@/infrastructure/supabase/Su
 import { SupabaseSiteContentRepository } from "@/infrastructure/supabase/SupabaseSiteContentRepository";
 import { SupabaseAdminSecuritySettingsRepository } from "@/infrastructure/supabase/SupabaseAdminSecuritySettingsRepository";
 import { SupabaseNotificationLogRepository } from "@/infrastructure/supabase/SupabaseNotificationLogRepository";
+import { SupabaseInfinitePayWebhookLogRepository } from "@/infrastructure/supabase/SupabaseInfinitePayWebhookLogRepository";
+import { InfinitePayWebhookLogRepository } from "@/domain/repositories/InfinitePayWebhookLogRepository";
 import { ResendEmailGateway } from "@/infrastructure/email/ResendEmailGateway";
 import { GetSiteContentUseCase } from "@/application/use-cases/content/GetSiteContentUseCase";
 import { UpdateSiteContentUseCase } from "@/application/use-cases/content/UpdateSiteContentUseCase";
@@ -19,10 +21,13 @@ import { ConfirmRsvpUseCase } from "@/application/use-cases/rsvp/ConfirmRsvpUseC
 import { ListGiftsUseCase } from "@/application/use-cases/gifts/ListGiftsUseCase";
 import { CreateGiftContributionUseCase } from "@/application/use-cases/gifts/CreateGiftContributionUseCase";
 import { ConfirmGiftPaymentUseCase } from "@/application/use-cases/gifts/ConfirmGiftPaymentUseCase";
+import { SyncInfinitePayPaymentsUseCase } from "@/application/use-cases/gifts/SyncInfinitePayPaymentsUseCase";
+import { ConfirmInfinitePayRedirectUseCase } from "@/application/use-cases/gifts/ConfirmInfinitePayRedirectUseCase";
 import { ListGuestsUseCase } from "@/application/use-cases/admin/ListGuestsUseCase";
 import { SearchGuestsUseCase } from "@/application/use-cases/rsvp/SearchGuestsUseCase";
 import { CreateGuestUseCase } from "@/application/use-cases/admin/CreateGuestUseCase";
 import { UpdateGuestUseCase } from "@/application/use-cases/admin/UpdateGuestUseCase";
+import { UpdateGuestCompanionsCountUseCase } from "@/application/use-cases/admin/UpdateGuestCompanionsCountUseCase";
 import { DeleteGuestUseCase } from "@/application/use-cases/admin/DeleteGuestUseCase";
 import { DeleteGiftUseCase } from "@/application/use-cases/admin/DeleteGiftUseCase";
 import { GetDashboardSummaryUseCase } from "@/application/use-cases/admin/GetDashboardSummaryUseCase";
@@ -70,6 +75,7 @@ function repositories() {
     mercadoPagoGateway: new MercadoPagoGateway(securitySettingsRepository),
     infinitePayGateway: new InfinitePayGateway(securitySettingsRepository),
     notificationLogRepository: new SupabaseNotificationLogRepository(client),
+    infinitePayWebhookLogRepository: new SupabaseInfinitePayWebhookLogRepository(client),
     emailGateway: new ResendEmailGateway(securitySettingsRepository, siteContentRepository),
   };
 }
@@ -100,6 +106,28 @@ export function createGiftContributionUseCase(): CreateGiftContributionUseCase {
 export function createConfirmGiftPaymentUseCase(): ConfirmGiftPaymentUseCase {
   const { giftRepository, giftContributionRepository, emailGateway, notificationLogRepository } = repositories();
   return new ConfirmGiftPaymentUseCase(giftRepository, giftContributionRepository, emailGateway, notificationLogRepository);
+}
+
+export function createInfinitePayWebhookLogRepository(): InfinitePayWebhookLogRepository {
+  return repositories().infinitePayWebhookLogRepository;
+}
+
+export function createSyncInfinitePayPaymentsUseCase(): SyncInfinitePayPaymentsUseCase {
+  const { giftContributionRepository, infinitePayGateway } = repositories();
+  return new SyncInfinitePayPaymentsUseCase(
+    giftContributionRepository,
+    infinitePayGateway,
+    createConfirmGiftPaymentUseCase()
+  );
+}
+
+export function createConfirmInfinitePayRedirectUseCase(): ConfirmInfinitePayRedirectUseCase {
+  const { giftContributionRepository, infinitePayGateway } = repositories();
+  return new ConfirmInfinitePayRedirectUseCase(
+    giftContributionRepository,
+    infinitePayGateway,
+    createConfirmGiftPaymentUseCase()
+  );
 }
 
 export function createListGuestsUseCase(): ListGuestsUseCase {
@@ -208,6 +236,10 @@ export function createCreateGuestUseCase(): CreateGuestUseCase {
 
 export function createUpdateGuestUseCase(): UpdateGuestUseCase {
   return new UpdateGuestUseCase(repositories().guestRepository);
+}
+
+export function createUpdateGuestCompanionsCountUseCase(): UpdateGuestCompanionsCountUseCase {
+  return new UpdateGuestCompanionsCountUseCase(repositories().guestRepository);
 }
 
 export function createDeleteGuestUseCase(): DeleteGuestUseCase {

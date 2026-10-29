@@ -46,6 +46,8 @@ const gifts: GiftListItem[] = [
     category: "cozinha",
     status: "paid",
     createdAt: new Date("2026-01-02T00:00:00-03:00"),
+    purchasedBy: "Ana Silva",
+    purchasedAt: new Date("2026-02-10T00:00:00-03:00"),
   }),
 ];
 
@@ -109,6 +111,22 @@ describe("GiftsTable", () => {
     expect(rows[2]).toHaveTextContent("Jogo de panelas");
   });
 
+  it("shows who purchased a gift and when", () => {
+    render(<GiftsTable gifts={gifts} />);
+
+    expect(screen.getByText("Ana Silva")).toBeInTheDocument();
+  });
+
+  it("sorts by purchase date when 'Data do presente recebido' is selected", async () => {
+    const user = userEvent.setup();
+    render(<GiftsTable gifts={gifts} />);
+
+    await user.selectOptions(screen.getByLabelText(/ordenar por/i), "purchasedAt");
+
+    const rows = screen.getAllByRole("row").slice(1);
+    expect(rows[0]).toHaveTextContent("Ana Silva");
+  });
+
   it("links the gift name to its edit page", () => {
     render(<GiftsTable gifts={gifts} />);
 
@@ -159,5 +177,15 @@ describe("GiftsTable", () => {
 
     rerender(<GiftsTable gifts={[makeGift({ hasPaymentLink: false })]} />);
     expect(screen.getByRole("button", { name: "Gerar links pendentes" })).toBeInTheDocument();
+  });
+
+  it("aligns the generate-links and sync buttons flush, with no per-form top margin", () => {
+    render(<GiftsTable gifts={[makeGift({ hasPaymentLink: false })]} />);
+
+    const generateButton = screen.getByRole("button", { name: "Gerar links pendentes" });
+    const syncButton = screen.getByRole("button", { name: "Atualizar status de pagamento" });
+
+    expect(generateButton.closest("form")?.className ?? "").not.toMatch(/\bmt-\d/);
+    expect(syncButton.closest("form")?.className ?? "").not.toMatch(/\bmt-\d/);
   });
 });

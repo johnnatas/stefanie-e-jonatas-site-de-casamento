@@ -72,9 +72,9 @@ function CompanionNameField({ index, guests, excludeIds, value, onSelect }: Comp
                 onClick={() => handleSelect(guest)}
                 className="w-full rounded-md border border-line px-3 py-2 text-left font-sans text-sm text-forest transition-colors hover:border-moss hover:text-moss"
               >
-                {displayNameFor(guest)}
-                {guest.nickname && guest.fullName !== guest.nickname && (
-                  <span className="ml-2 font-sans text-xs text-forest/60">({guest.fullName})</span>
+                {guest.fullName}
+                {guest.nickname && guest.nickname !== guest.fullName && (
+                  <span className="ml-2 font-sans text-xs text-forest/60">({guest.nickname})</span>
                 )}
               </button>
             </li>
@@ -105,7 +105,7 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
 
   const trimmedQuery = query.trim();
   const matches = useMemo(() => findGuestMatches(trimmedQuery, guests), [trimmedQuery, guests]);
-  const displayName = selectedGuest ? selectedGuest.nickname ?? selectedGuest.fullName.split(" ")[0] : "";
+  const displayName = selectedGuest ? selectedGuest.fullName.split(" ")[0] : "";
 
   if (previousCompanionsCount !== companionsCount) {
     setPreviousCompanionsCount(companionsCount);
@@ -209,9 +209,9 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
                       onClick={() => handleSelectGuest(guest)}
                       className="w-full rounded-md border border-line px-4 py-3 text-center font-serif text-lg text-forest transition-colors hover:border-moss hover:text-moss"
                     >
-                      {displayNameFor(guest)}
-                      {guest.nickname && guest.fullName !== guest.nickname && (
-                        <span className="ml-2 font-sans text-sm text-forest/60">({guest.fullName})</span>
+                      {guest.fullName}
+                      {guest.nickname && guest.nickname !== guest.fullName && (
+                        <span className="ml-2 font-sans text-xs text-forest/60">({guest.nickname})</span>
                       )}
                     </button>
                   </li>
@@ -227,7 +227,6 @@ export function RsvpSearch({ guests }: RsvpSearchProps) {
 
             {selectedGuest && step === "searching" && (
               <div className="flex flex-col items-center gap-4">
-                <p className="font-script text-2xl italic text-moss">{displayNameFor(selectedGuest)}</p>
                 <p className="font-serif text-xl text-forest">{displayName}? Que bom que você apareceu! :)</p>
                 <div className="flex flex-col items-center gap-3 sm:flex-row">
                   <PillButton onClick={() => setStep("confirming")} disabled={isSubmitting}>

@@ -23,13 +23,6 @@ export interface PaymentCheckInput {
   slug?: string;
 }
 
-// Our webhook handler approves the contribution unconditionally whenever a
-// request carries order_nsu + transaction_nsu + paid_amount — it does not
-// branch on event type. Registering any event besides "paid" risks approving
-// a gift from a "created" or "payment_failed" delivery, so keep this to the
-// one event the handler actually knows how to interpret.
-const WEBHOOK_EVENTS = ["paid"];
-
 export class InfinitePayGateway implements PaymentGateway {
   constructor(private readonly securitySettingsRepository: AdminSecuritySettingsRepository) {}
 
@@ -48,7 +41,13 @@ export class InfinitePayGateway implements PaymentGateway {
         handle: settings.infinitePayHandle,
         order_nsu: input.externalReference,
         redirect_url: `${siteUrl}/presentes?status=sucesso`,
-        webhook: { url: `${siteUrl}/api/webhooks/infinitepay`, events: WEBHOOK_EVENTS },
+        // The documented {url, events} object form caused Infinite Pay to
+        // stop honoring order_nsu in a live test (2026-10-29): the webhook
+        // came back with a random order_nsu instead of the one we sent.
+        // webhook_url is the exact format every historically-successful
+        // payment confirmation used, so stick with it until Infinite Pay
+        // support clarifies the regression.
+        webhook_url: `${siteUrl}/api/webhooks/infinitepay`,
         items: [{ quantity: 1, price: Math.round(input.amount * 100), description: input.title }],
         customer: input.payerEmail
           ? { name: input.payerName, email: input.payerEmail, phone_number: input.payerPhone }

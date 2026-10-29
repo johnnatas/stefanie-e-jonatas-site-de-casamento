@@ -37,6 +37,12 @@ const STATUS_MESSAGES: Record<string, string> = {
   falha: "Não foi possível concluir o pagamento. Você pode tentar novamente.",
 };
 
+const STATUS_STYLES: Record<string, string> = {
+  sucesso: "border-moss/30 bg-[#eef3e3] text-forest",
+  pendente: "border-line bg-paper text-forest",
+  falha: "border-danger/30 bg-danger/10 text-danger",
+};
+
 function toArray(value: string | string[] | undefined): string[] {
   if (!value) return [];
   return Array.isArray(value) ? value : [value];
@@ -99,15 +105,15 @@ export default async function GiftsPage({ searchParams }: GiftsPageProps) {
 
       {status && STATUS_MESSAGES[status] && (
         <div className="mx-auto max-w-2xl px-6">
-          <p className="rounded-md border border-moss/40 bg-moss/10 px-4 py-3 text-center font-sans text-sm text-forest">
-            {STATUS_MESSAGES[status]}
-          </p>
-          {status === "sucesso" && (
-            <p className="mt-2 text-center font-sans text-xs text-forest/60">
-              Enviamos um e-mail de agradecimento — se não aparecer na caixa de entrada, dê uma olhada na caixa de
-              spam.
-            </p>
-          )}
+          <div className={`rounded-xl border px-5 py-4 text-center shadow-sm ${STATUS_STYLES[status]}`}>
+            <p className="font-sans text-sm font-medium">{STATUS_MESSAGES[status]}</p>
+            {status === "sucesso" && (
+              <p className="mt-1.5 font-sans text-xs text-forest/80">
+                Enviamos um e-mail de agradecimento — se não aparecer na caixa de entrada, dê uma olhada na caixa de
+                spam.
+              </p>
+            )}
+          </div>
         </div>
       )}
 

@@ -3,6 +3,7 @@ import { Gift } from "@/domain/entities/Gift";
 
 export interface ContributionRow {
   id: string;
+  giftId: string;
   guestName: string;
   giftName: string;
   amount: number;
@@ -18,6 +19,7 @@ export function buildContributionRows(contributions: GiftContribution[], gifts: 
     .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
     .map((contribution) => ({
       id: contribution.id!,
+      giftId: contribution.giftId,
       guestName: contribution.guestName,
       giftName: giftNameById.get(contribution.giftId) ?? "—",
       amount: contribution.amount,

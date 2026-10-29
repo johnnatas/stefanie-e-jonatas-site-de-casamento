@@ -7,6 +7,7 @@ export interface AdminSecuritySettingsSummary {
   hasSecretKey: boolean;
   activePaymentProvider: PaymentProvider;
   infinitePayHandle: string | null;
+  infinitePayApiKeyLast4: string | null;
 }
 
 export class GetAdminSecuritySettingsUseCase {
@@ -22,6 +23,7 @@ export class GetAdminSecuritySettingsUseCase {
       hasSecretKey: Boolean(settings.priceChangeSecretHash),
       activePaymentProvider: settings.activePaymentProvider,
       infinitePayHandle: settings.infinitePayHandle,
+      infinitePayApiKeyLast4: settings.infinitePayApiKey ? settings.infinitePayApiKey.slice(-4) : null,
     };
   }
 }

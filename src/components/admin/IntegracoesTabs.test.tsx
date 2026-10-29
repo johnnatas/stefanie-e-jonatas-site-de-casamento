@@ -15,6 +15,7 @@ vi.mock("@/app/admin/(protected)/integracoes/actions", () => ({
 const baseProps = {
   activePaymentProvider: "mercado_pago" as const,
   infinitePayHandle: null,
+  infinitePayApiKeyLast4: null,
   mercadoPagoAccessTokenLast4: "1234",
   resendApiKeyLast4: null,
   hasSecretKey: true,

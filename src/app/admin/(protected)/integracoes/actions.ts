@@ -136,9 +136,14 @@ export async function updatePaymentProviderAction(
 ): Promise<UpdatePaymentProviderActionState> {
   const provider = (formData.get("provider") as string) as PaymentProvider;
   const infinitePayHandle = (formData.get("infinitePayHandle") as string) || undefined;
+  const infinitePayApiKey = (formData.get("infinitePayApiKey") as string) || undefined;
 
   try {
-    const result = await createUpdateActivePaymentProviderUseCase().execute({ provider, infinitePayHandle });
+    const result = await createUpdateActivePaymentProviderUseCase().execute({
+      provider,
+      infinitePayHandle,
+      infinitePayApiKey,
+    });
 
     const providerLabel = provider === "infinite_pay" ? "Infinite Pay" : "Mercado Pago";
     if (result.generated === 0 && result.failed.length === 0) {

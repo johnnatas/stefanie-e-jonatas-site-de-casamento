@@ -22,6 +22,7 @@ import { ListGiftsUseCase } from "@/application/use-cases/gifts/ListGiftsUseCase
 import { CreateGiftContributionUseCase } from "@/application/use-cases/gifts/CreateGiftContributionUseCase";
 import { ConfirmGiftPaymentUseCase } from "@/application/use-cases/gifts/ConfirmGiftPaymentUseCase";
 import { SyncInfinitePayPaymentsUseCase } from "@/application/use-cases/gifts/SyncInfinitePayPaymentsUseCase";
+import { ConfirmInfinitePayRedirectUseCase } from "@/application/use-cases/gifts/ConfirmInfinitePayRedirectUseCase";
 import { ListGuestsUseCase } from "@/application/use-cases/admin/ListGuestsUseCase";
 import { SearchGuestsUseCase } from "@/application/use-cases/rsvp/SearchGuestsUseCase";
 import { CreateGuestUseCase } from "@/application/use-cases/admin/CreateGuestUseCase";
@@ -114,6 +115,15 @@ export function createInfinitePayWebhookLogRepository(): InfinitePayWebhookLogRe
 export function createSyncInfinitePayPaymentsUseCase(): SyncInfinitePayPaymentsUseCase {
   const { giftContributionRepository, infinitePayGateway } = repositories();
   return new SyncInfinitePayPaymentsUseCase(
+    giftContributionRepository,
+    infinitePayGateway,
+    createConfirmGiftPaymentUseCase()
+  );
+}
+
+export function createConfirmInfinitePayRedirectUseCase(): ConfirmInfinitePayRedirectUseCase {
+  const { giftContributionRepository, infinitePayGateway } = repositories();
+  return new ConfirmInfinitePayRedirectUseCase(
     giftContributionRepository,
     infinitePayGateway,
     createConfirmGiftPaymentUseCase()

@@ -15,6 +15,7 @@ describe("GetAdminSecuritySettingsUseCase", () => {
       hasSecretKey: false,
       activePaymentProvider: "mercado_pago",
       infinitePayHandle: null,
+      infinitePayApiKeyLast4: null,
     });
   });
 
@@ -32,6 +33,7 @@ describe("GetAdminSecuritySettingsUseCase", () => {
       hasSecretKey: true,
       activePaymentProvider: "mercado_pago",
       infinitePayHandle: null,
+      infinitePayApiKeyLast4: null,
     });
   });
 

@@ -48,6 +48,7 @@ export default async function IntegracoesPage({ searchParams }: IntegracoesPageP
         <IntegracoesTabs
           activePaymentProvider={summary.activePaymentProvider}
           infinitePayHandle={summary.infinitePayHandle}
+          infinitePayApiKeyLast4={summary.infinitePayApiKeyLast4}
           mercadoPagoAccessTokenLast4={summary.mercadoPagoAccessTokenLast4}
           resendApiKeyLast4={summary.resendApiKeyLast4}
           hasSecretKey={summary.hasSecretKey}

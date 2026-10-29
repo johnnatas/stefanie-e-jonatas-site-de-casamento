@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { createListGiftsUseCase, getSiteContentOrDefault } from "@/infrastructure/composition";
+import {
+  createListGiftsUseCase,
+  createConfirmInfinitePayRedirectUseCase,
+  getSiteContentOrDefault,
+} from "@/infrastructure/composition";
 import { isBackendConfigured } from "@/infrastructure/config/env";
 import { mapGiftToDto, GiftDto } from "@/components/gifts/GiftDto";
 import { GiftGrid } from "@/components/gifts/GiftGrid";
@@ -21,6 +25,9 @@ interface GiftsPageProps {
     situacao?: string;
     ordenar?: string;
     presente?: string;
+    order_nsu?: string;
+    transaction_nsu?: string;
+    slug?: string;
   }>;
 }
 
@@ -36,7 +43,8 @@ function toArray(value: string | string[] | undefined): string[] {
 }
 
 export default async function GiftsPage({ searchParams }: GiftsPageProps) {
-  const { status, q, categoria, situacao, ordenar, presente } = await searchParams;
+  const { status, q, categoria, situacao, ordenar, presente, order_nsu, transaction_nsu, slug } =
+    await searchParams;
 
   let gifts: GiftDto[] = [];
   let loadError = false;
@@ -44,6 +52,22 @@ export default async function GiftsPage({ searchParams }: GiftsPageProps) {
   let backgroundImage: string | null = null;
 
   if (isBackendConfigured()) {
+    // Infinite Pay appends order_nsu/transaction_nsu/slug to whatever
+    // redirect_url we configured — this is the one place these three values
+    // are guaranteed to be the exact ones /payment_check requires, so we use
+    // it as a second, synchronous confirmation path alongside the webhook.
+    if (order_nsu && transaction_nsu && slug) {
+      try {
+        await createConfirmInfinitePayRedirectUseCase().execute({
+          giftId: order_nsu,
+          transactionNsu: transaction_nsu,
+          slug,
+        });
+      } catch (error) {
+        console.error("Failed to confirm Infinite Pay payment from redirect params", error);
+      }
+    }
+
     try {
       const [result, settings, presentesContent] = await Promise.all([
         createListGiftsUseCase().execute(),

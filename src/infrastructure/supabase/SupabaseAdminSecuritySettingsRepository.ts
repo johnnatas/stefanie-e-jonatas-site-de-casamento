@@ -13,6 +13,7 @@ interface SettingsRow {
   resend_api_key: string | null;
   active_payment_provider: PaymentProvider;
   infinitepay_handle: string | null;
+  infinitepay_api_key: string | null;
 }
 
 export class SupabaseAdminSecuritySettingsRepository implements AdminSecuritySettingsRepository {
@@ -22,7 +23,7 @@ export class SupabaseAdminSecuritySettingsRepository implements AdminSecuritySet
     const { data, error } = await this.client
       .from("admin_security_settings")
       .select(
-        "mercadopago_access_token, price_change_secret_hash, price_change_secret_salt, resend_api_key, active_payment_provider, infinitepay_handle"
+        "mercadopago_access_token, price_change_secret_hash, price_change_secret_salt, resend_api_key, active_payment_provider, infinitepay_handle, infinitepay_api_key"
       )
       .eq("id", 1)
       .single();
@@ -39,6 +40,7 @@ export class SupabaseAdminSecuritySettingsRepository implements AdminSecuritySet
       resendApiKey: row.resend_api_key,
       activePaymentProvider: row.active_payment_provider,
       infinitePayHandle: row.infinitepay_handle,
+      infinitePayApiKey: row.infinitepay_api_key,
     };
   }
 
@@ -98,6 +100,17 @@ export class SupabaseAdminSecuritySettingsRepository implements AdminSecuritySet
 
     if (error) {
       throw new Error(`Failed to update Infinite Pay handle: ${error.message}`);
+    }
+  }
+
+  async updateInfinitePayApiKey(apiKey: string): Promise<void> {
+    const { error } = await this.client
+      .from("admin_security_settings")
+      .update({ infinitepay_api_key: apiKey, updated_at: new Date().toISOString() })
+      .eq("id", 1);
+
+    if (error) {
+      throw new Error(`Failed to update Infinite Pay API key: ${error.message}`);
     }
   }
 
